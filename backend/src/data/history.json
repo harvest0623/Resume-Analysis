@@ -1,0 +1,42 @@
+{
+  "resumes": {
+    "ec8c9c43-8909-4cd7-8210-e9ae6635e5b7": {
+      "id": "ec8c9c43-8909-4cd7-8210-e9ae6635e5b7",
+      "filename": "--18679460523.pdf",
+      "uploadedAt": "2026-04-14T09:45:31.852093",
+      "basicInfo": {
+        "name": "黄鹤",
+        "phone": "18679460523",
+        "email": "3367741939@qq.com",
+        "address": "https://github.com/harvest0623/React-Playground 预览地址：http://47.118.25.23:8084"
+      },
+      "jobInfo": {
+        "position": "前端工程师",
+        "expectedSalary": "面议"
+      },
+      "background": {
+        "workYears": "未知",
+        "education": "本科",
+        "projects": [
+          "React Playground（React在线编译平台） 2025.11 - 2026.01",
+          "项目介绍：开发现代的在线 React 代码编辑与预览平台，基于浏览器编译技术实现实时开发，无需本地环境配置",
+          "采用 @babel/standalone 完成 TSX/JSX 即时转译，实现 300ms 内代码修改自动编译与预览刷新"
+        ]
+      },
+      "skills": [
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Node.js",
+        "Git"
+      ],
+      "scores": {
+        "overall": 58,
+        "skills": 55,
+        "experience": 50,
+        "education": 75
+      },
+      "analysis": "该候选人综合表现有待提高，建议谨慎考虑。 技能方面需要加强，建议补充相关技术学习。 工作经验相对较少，需要更多实践机会。 教育背景良好，具备基本的知识体系。"
+    }
+  }
+}
