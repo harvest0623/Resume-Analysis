@@ -8,7 +8,7 @@ export default function Home() {
         {
             icon: FileText,
             title: "智能简历解析",
-            description: "自动解析 PDF 简历，提取关键信息，包括姓名、电话、邮箱、技能等",
+            description: "自动解析 PDF，提取关键信息，包括姓名、电话、邮箱、技能等",
             path: "/home/analyze",
             color: "from-blue-500 to-blue-600",
         },
@@ -212,7 +212,7 @@ export default function Home() {
                         <span className="text-lg font-bold">智能简历分析系统</span>
                     </div>
                     <p className="text-gray-400">
-                        © 2024 智能简历分析系统. 保留所有权利.
+                        © 2026 智能简历分析系统. 保留所有权利.
                     </p>
                 </div>
             </footer>
