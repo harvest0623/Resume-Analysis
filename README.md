@@ -10,6 +10,7 @@
 [<img src="https://img.shields.io/badge/Recharts-2.0+-FF6B6B?logo=recharts&logoColor=FF6B6B" alt="Recharts"/>](https://recharts.org/)
 
 **本项目使用：**
+
 [<img src="https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=61DAFB" alt="React"/>](https://react.dev/)
 [<img src="https://img.shields.io/badge/TypeScript-5.8.3-3178C6?logo=typescript&logoColor=3178C6" alt="TypeScript"/>](https://www.typescriptlang.org/)
 [<img src="https://img.shields.io/badge/Vite-6.3.5-646CFF?logo=vite&logoColor=646CFF" alt="Vite"/>](https://vitejs.dev/)
