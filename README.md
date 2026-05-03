@@ -24,7 +24,7 @@
 [<img src="https://img.shields.io/badge/Lucide_React-0.511.0-333333?logo=lucide&logoColor=333333" alt="Lucide React"/>](https://lucide.dev/)
 [<img src="https://img.shields.io/badge/React_Dropzone-14.2.9-333333?logo=npm&logoColor=333333" alt="React Dropzone"/>](https://react-dropzone.js.org/)
 
-> **一个功能强大的智能简历分析系统**，帮助招聘人员快速筛选和分析大量简历，自动解析 PDF 简历，提取关键信息，并利用 AI 模型进行评分和关键词匹配，提升招聘效率。
+> **一个功能强大的智能简历分析系统**，帮助招聘人员快速筛选和分析大量简历。支持 **Coze AI 工作流** 深度分析，自动解析 PDF 简历，提取关键信息，并利用 AI 模型进行评分和关键词匹配，提升招聘效率。
 
 ## ✨ 项目亮点
 
@@ -37,9 +37,10 @@
   - 智能识别技能标签
 
 - **AI 智能评分**
+  - 支持 **Coze AI 工作流** 和规则引擎双模式
   - 多维度评分系统（技能、经验、学历）
   - 综合评分算法，权重自动计算
-  - 详细的 AI 分析报告
+  - 详细的 AI 分析报告和改进建议
   - 可视化评分图表展示
 
 - **简历对比功能**
@@ -124,6 +125,12 @@
 | PyPDF2 | 3.0.1 | PDF 解析 |
 | PDFPlumber | 0.10.3 | PDF 文本提取 |
 | Python Dotenv | 1.0.0 | 环境变量管理 |
+| Requests | 2.31.0 | HTTP 请求库（Coze API 调用） |
+
+### AI 集成
+| 服务 | 用途 |
+|------|------|
+| **Coze AI** | 智能简历分析、深度内容理解、评分建议生成 |
 
 ## 📁 项目结构
 
@@ -165,7 +172,8 @@ D:\Coding\Resume-Analysis\
 │   │   │   ├── pdf_parser.py       # PDF 解析器
 │   │   │   └── text_extractor.py   # 文本提取器
 │   │   ├── analyzer/            # 分析模块
-│   │   │   ├── resume_analyzer.py  # 简历分析器
+│   │   │   ├── resume_analyzer.py  # 规则引擎简历分析器
+│   │   │   ├── coze_analyzer.py    # Coze AI 分析器
 │   │   │   └── matcher.py          # 岗位匹配器
 │   │   ├── storage/             # 存储模块
 │   │   │   └── history_store.py    # 历史记录存储
@@ -216,7 +224,30 @@ cd backend
 pip install -r requirements.txt
 ```
 
-### 3. 启动服务
+### 3. 配置 Coze AI（可选但推荐）
+
+在使用 Coze AI 分析功能之前，需要配置 Coze 工作流：
+
+1. **创建 Coze 工作流**
+   - 在 [Coze 平台](https://coze.cn/) 创建一个简历分析工作流
+   - 工作流输入参数：`resume_text`（简历文本）、`basic_info`（包含 name、phone、email）
+   - 工作流输出参数：`overall_score`、`skills_score`、`experience_score`、`education_score`、`analysis`、`suggestions`
+
+   ![alt text](image.png)
+
+2. **配置环境变量**
+   ```bash
+   cd backend
+   cp .env.example .env
+   ```
+   
+   编辑 `.env` 文件，填入您的 Coze API 密钥和工作流 URL：
+   ```env
+   COZE_API_KEY=your_coze_api_key_here
+   COZE_WORKFLOW_URL=https://your-workflow-url.coze.site/run
+   ```
+
+### 4. 启动服务
 
 #### 启动后端服务
 ```bash
@@ -247,10 +278,10 @@ VITE v6.4.2 dev server running at:
   > press h to show help
 ```
 
-### 4. 访问应用
+### 5. 访问应用
 在浏览器中打开：**http://localhost:5173**
 
-### 5. 构建生产版本
+### 6. 构建生产版本
 
 #### 前端构建
 ```bash
