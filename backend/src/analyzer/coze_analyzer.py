@@ -30,10 +30,11 @@ class CozeAnalyzer:
         info = basic_info or {}
         input_data = {
             "resume_text": resume_text,
-            "basic_info": json.dumps(info),
-            "name": info.get('name', ''),
-            "phone": info.get('phone', ''),
-            "email": info.get('email', '')
+            "basic_info": {
+                "name": info.get('name', ''),
+                "phone": info.get('phone', ''),
+                "email": info.get('email', '')
+            }
         }
 
         try:
