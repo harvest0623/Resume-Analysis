@@ -8,11 +8,18 @@ from werkzeug.utils import secure_filename
 from parser.pdf_parser import PDFParser
 from parser.text_extractor import TextExtractor
 from analyzer.resume_analyzer import ResumeAnalyzer
+from analyzer.coze_analyzer import CozeAnalyzer
 from analyzer.matcher import Matcher
 from storage.history_store import HistoryStore
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+    r"/*": {
+        "origins": ["*"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -24,6 +31,10 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 history_store = HistoryStore()
+
+# 初始化两种分析器
+resume_analyzer = ResumeAnalyzer
+coze_analyzer = CozeAnalyzer()
 
 
 def allowed_file(filename):
@@ -68,26 +79,63 @@ def upload_resume():
 def analyze_resume():
     data = request.get_json()
     resume_id = data.get('id')
-    
+    use_coze = data.get('useCoze', False)  # 是否使用 Coze AI 分析
+
     if not resume_id:
         return jsonify({'error': 'Resume ID is required'}), 400
-    
+
     pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{resume_id}.pdf")
-    
+
     if not os.path.exists(pdf_path):
         return jsonify({'error': 'Resume file not found'}), 404
-    
+
     try:
         parser = PDFParser(pdf_path)
         text = parser.get_text()
         lines = parser.get_lines()
-        
+
         extractor = TextExtractor(text, lines)
         extracted_data = extractor.extract_all()
-        
-        analyzer = ResumeAnalyzer(extracted_data)
-        analysis_result = analyzer.analyze()
-        
+
+        # 根据选择使用不同的分析方式
+        if use_coze:
+            try:
+                # 使用 Coze AI 分析
+                coze_result = coze_analyzer.analyze_resume(
+                    resume_text=text,
+                    basic_info=extracted_data.get('basicInfo', {})
+                )
+
+                # 合并 Coze 分析结果和提取的数据
+                analysis_result = {
+                    'scores': coze_result.get('scores', {}),
+                    'analysis': coze_result.get('analysis', ''),
+                    'suggestions': coze_result.get('suggestions', []),
+                    'aiProvider': 'coze'
+                }
+
+                # 如果 Coze 没有返回部分数据，用规则补充
+                if 'skills' not in analysis_result.get('scores', {}):
+                    analyzer = ResumeAnalyzer(extracted_data)
+                    rule_result = analyzer.analyze()
+                    analysis_result['scores'] = {
+                        **rule_result['scores'],
+                        **analysis_result['scores']
+                    }
+
+            except Exception as e:
+                # Coze 分析失败，回退到规则分析
+                print(f"Coze analysis failed, falling back to rules: {e}")
+                analyzer = ResumeAnalyzer(extracted_data)
+                analysis_result = analyzer.analyze()
+                analysis_result['aiProvider'] = 'rule'
+                analysis_result['cozeError'] = str(e)
+        else:
+            # 使用规则分析（默认）
+            analyzer = ResumeAnalyzer(extracted_data)
+            analysis_result = analyzer.analyze()
+            analysis_result['aiProvider'] = 'rule'
+
         resume_data = {
             'id': resume_id,
             'filename': data.get('filename', 'unknown.pdf'),
@@ -95,11 +143,11 @@ def analyze_resume():
             **extracted_data,
             **analysis_result
         }
-        
+
         history_store.add(resume_data)
-        
+
         return jsonify(resume_data)
-    
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

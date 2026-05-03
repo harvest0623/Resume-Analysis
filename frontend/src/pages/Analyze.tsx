@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, RefreshCcw, User, Phone, Mail, MapPin, Briefcase, GraduationCap, FileText, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, RefreshCcw, User, Phone, Mail, MapPin, Briefcase, GraduationCap, FileText, CheckCircle, XCircle, Sparkles, Brain } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ResumeUploader from "@/components/ResumeUploader";
 import ScoreChart from "@/components/ScoreChart";
@@ -15,6 +15,7 @@ export default function Analyze() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [result, setResult] = useState<ResumeData | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [useCoze, setUseCoze] = useState(false);
     const { addResume, setCurrentResume } = useResumeStore();
 
     useEffect(() => {
@@ -44,7 +45,7 @@ export default function Analyze() {
 
         try {
             const uploadResult = await api.uploadResume(file);
-            const analysisResult = await api.analyzeResume(uploadResult.id, uploadResult.filename);
+            const analysisResult = await api.analyzeResume(uploadResult.id, uploadResult.filename, useCoze);
             
             setResult(analysisResult);
             addResume(analysisResult);
@@ -97,6 +98,37 @@ export default function Analyze() {
                                 transition={{ duration: 0.3 }}
                             >
                                 <div className="max-w-3xl mx-auto">
+                                    <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-100">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-3">
+                                                <Brain className="w-6 h-6 text-blue-600" />
+                                                <div>
+                                                    <p className="font-semibold text-gray-900">选择分析方式</p>
+                                                    <p className="text-sm text-gray-600">
+                                                        {useCoze ? "Coze AI 智能分析（更精准）" : "规则分析（快速响应）"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setUseCoze(!useCoze)}
+                                                className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
+                                                    useCoze ? "bg-blue-600" : "bg-gray-300"
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 ${
+                                                        useCoze ? "translate-x-7" : "translate-x-0"
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            {useCoze 
+                                                ? "✨ Coze AI 模式：利用先进的大语言模型进行深度分析，提供更精准的评分和建议"
+                                                : "⚡ 规则模式：基于预设规则的快速分析，响应更快"}
+                                        </p>
+                                    </div>
+                                    
                                     <ResumeUploader
                                         onFileSelect={handleFileSelect}
                                         disabled={isAnalyzing}
@@ -150,6 +182,18 @@ export default function Analyze() {
                                     <div className="flex items-center space-x-3">
                                         <CheckCircle className="w-8 h-8 text-emerald-500" />
                                         <h2 className="text-2xl font-bold text-gray-900">分析完成</h2>
+                                        {result.aiProvider === 'coze' && (
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                                                <Sparkles className="w-3 h-3 mr-1" />
+                                                Coze AI
+                                            </span>
+                                        )}
+                                        {result.aiProvider === 'rule' && (
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                                <Brain className="w-3 h-3 mr-1" />
+                                                规则分析
+                                            </span>
+                                        )}
                                     </div>
                                     <button
                                         onClick={reset}

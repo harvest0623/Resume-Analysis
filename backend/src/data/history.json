@@ -1,9 +1,9 @@
 {
   "resumes": {
-    "932bdbfa-65ca-4f4d-957c-346a3aeba7d8": {
-      "id": "932bdbfa-65ca-4f4d-957c-346a3aeba7d8",
+    "9aaa5852-e7ab-47d4-9d2f-234786467b8b": {
+      "id": "9aaa5852-e7ab-47d4-9d2f-234786467b8b",
       "filename": "--18679460523.pdf",
-      "uploadedAt": "2026-04-15T19:37:06.399583",
+      "uploadedAt": "2026-05-03T17:04:48.303189",
       "basicInfo": {
         "name": "黄鹤",
         "phone": "18679460523",
@@ -36,7 +36,49 @@
         "experience": 50,
         "education": 75
       },
-      "analysis": "该候选人综合表现有待提高，建议谨慎考虑。 技能方面需要加强，建议补充相关技术学习。 工作经验相对较少，需要更多实践机会。 教育背景良好，具备基本的知识体系。"
+      "analysis": "该候选人综合表现有待提高，建议谨慎考虑。 技能方面需要加强，建议补充相关技术学习。 工作经验相对较少，需要更多实践机会。 教育背景良好，具备基本的知识体系。",
+      "aiProvider": "rule",
+      "cozeError": "请配置 COZE_API_KEY 和 COZE_WORKFLOW_URL 环境变量"
+    },
+    "962904f9-df11-4454-aa17-aeb07e878f15": {
+      "id": "962904f9-df11-4454-aa17-aeb07e878f15",
+      "filename": "--18679460523.pdf",
+      "uploadedAt": "2026-05-03T17:05:59.891780",
+      "basicInfo": {
+        "name": "黄鹤",
+        "phone": "18679460523",
+        "email": "3367741939@qq.com",
+        "address": "https://github.com/harvest0623/React-Playground 预览地址：http://47.118.25.23:8084"
+      },
+      "jobInfo": {
+        "position": "前端工程师",
+        "expectedSalary": "面议"
+      },
+      "background": {
+        "workYears": "未知",
+        "education": "本科",
+        "projects": [
+          "React Playground（React在线编译平台） 2025.11 - 2026.01",
+          "项目介绍：开发现代的在线 React 代码编辑与预览平台，基于浏览器编译技术实现实时开发，无需本地环境配置",
+          "采用 @babel/standalone 完成 TSX/JSX 即时转译，实现 300ms 内代码修改自动编译与预览刷新"
+        ]
+      },
+      "skills": [
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Node.js",
+        "Git"
+      ],
+      "scores": {
+        "overall": 58,
+        "skills": 55,
+        "experience": 50,
+        "education": 75
+      },
+      "analysis": "该候选人综合表现有待提高，建议谨慎考虑。 技能方面需要加强，建议补充相关技术学习。 工作经验相对较少，需要更多实践机会。 教育背景良好，具备基本的知识体系。",
+      "aiProvider": "rule",
+      "cozeError": "Coze API 调用失败: 500 - {\"detail\":{\"error_code\":201002,\"error_message\":\"字段类型错误: 1 validation error for ResumeAnalysisInput\\nbasic_info\\n  Input should be a valid dictionary or instance of BasicInfo [type=model_type, input_value='{\\\"name\\\": \\\"\\\\\\\\u9ec4\\\\\\\\u9e64...p://47.118.25.23:8084\\\"}', \",\"stack_trace\":[\"Traceback (most recent call last):\",\"File \\\"src/main.py\\\", line 278, in http_run\",\"    result = await asyncio.wait_for(task, timeout=float(TIMEOUT_SECONDS))\",\"File \\\"src/main.py\\\", line 102, in run\",\"    return await graph.ainvoke(payload, config=run_config, context=ctx)\",\"pydantic_core._pydantic_core.ValidationError: 1 validation error for ResumeAnalysisInput\\nbasic_info\\n  Input should be a valid dictionary or instance of BasicInfo [type=model_type, input_value='{\\\"name\\\": \\\"\\\\\\\\u9ec4\\\\\\\\u9e64...p://47.118.25.23:8084\\\"}', input_type=str]\\n    For further information visit https://errors.pydantic.dev/2.12/v/model_type\",\"Before task with name 'resume_analysis' and path '('__pregel_pull', 'resume_analysis')'\"]}}"
     }
   }
 }

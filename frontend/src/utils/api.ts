@@ -25,13 +25,13 @@ export const api = {
         return response.json();
     },
 
-    async analyzeResume(id: string, filename: string): Promise<ResumeData> {
+    async analyzeResume(id: string, filename: string, useCoze: boolean = false): Promise<ResumeData> {
         const response = await fetch(`${API_BASE}/resume/analyze`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ id, filename }),
+            body: JSON.stringify({ id, filename, useCoze }),
         });
 
         if (!response.ok) {

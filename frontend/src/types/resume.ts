@@ -25,6 +25,9 @@ export interface ResumeData {
         education: number;
     };
     analysis: string;
+    suggestions?: string[];
+    aiProvider?: 'coze' | 'rule';
+    cozeError?: string;
 }
 
 export interface MatchResult {
