@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, RefreshCcw, CheckCircle, ArrowRight, TrendingUp, TrendingDown, Equal, Trophy } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import BackButton from "@/components/BackButton";
 import ResumeCard from "@/components/ResumeCard";
 import { api } from "@/utils/api";
 import { useResumeStore } from "@/store/resumeStore";
@@ -71,6 +72,7 @@ export default function Compare() {
             <Navbar />
             
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <BackButton />
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

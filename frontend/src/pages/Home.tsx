@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
-import { FileText, Users, Search, History, ArrowRight, Sparkles, Zap, Shield, BarChart3 } from "lucide-react";
+import { 
+  FileText, Users, Search, History, ArrowRight, Sparkles, Zap, Shield, BarChart3, 
+  Upload, Lightbulb, PieChart, Briefcase, Calendar, Funnel, Download, 
+  FileStack, UserCheck, Sparkle
+} from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 
@@ -11,6 +15,15 @@ export default function Home() {
             description: "自动解析 PDF，提取关键信息，包括姓名、电话、邮箱、技能等",
             path: "/home/analyze",
             color: "from-blue-500 to-blue-600",
+            category: "简历工具",
+        },
+        {
+            icon: Upload,
+            title: "批量分析",
+            description: "一次性上传多份简历，系统自动进行批量分析处理",
+            path: "/home/batch",
+            color: "from-cyan-500 to-cyan-600",
+            category: "简历工具",
         },
         {
             icon: Users,
@@ -18,6 +31,47 @@ export default function Home() {
             description: "对比两份简历的各项指标，帮助您做出更好的招聘决策",
             path: "/home/compare",
             color: "from-indigo-500 to-indigo-600",
+            category: "简历工具",
+        },
+        {
+            icon: Lightbulb,
+            title: "简历优化建议",
+            description: "AI 生成个性化优化建议，帮助候选人提升简历质量",
+            path: "/home/optimize",
+            color: "from-amber-500 to-amber-600",
+            category: "简历工具",
+        },
+        {
+            icon: Sparkle,
+            title: "AI 生成简历",
+            description: "填写基本信息，AI 为您生成专业的简历内容",
+            path: "/home/generate",
+            color: "from-violet-500 to-violet-600",
+            category: "简历工具",
+        },
+        {
+            icon: FileStack,
+            title: "简历模板",
+            description: "精选多款专业简历模板，助您打造完美简历",
+            path: "/home/templates",
+            color: "from-teal-500 to-teal-600",
+            category: "简历工具",
+        },
+        {
+            icon: Briefcase,
+            title: "职位管理",
+            description: "管理和发布招聘职位，跟踪招聘进度",
+            path: "/home/jobs",
+            color: "from-orange-500 to-orange-600",
+            category: "招聘管理",
+        },
+        {
+            icon: UserCheck,
+            title: "人才库",
+            description: "管理和筛选候选人，建立企业人才储备",
+            path: "/home/talent",
+            color: "from-fuchsia-500 to-fuchsia-600",
+            category: "招聘管理",
         },
         {
             icon: Search,
@@ -25,6 +79,31 @@ export default function Home() {
             description: "输入岗位要求，自动匹配最合适的候选人，提高招聘效率",
             path: "/home/match",
             color: "from-purple-500 to-purple-600",
+            category: "招聘管理",
+        },
+        {
+            icon: Calendar,
+            title: "面试管理",
+            description: "安排和管理候选人面试，记录面试反馈",
+            path: "/home/interview",
+            color: "from-pink-500 to-pink-600",
+            category: "招聘管理",
+        },
+        {
+            icon: Funnel,
+            title: "招聘漏斗",
+            description: "可视化招聘流程，分析各阶段转化率",
+            path: "/home/pipeline",
+            color: "from-red-500 to-red-600",
+            category: "招聘管理",
+        },
+        {
+            icon: PieChart,
+            title: "数据统计",
+            description: "查看简历分析的整体数据概览，包括评分分布、技能统计等",
+            path: "/home/stats",
+            color: "from-rose-500 to-rose-600",
+            category: "数据分析",
         },
         {
             icon: History,
@@ -32,6 +111,15 @@ export default function Home() {
             description: "保存和管理所有分析过的简历，方便随时查看和对比",
             path: "/home/history",
             color: "from-emerald-500 to-emerald-600",
+            category: "数据分析",
+        },
+        {
+            icon: Download,
+            title: "报告导出",
+            description: "导出各类招聘数据报告和分析结果",
+            path: "/home/export",
+            color: "from-sky-500 to-sky-600",
+            category: "数据分析",
         },
     ];
 
@@ -121,7 +209,7 @@ export default function Home() {
                             </p>
                         </motion.div>
 
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {features.map((feature, index) => {
                                 const Icon = feature.icon;
                                 return (

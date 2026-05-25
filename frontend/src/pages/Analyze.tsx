@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, RefreshCcw, User, Phone, Mail, MapPin, Briefcase, GraduationCap, FileText, CheckCircle, XCircle, Sparkles, Brain } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import BackButton from "@/components/BackButton";
 import ResumeUploader from "@/components/ResumeUploader";
 import ScoreChart from "@/components/ScoreChart";
 import { api } from "@/utils/api";
@@ -74,6 +75,7 @@ export default function Analyze() {
             <Navbar />
             
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <BackButton />
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
