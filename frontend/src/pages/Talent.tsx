@@ -118,13 +118,13 @@ export default function Talent() {
     };
 
     const getScoreColor = (score: number) => {
-        if (score >= 80) return "text-emerald-600 bg-emerald-50";
-        if (score >= 60) return "text-amber-600 bg-amber-50";
-        return "text-red-600 bg-red-50";
+        if (score >= 80) return "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20";
+        if (score >= 60) return "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20";
+        return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20";
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -136,21 +136,21 @@ export default function Talent() {
                 >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
                         <div>
-                            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                                 人才库
                             </h1>
-                            <p className="text-lg text-gray-600">
+                            <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                                 管理和筛选候选人，共 {filteredResumes.length} 人
                             </p>
                         </div>
                         <div className="flex items-center space-x-3 mt-4 md:mt-0">
-                            <div className="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden">
+                            <div className="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden">
                                 <button
                                     onClick={() => setViewMode("grid")}
                                     className={`p-3 ${
                                         viewMode === "grid"
-                                            ? "bg-blue-50 text-blue-600"
-                                            : "text-gray-400 hover:text-gray-600"
+                                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                                            : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:text-gray-500"
                                     } transition-colors`}
                                 >
                                     <Grid className="w-5 h-5" />
@@ -159,8 +159,8 @@ export default function Talent() {
                                     onClick={() => setViewMode("list")}
                                     className={`p-3 ${
                                         viewMode === "list"
-                                            ? "bg-blue-50 text-blue-600"
-                                            : "text-gray-400 hover:text-gray-600"
+                                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                                            : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:text-gray-500"
                                     } transition-colors`}
                                 >
                                     <List className="w-5 h-5" />
@@ -169,22 +169,22 @@ export default function Talent() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
                         <div className="flex flex-col lg:flex-row gap-4">
                             <div className="flex-1 relative">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                                 <input
                                     type="text"
                                     placeholder="搜索姓名、岗位、技能..."
                                     value={searchKeyword}
                                     onChange={(e) => setSearchKeyword(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                 />
                             </div>
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className="inline-flex items-center space-x-2 px-4 py-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
+                                    className="inline-flex items-center space-x-2 px-4 py-3 bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 dark:text-gray-600 rounded-xl hover:bg-gray-100 dark:bg-gray-700 transition-colors"
                                 >
                                     <Filter className="w-5 h-5" />
                                     <span>筛选</span>
@@ -197,7 +197,7 @@ export default function Talent() {
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value as SortBy)}
-                                    className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 >
                                     <option value="score">按评分排序</option>
                                     <option value="name">按姓名排序</option>
@@ -214,15 +214,15 @@ export default function Talent() {
                                     exit={{ height: 0, opacity: 0 }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="grid md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
+                                    <div className="grid md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                                 技能筛选
                                             </label>
                                             <select
                                                 value={filterSkill}
                                                 onChange={(e) => setFilterSkill(e.target.value)}
-                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             >
                                                 <option value="">全部技能</option>
                                                 {allSkills.map((skill) => (
@@ -233,13 +233,13 @@ export default function Talent() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                                 学历筛选
                                             </label>
                                             <select
                                                 value={filterEducation}
                                                 onChange={(e) => setFilterEducation(e.target.value)}
-                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             >
                                                 <option value="">全部学历</option>
                                                 {allEducations.map((edu) => (
@@ -264,7 +264,7 @@ export default function Talent() {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-200"
+                                        className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-200"
                                     >
                                         <div className="p-6">
                                             <div className="flex items-start justify-between mb-4">
@@ -273,41 +273,41 @@ export default function Talent() {
                                                         {resume.basicInfo.name.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <h3 className="text-lg font-semibold text-gray-900">
+                                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                                             {resume.basicInfo.name}
                                                         </h3>
-                                                        <p className="text-sm text-gray-500">
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                             {resume.jobInfo.position || "未知岗位"}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <button
                                                     onClick={() => toggleBookmark(resume.id)}
-                                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                    className="p-2 hover:bg-gray-100 dark:bg-gray-700 rounded-lg transition-colors"
                                                 >
                                                     {bookmarked.has(resume.id) ? (
-                                                        <BookmarkCheck className="w-5 h-5 text-blue-600" />
+                                                        <BookmarkCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                                     ) : (
-                                                        <Bookmark className="w-5 h-5 text-gray-400" />
+                                                        <Bookmark className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                     )}
                                                 </button>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-3 mb-4">
-                                                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                                    <GraduationCap className="w-4 h-4 text-gray-400" />
+                                                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                                    <GraduationCap className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                                     <span>{resume.background.education}</span>
                                                 </div>
-                                                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                                    <Briefcase className="w-4 h-4 text-gray-400" />
+                                                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                                    <Briefcase className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                                     <span>{resume.background.workYears}</span>
                                                 </div>
-                                                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                                    <Mail className="w-4 h-4 text-gray-400" />
+                                                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                                    <Mail className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                                     <span className="truncate">{resume.basicInfo.email}</span>
                                                 </div>
-                                                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                                    <Phone className="w-4 h-4 text-gray-400" />
+                                                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                                    <Phone className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                                     <span>{resume.basicInfo.phone}</span>
                                                 </div>
                                             </div>
@@ -317,20 +317,20 @@ export default function Talent() {
                                                     {resume.skills.slice(0, 4).map((skill, i) => (
                                                         <span
                                                             key={i}
-                                                            className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md"
+                                                            className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs rounded-md"
                                                         >
                                                             {skill}
                                                         </span>
                                                     ))}
                                                     {resume.skills.length > 4 && (
-                                                        <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-md">
+                                                        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 dark:text-gray-500 text-xs rounded-md">
                                                             +{resume.skills.length - 4}
                                                         </span>
                                                     )}
                                                 </div>
                                             )}
 
-                                            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                            <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                                                 <div
                                                     className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreColor(
                                                         resume.scores.overall
@@ -338,7 +338,7 @@ export default function Talent() {
                                                 >
                                                     {resume.scores.overall} 分
                                                 </div>
-                                                <button className="inline-flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                                <button className="inline-flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:text-blue-300 font-medium">
                                                     <Eye className="w-4 h-4" />
                                                     <span>查看详情</span>
                                                 </button>
@@ -348,24 +348,24 @@ export default function Talent() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                                 {filteredResumes.map((resume, index) => (
                                     <motion.div
                                         key={resume.id}
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="flex items-center justify-between p-6 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
+                                        className="flex items-center justify-between p-6 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 dark:bg-gray-700/50 transition-colors"
                                     >
                                         <div className="flex items-center space-x-6 flex-1 min-w-0">
                                             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">
                                                 {resume.basicInfo.name.charAt(0)}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="text-lg font-semibold text-gray-900">
+                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                                     {resume.basicInfo.name}
                                                 </h3>
-                                                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                     <span>{resume.jobInfo.position}</span>
                                                     <span>•</span>
                                                     <span>{resume.background.education}</span>
@@ -377,7 +377,7 @@ export default function Talent() {
                                                 {resume.skills.slice(0, 3).map((skill, i) => (
                                                     <span
                                                         key={i}
-                                                        className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md"
+                                                        className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs rounded-md"
                                                     >
                                                         {skill}
                                                     </span>
@@ -394,12 +394,12 @@ export default function Talent() {
                                             </div>
                                             <button
                                                 onClick={() => toggleBookmark(resume.id)}
-                                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                className="p-2 hover:bg-gray-100 dark:bg-gray-700 rounded-lg transition-colors"
                                             >
                                                 {bookmarked.has(resume.id) ? (
-                                                    <BookmarkCheck className="w-5 h-5 text-blue-600" />
+                                                    <BookmarkCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                                 ) : (
-                                                    <Bookmark className="w-5 h-5 text-gray-400" />
+                                                    <Bookmark className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                 )}
                                             </button>
                                         </div>
@@ -408,12 +408,12 @@ export default function Talent() {
                             </div>
                         )
                     ) : (
-                        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-                            <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600">
+                            <Users className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                 暂无人才数据
                             </h3>
-                            <p className="text-gray-500">请先上传并分析一些简历</p>
+                            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">请先上传并分析一些简历</p>
                         </div>
                     )}
                 </motion.div>

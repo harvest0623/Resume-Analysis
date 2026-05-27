@@ -18,12 +18,12 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
-
-type Theme = "light" | "dark" | "system";
+import { useTheme } from "@/hooks/useTheme";
+import type { Theme } from "@/hooks/useTheme";
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState("profile");
-    const [theme, setTheme] = useState<Theme>("light");
+    const { theme, setTheme, isDark } = useTheme();
     const [notifications, setNotifications] = useState({
         email: true,
         push: true,
@@ -51,7 +51,7 @@ export default function Settings() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
 
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -62,27 +62,27 @@ export default function Settings() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="mb-8">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                             系统设置
                         </h1>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-gray-600 dark:text-gray-400">
                             管理您的账户和系统偏好设置
                         </p>
                     </div>
 
                     <div className="grid lg:grid-cols-4 gap-8">
                         <div className="lg:col-span-1">
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="p-6 border-b border-gray-100">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
                                     <div className="flex items-center space-x-4">
                                         <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
                                             {profile.name.charAt(0)}
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900">
+                                            <h3 className="font-semibold text-gray-900 dark:text-white">
                                                 {profile.name}
                                             </h3>
-                                            <p className="text-sm text-gray-500">{profile.position}</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">{profile.position}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -95,8 +95,8 @@ export default function Settings() {
                                                 onClick={() => setActiveTab(tab.id)}
                                                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                                                     activeTab === tab.id
-                                                        ? "bg-blue-50 text-blue-600 font-medium"
-                                                        : "text-gray-600 hover:bg-gray-50"
+                                                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                                                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                                 }`}
                                             >
                                                 <Icon className="w-5 h-5" />
@@ -113,9 +113,9 @@ export default function Settings() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                 >
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                                         个人信息
                                     </h2>
 
@@ -124,21 +124,21 @@ export default function Settings() {
                                             <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl">
                                                 {profile.name.charAt(0)}
                                             </div>
-                                            <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-200 hover:bg-gray-50 transition-colors">
-                                                <Camera className="w-4 h-4 text-gray-600" />
+                                            <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                                <Camera className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                                             </button>
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                                 {profile.name}
                                             </h3>
-                                            <p className="text-gray-500">{profile.email}</p>
+                                            <p className="text-gray-500 dark:text-gray-400">{profile.email}</p>
                                         </div>
                                     </div>
 
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 姓名
                                             </label>
                                             <input
@@ -147,11 +147,11 @@ export default function Settings() {
                                                 onChange={(e) =>
                                                     setProfile({ ...profile, name: e.target.value })
                                                 }
-                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 职位
                                             </label>
                                             <input
@@ -160,11 +160,11 @@ export default function Settings() {
                                                 onChange={(e) =>
                                                     setProfile({ ...profile, position: e.target.value })
                                                 }
-                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 邮箱
                                             </label>
                                             <div className="relative">
@@ -175,12 +175,12 @@ export default function Settings() {
                                                     onChange={(e) =>
                                                         setProfile({ ...profile, email: e.target.value })
                                                     }
-                                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                                 />
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 手机
                                             </label>
                                             <div className="relative">
@@ -191,12 +191,12 @@ export default function Settings() {
                                                     onChange={(e) =>
                                                         setProfile({ ...profile, phone: e.target.value })
                                                     }
-                                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                                 />
                                             </div>
                                         </div>
                                         <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 公司
                                             </label>
                                             <div className="relative">
@@ -207,7 +207,7 @@ export default function Settings() {
                                                     onChange={(e) =>
                                                         setProfile({ ...profile, company: e.target.value })
                                                     }
-                                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                                 />
                                             </div>
                                         </div>
@@ -229,23 +229,23 @@ export default function Settings() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                 >
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                                         通知设置
                                     </h2>
 
                                     <div className="space-y-6">
-                                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                                             <div className="flex items-center space-x-4">
-                                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                    <Mail className="w-5 h-5 text-blue-600" />
+                                                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center">
+                                                    <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-medium text-gray-900">
+                                                    <h3 className="font-medium text-gray-900 dark:text-white">
                                                         邮件通知
                                                     </h3>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
                                                         接收重要的邮件通知
                                                     </p>
                                                 </div>
@@ -262,20 +262,20 @@ export default function Settings() {
                                                     }
                                                     className="sr-only peer"
                                                 />
-                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                             </label>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                                             <div className="flex items-center space-x-4">
-                                                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                                    <Bell className="w-5 h-5 text-purple-600" />
+                                                <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center">
+                                                    <Bell className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-medium text-gray-900">
+                                                    <h3 className="font-medium text-gray-900 dark:text-white">
                                                         推送通知
                                                     </h3>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
                                                         接收浏览器推送通知
                                                     </p>
                                                 </div>
@@ -292,20 +292,20 @@ export default function Settings() {
                                                     }
                                                     className="sr-only peer"
                                                 />
-                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                             </label>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                                             <div className="flex items-center space-x-4">
-                                                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                                                    <Calendar className="w-5 h-5 text-emerald-600" />
+                                                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center">
+                                                    <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-medium text-gray-900">
+                                                    <h3 className="font-medium text-gray-900 dark:text-white">
                                                         面试提醒
                                                     </h3>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
                                                         面试前接收提醒通知
                                                     </p>
                                                 </div>
@@ -322,20 +322,20 @@ export default function Settings() {
                                                     }
                                                     className="sr-only peer"
                                                 />
-                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                             </label>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                                             <div className="flex items-center space-x-4">
-                                                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                                                    <User className="w-5 h-5 text-amber-600" />
+                                                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/40 rounded-lg flex items-center justify-center">
+                                                    <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-medium text-gray-900">
+                                                    <h3 className="font-medium text-gray-900 dark:text-white">
                                                         新候选人通知
                                                     </h3>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
                                                         有新候选人投递时通知
                                                     </p>
                                                 </div>
@@ -352,7 +352,7 @@ export default function Settings() {
                                                     }
                                                     className="sr-only peer"
                                                 />
-                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                             </label>
                                         </div>
                                     </div>
@@ -373,15 +373,15 @@ export default function Settings() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                 >
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                                         外观设置
                                     </h2>
 
                                     <div className="space-y-6">
                                         <div>
-                                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                                                 主题模式
                                             </h3>
                                             <div className="grid grid-cols-3 gap-4">
@@ -389,12 +389,12 @@ export default function Settings() {
                                                     onClick={() => setTheme("light")}
                                                     className={`p-6 rounded-xl border-2 transition-all duration-200 ${
                                                         theme === "light"
-                                                            ? "border-blue-500 bg-blue-50"
-                                                            : "border-gray-200 hover:border-gray-300"
+                                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                                                            : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                                                     }`}
                                                 >
                                                     <Sun className="w-8 h-8 text-amber-500 mx-auto mb-3" />
-                                                    <p className="font-medium text-gray-900 text-center">
+                                                    <p className="font-medium text-gray-900 dark:text-white text-center">
                                                         浅色模式
                                                     </p>
                                                 </button>
@@ -402,12 +402,12 @@ export default function Settings() {
                                                     onClick={() => setTheme("dark")}
                                                     className={`p-6 rounded-xl border-2 transition-all duration-200 ${
                                                         theme === "dark"
-                                                            ? "border-blue-500 bg-blue-50"
-                                                            : "border-gray-200 hover:border-gray-300"
+                                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                                                            : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                                                     }`}
                                                 >
                                                     <Moon className="w-8 h-8 text-indigo-500 mx-auto mb-3" />
-                                                    <p className="font-medium text-gray-900 text-center">
+                                                    <p className="font-medium text-gray-900 dark:text-white text-center">
                                                         深色模式
                                                     </p>
                                                 </button>
@@ -415,12 +415,12 @@ export default function Settings() {
                                                     onClick={() => setTheme("system")}
                                                     className={`p-6 rounded-xl border-2 transition-all duration-200 ${
                                                         theme === "system"
-                                                            ? "border-blue-500 bg-blue-50"
-                                                            : "border-gray-200 hover:border-gray-300"
+                                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                                                            : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                                                     }`}
                                                 >
                                                     <Monitor className="w-8 h-8 text-gray-500 mx-auto mb-3" />
-                                                    <p className="font-medium text-gray-900 text-center">
+                                                    <p className="font-medium text-gray-900 dark:text-white text-center">
                                                         跟随系统
                                                     </p>
                                                 </button>
@@ -428,10 +428,10 @@ export default function Settings() {
                                         </div>
 
                                         <div>
-                                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                                                 语言设置
                                             </h3>
-                                            <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <select className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                                 <option value="zh-CN">简体中文</option>
                                                 <option value="en-US">English</option>
                                                 <option value="ja-JP">日本語</option>
@@ -455,45 +455,45 @@ export default function Settings() {
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                 >
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                                         安全设置
                                     </h2>
 
                                     <div className="space-y-6">
-                                        <div className="p-6 bg-gray-50 rounded-xl">
-                                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                        <div className="p-6 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                                                 修改密码
                                             </h3>
                                             <div className="space-y-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                         当前密码
                                                     </label>
                                                     <input
                                                         type="password"
-                                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                                         placeholder="请输入当前密码"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                         新密码
                                                     </label>
                                                     <input
                                                         type="password"
-                                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                                         placeholder="请输入新密码"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                         确认新密码
                                                     </label>
                                                     <input
                                                         type="password"
-                                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                                         placeholder="请再次输入新密码"
                                                     />
                                                 </div>
@@ -503,11 +503,11 @@ export default function Settings() {
                                             </div>
                                         </div>
 
-                                        <div className="p-6 bg-red-50 rounded-xl border border-red-200">
-                                            <h3 className="text-lg font-medium text-red-900 mb-2">
+                                        <div className="p-6 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                                            <h3 className="text-lg font-medium text-red-900 dark:text-red-300 mb-2">
                                                 危险区域
                                             </h3>
-                                            <p className="text-sm text-red-600 mb-4">
+                                            <p className="text-sm text-red-600 dark:text-red-400 mb-4">
                                                 删除账户后，所有数据将被永久删除且无法恢复。
                                             </p>
                                             <button className="px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors">

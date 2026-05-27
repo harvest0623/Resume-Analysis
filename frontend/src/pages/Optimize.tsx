@@ -139,7 +139,7 @@ export default function Optimize() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -150,10 +150,10 @@ export default function Optimize() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="text-center mb-12">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                             简历优化建议
                         </h1>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                             选择一份简历，获取 AI 生成的优化建议
                         </p>
                     </div>
@@ -176,7 +176,7 @@ export default function Optimize() {
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         whileHover={{ y: -4 }}
-                                                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 cursor-pointer hover:shadow-lg transition-all duration-200"
+                                                        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 cursor-pointer hover:shadow-lg transition-all duration-200"
                                                         onClick={() => generateSuggestions(resume)}
                                                     >
                                                         <div className="flex items-center justify-between mb-4">
@@ -186,30 +186,30 @@ export default function Optimize() {
                                                             <div
                                                                 className={`px-3 py-1 rounded-full text-sm font-semibold ${
                                                                     resume.scores.overall >= 80
-                                                                        ? "text-emerald-600 bg-emerald-50"
+                                                                        ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20"
                                                                         : resume.scores.overall >= 60
-                                                                        ? "text-amber-600 bg-amber-50"
-                                                                        : "text-red-600 bg-red-50"
+                                                                        ? "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20"
+                                                                        : "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20"
                                                                 }`}
                                                             >
                                                                 {resume.scores.overall} 分
                                                             </div>
                                                         </div>
-                                                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                                                             {resume.basicInfo.name}
                                                         </h3>
-                                                        <p className="text-sm text-gray-500 mb-4">
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-4">
                                                             {resume.jobInfo.position || "未知岗位"}
                                                         </p>
-                                                        <div className="flex items-center justify-between text-sm text-gray-500">
+                                                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                             <span>{resume.background.education}</span>
                                                             <span>{resume.background.workYears}</span>
                                                         </div>
                                                         <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                                                            <span className="text-sm text-blue-600 font-medium">
+                                                            <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
                                                                 获取优化建议
                                                             </span>
-                                                            <ArrowRight className="w-4 h-4 text-blue-600" />
+                                                            <ArrowRight className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                                                         </div>
                                                     </motion.div>
                                                 ))}
@@ -218,7 +218,7 @@ export default function Optimize() {
                                                 <div className="mt-8 text-center">
                                                     <a
                                                         href="/home/history"
-                                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:bg-gray-700/50 transition-all duration-200"
                                                     >
                                                         <span>查看全部简历</span>
                                                         <ArrowRight className="w-4 h-4" />
@@ -227,12 +227,12 @@ export default function Optimize() {
                                             )}
                                         </>
                                     ) : (
-                                        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-                                            <Lightbulb className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600">
+                                            <Lightbulb className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                                 暂无可优化的简历
                                             </h3>
-                                            <p className="text-gray-500 mb-6">
+                                            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-6">
                                                 请先上传并分析一些简历
                                             </p>
                                             <a
@@ -260,17 +260,17 @@ export default function Optimize() {
                                                 {selectedResume.basicInfo.name.charAt(0)}
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-bold text-gray-900">
+                                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                                                     {selectedResume.basicInfo.name} 的优化建议
                                                 </h2>
-                                                <p className="text-gray-500">
+                                                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                     {selectedResume.jobInfo.position} · 当前评分: {selectedResume.scores.overall}
                                                 </p>
                                             </div>
                                         </div>
                                         <button
                                             onClick={reset}
-                                            className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                                            className="inline-flex items-center space-x-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:bg-gray-700/50 transition-all duration-200"
                                         >
                                             <RefreshCcw className="w-5 h-5" />
                                             <span>选择其他简历</span>
@@ -283,11 +283,11 @@ export default function Optimize() {
                                             animate={{ opacity: 1 }}
                                             className="text-center py-16"
                                         >
-                                            <div className="inline-flex items-center space-x-3 bg-white px-8 py-6 rounded-2xl shadow-lg">
-                                                <Sparkles className="w-8 h-8 text-blue-600 animate-pulse" />
+                                            <div className="inline-flex items-center space-x-3 bg-white dark:bg-gray-800 px-8 py-6 rounded-2xl shadow-lg">
+                                                <Sparkles className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-pulse" />
                                                 <div className="text-left">
-                                                    <p className="font-semibold text-gray-900">AI 正在分析...</p>
-                                                    <p className="text-sm text-gray-500">生成个性化优化建议</p>
+                                                    <p className="font-semibold text-gray-900 dark:text-white">AI 正在分析...</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">生成个性化优化建议</p>
                                                 </div>
                                             </div>
                                         </motion.div>
@@ -301,7 +301,7 @@ export default function Optimize() {
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ delay: index * 0.1 }}
-                                                        className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                                        className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                                     >
                                                         <div className="flex items-center space-x-3 mb-6">
                                                             <div
@@ -309,7 +309,7 @@ export default function Optimize() {
                                                             >
                                                                 <Icon className="w-6 h-6 text-white" />
                                                             </div>
-                                                            <h3 className="text-xl font-semibold text-gray-900">
+                                                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                                                                 {category.title}
                                                             </h3>
                                                         </div>
@@ -323,7 +323,7 @@ export default function Optimize() {
                                                                     className="flex items-start space-x-3"
                                                                 >
                                                                     <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                                                                    <span className="text-gray-700">{suggestion}</span>
+                                                                    <span className="text-gray-700 dark:text-gray-300 dark:text-gray-600">{suggestion}</span>
                                                                 </motion.li>
                                                             ))}
                                                         </ul>
@@ -335,15 +335,15 @@ export default function Optimize() {
                                                 initial={{ opacity: 0, y: 20 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: 0.5 }}
-                                                className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100"
+                                                className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-8 border border-blue-100 dark:border-blue-800"
                                             >
                                                 <div className="flex items-center space-x-3 mb-4">
-                                                    <Lightbulb className="w-6 h-6 text-blue-600" />
-                                                    <h3 className="text-lg font-semibold text-gray-900">
+                                                    <Lightbulb className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                                         温馨提示
                                                     </h3>
                                                 </div>
-                                                <p className="text-gray-700">
+                                                <p className="text-gray-700 dark:text-gray-300 dark:text-gray-600">
                                                     以上建议基于 AI 分析生成，仅供参考。建议根据目标岗位的具体要求，
                                                     有针对性地优化简历内容。同时，保持简历真实、简洁、突出重点是最重要的原则。
                                                 </p>

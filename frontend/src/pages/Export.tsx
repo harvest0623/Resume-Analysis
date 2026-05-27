@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { motion } from "framer-motion";
 import {
     Download,
@@ -115,7 +115,7 @@ export default function Export() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -126,10 +126,10 @@ export default function Export() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="mb-8">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                             报告导出
                         </h1>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                             导出各类招聘数据报告和分析结果
                         </p>
                     </div>
@@ -145,10 +145,10 @@ export default function Export() {
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: index * 0.1 }}
-                                            className={`bg-white rounded-2xl p-6 shadow-sm border-2 transition-all duration-200 cursor-pointer hover:shadow-lg ${
+                                            className={`bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border-2 transition-all duration-200 cursor-pointer hover:shadow-lg ${
                                                 selectedOption === option.id
                                                     ? "border-blue-500 ring-2 ring-blue-200"
-                                                    : "border-gray-100 hover:border-gray-200"
+                                                    : "border-gray-100 hover:border-gray-200 dark:border-gray-600"
                                             }`}
                                             onClick={() => setSelectedOption(option.id)}
                                         >
@@ -158,15 +158,15 @@ export default function Export() {
                                                 >
                                                     <Icon className="w-6 h-6 text-white" />
                                                 </div>
-                                                <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-medium rounded-lg">
+                                                <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 dark:text-gray-600 text-sm font-medium rounded-lg">
                                                     {option.format}
                                                 </span>
                                             </div>
 
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                                                 {option.title}
                                             </h3>
-                                            <p className="text-sm text-gray-500 mb-4">
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-4">
                                                 {option.description}
                                             </p>
 
@@ -178,7 +178,7 @@ export default function Export() {
                                                 disabled={isExporting && selectedOption === option.id}
                                                 className={`w-full inline-flex items-center justify-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                                                     isExporting && selectedOption === option.id
-                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                        ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                                                         : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg"
                                                 }`}
                                             >
@@ -205,20 +205,20 @@ export default function Export() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3 }}
-                                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6"
+                                className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 mb-6"
                             >
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                                     导出设置
                                 </h3>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                             时间范围
                                         </label>
                                         <select
                                             value={dateRange}
                                             onChange={(e) => setDateRange(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         >
                                             <option value="week">最近一周</option>
                                             <option value="month">最近一月</option>
@@ -228,23 +228,23 @@ export default function Export() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                             文件格式
                                         </label>
                                         <div className="space-y-2">
                                             {["PDF", "Excel", "CSV"].map((format) => (
                                                 <label
                                                     key={format}
-                                                    className="flex items-center space-x-3 p-3 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer"
+                                                    className="flex items-center space-x-3 p-3 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:bg-gray-700/50 cursor-pointer"
                                                 >
                                                     <input
                                                         type="radio"
                                                         name="format"
                                                         value={format}
-                                                        className="w-4 h-4 text-blue-600"
+                                                        className="w-4 h-4 text-blue-600 dark:text-blue-400"
                                                         defaultChecked={format === "PDF"}
                                                     />
-                                                    <span className="text-gray-700">{format}</span>
+                                                    <span className="text-gray-700 dark:text-gray-300 dark:text-gray-600">{format}</span>
                                                 </label>
                                             ))}
                                         </div>
@@ -256,24 +256,24 @@ export default function Export() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4 }}
-                                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+                                className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
                             >
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                                     最近导出
                                 </h3>
                                 <div className="space-y-4">
                                     {recentExports.map((item) => (
                                         <div
                                             key={item.id}
-                                            className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
+                                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
                                         >
                                             <div className="flex items-center space-x-3 flex-1 min-w-0">
                                                 <FileSpreadsheet className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                                                 <div className="min-w-0">
-                                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                                                         {item.name}
                                                     </p>
-                                                    <p className="text-xs text-gray-500">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                         {item.date} · {item.size}
                                                     </p>
                                                 </div>

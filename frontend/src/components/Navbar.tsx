@@ -1,4 +1,4 @@
-﻿import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
     FileText,
     Users,
@@ -87,7 +87,7 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
+        <nav className="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     <Link to="/home" className="flex items-center space-x-2">
@@ -108,8 +108,8 @@ export default function Navbar() {
                                     to={item.path}
                                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                                         isActive(item.path)
-                                            ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 font-medium"
-                                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                            ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                                     }`}
                                 >
                                     <Icon className="w-4 h-4" />
@@ -128,8 +128,8 @@ export default function Navbar() {
                                 <button
                                     className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 ${
                                         isGroupActive(group)
-                                            ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 font-medium"
-                                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                            ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                                     }`}
                                 >
                                     <span>{group.title}</span>
@@ -142,7 +142,7 @@ export default function Navbar() {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full left-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                                            className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-50"
                                         >
                                             {group.items.map((item) => {
                                                 const Icon = item.icon;
@@ -152,8 +152,8 @@ export default function Navbar() {
                                                         to={item.path}
                                                         className={`flex items-center space-x-3 px-4 py-2 transition-all duration-200 ${
                                                             isActive(item.path)
-                                                                ? "bg-blue-50 text-blue-600 font-medium"
-                                                                : "text-gray-600 hover:bg-gray-50"
+                                                                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                                                                : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                                         }`}
                                                     >
                                                         <Icon className="w-4 h-4" />
@@ -171,8 +171,8 @@ export default function Navbar() {
                             to="/home/settings"
                             className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                                 isActive("/home/settings")
-                                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 font-medium"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                             }`}
                         >
                             <Settings className="w-4 h-4" />
@@ -182,12 +182,12 @@ export default function Navbar() {
 
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                         {isMenuOpen ? (
-                            <X className="w-6 h-6" />
+                            <X className="w-6 h-6 text-gray-900 dark:text-white" />
                         ) : (
-                            <Menu className="w-6 h-6" />
+                            <Menu className="w-6 h-6 text-gray-900 dark:text-white" />
                         )}
                     </button>
                 </div>
@@ -199,7 +199,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="lg:hidden bg-white border-t border-gray-100 overflow-y-auto max-h-[80vh]"
+                        className="lg:hidden bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 overflow-y-auto max-h-[80vh]"
                     >
                         <div className="px-4 py-3 space-y-1">
                             {mainNavItems.map((item) => {
@@ -211,8 +211,8 @@ export default function Navbar() {
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                                             isActive(item.path)
-                                                ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 font-medium"
-                                                : "text-gray-600 hover:bg-gray-50"
+                                                ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                                                : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                         }`}
                                     >
                                         <Icon className="w-5 h-5" />
@@ -223,7 +223,7 @@ export default function Navbar() {
 
                             {navGroups.map((group) => (
                                 <div key={group.title} className="pt-2">
-                                    <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">
+                                    <p className="px-4 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase">
                                         {group.title}
                                     </p>
                                     {group.items.map((item) => {
@@ -235,8 +235,8 @@ export default function Navbar() {
                                                 onClick={() => setIsMenuOpen(false)}
                                                 className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                                                     isActive(item.path)
-                                                        ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 font-medium"
-                                                        : "text-gray-600 hover:bg-gray-50"
+                                                        ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                                                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                                 }`}
                                             >
                                                 <Icon className="w-5 h-5" />
@@ -247,14 +247,14 @@ export default function Navbar() {
                                 </div>
                             ))}
 
-                            <div className="pt-2 border-t border-gray-100">
+                            <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
                                 <Link
                                     to="/home/settings"
                                     onClick={() => setIsMenuOpen(false)}
                                     className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                                         isActive("/home/settings")
-                                            ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 font-medium"
-                                            : "text-gray-600 hover:bg-gray-50"
+                                            ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                     }`}
                                 >
                                     <Settings className="w-5 h-5" />

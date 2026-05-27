@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, RefreshCcw, User, Phone, Mail, MapPin, Briefcase, GraduationCap, FileText, CheckCircle, XCircle, Sparkles, Brain } from "lucide-react";
@@ -65,13 +65,13 @@ export default function Analyze() {
     };
 
     const getScoreColor = (score: number) => {
-        if (score >= 80) return "text-emerald-600";
-        if (score >= 60) return "text-amber-600";
-        return "text-red-600";
+        if (score >= 80) return "text-emerald-600 dark:text-emerald-400";
+        if (score >= 60) return "text-amber-600 dark:text-amber-400";
+        return "text-red-600 dark:text-red-400";
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
             
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -82,10 +82,10 @@ export default function Analyze() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="text-center mb-12">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                             简历智能分析
                         </h1>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                             上传 PDF 简历，AI 自动解析并分析候选人信息
                         </p>
                     </div>
@@ -100,13 +100,13 @@ export default function Analyze() {
                                 transition={{ duration: 0.3 }}
                             >
                                 <div className="max-w-3xl mx-auto">
-                                    <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-100">
+                                    <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-3">
-                                                <Brain className="w-6 h-6 text-blue-600" />
+                                                <Brain className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                                                 <div>
-                                                    <p className="font-semibold text-gray-900">选择分析方式</p>
-                                                    <p className="text-sm text-gray-600">
+                                                    <p className="font-semibold text-gray-900 dark:text-white">选择分析方式</p>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
                                                         {useCoze ? "Coze AI 智能分析（更精准）" : "规则分析（快速响应）"}
                                                     </p>
                                                 </div>
@@ -114,7 +114,7 @@ export default function Analyze() {
                                             <button
                                                 onClick={() => setUseCoze(!useCoze)}
                                                 className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
-                                                    useCoze ? "bg-blue-600" : "bg-gray-300"
+                                                    useCoze ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
                                                 }`}
                                             >
                                                 <span
@@ -124,7 +124,7 @@ export default function Analyze() {
                                                 />
                                             </button>
                                         </div>
-                                        <p className="mt-2 text-xs text-gray-500">
+                                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                             {useCoze 
                                                 ? "✨ Coze AI 模式：利用先进的大语言模型进行深度分析，提供更精准的评分和建议"
                                                 : "⚡ 规则模式：基于预设规则的快速分析，响应更快"}
@@ -142,11 +142,11 @@ export default function Analyze() {
                                             animate={{ opacity: 1, y: 0 }}
                                             className="mt-8 text-center"
                                         >
-                                            <div className="inline-flex items-center space-x-3 bg-white px-8 py-4 rounded-2xl shadow-lg">
-                                                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                                            <div className="inline-flex items-center space-x-3 bg-white dark:bg-gray-800 px-8 py-4 rounded-2xl shadow-lg">
+                                                <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
                                                 <div className="text-left">
-                                                    <p className="font-semibold text-gray-900">正在分析简历...</p>
-                                                    <p className="text-sm text-gray-500">请稍候，这可能需要几秒钟</p>
+                                                    <p className="font-semibold text-gray-900 dark:text-white">正在分析简历...</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">请稍候，这可能需要几秒钟</p>
                                                 </div>
                                             </div>
                                         </motion.div>
@@ -156,12 +156,12 @@ export default function Analyze() {
                                         <motion.div
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className="mt-8 p-6 bg-red-50 border border-red-200 rounded-2xl flex items-center space-x-4"
+                                            className="mt-8 p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-center space-x-4"
                                         >
                                             <XCircle className="w-8 h-8 text-red-500 flex-shrink-0" />
                                             <div className="flex-1">
                                                 <p className="text-red-800 font-semibold">分析失败</p>
-                                                <p className="text-red-600">{error}</p>
+                                                <p className="text-red-600 dark:text-red-400">{error}</p>
                                             </div>
                                             <button
                                                 onClick={() => setError(null)}
@@ -183,7 +183,7 @@ export default function Analyze() {
                                 <div className="flex items-center justify-between mb-8">
                                     <div className="flex items-center space-x-3">
                                         <CheckCircle className="w-8 h-8 text-emerald-500" />
-                                        <h2 className="text-2xl font-bold text-gray-900">分析完成</h2>
+                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">分析完成</h2>
                                         {result.aiProvider === 'coze' && (
                                             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                                                 <Sparkles className="w-3 h-3 mr-1" />
@@ -191,7 +191,7 @@ export default function Analyze() {
                                             </span>
                                         )}
                                         {result.aiProvider === 'rule' && (
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                                                 <Brain className="w-3 h-3 mr-1" />
                                                 规则分析
                                             </span>
@@ -199,7 +199,7 @@ export default function Analyze() {
                                     </div>
                                     <button
                                         onClick={reset}
-                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
                                     >
                                         <RefreshCcw className="w-5 h-5" />
                                         <span>再分析一份</span>
@@ -208,8 +208,8 @@ export default function Analyze() {
 
                                 <div className="grid lg:grid-cols-3 gap-8">
                                     <div className="lg:col-span-1">
-                                        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">
+                                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 text-center">
                                                 综合评分
                                             </h3>
                                             <ScoreChart scores={result.scores} />
@@ -217,91 +217,91 @@ export default function Analyze() {
                                     </div>
 
                                     <div className="lg:col-span-2 space-y-6">
-                                        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
                                             <div className="flex items-center space-x-3 mb-6">
                                                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
                                                     <User className="w-6 h-6 text-white" />
                                                 </div>
-                                                <h3 className="text-xl font-semibold text-gray-900">基本信息</h3>
+                                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">基本信息</h3>
                                             </div>
                                             
                                             <div className="grid md:grid-cols-2 gap-6">
                                                 <div className="space-y-4">
                                                     <div className="flex items-center space-x-3">
-                                                        <User className="w-5 h-5 text-gray-400" />
+                                                        <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                         <div>
-                                                            <p className="text-sm text-gray-500">姓名</p>
-                                                            <p className="font-semibold text-gray-900">{result.basicInfo.name}</p>
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">姓名</p>
+                                                            <p className="font-semibold text-gray-900 dark:text-white">{result.basicInfo.name}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center space-x-3">
-                                                        <Phone className="w-5 h-5 text-gray-400" />
+                                                        <Phone className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                         <div>
-                                                            <p className="text-sm text-gray-500">电话</p>
-                                                            <p className="font-semibold text-gray-900">{result.basicInfo.phone}</p>
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">电话</p>
+                                                            <p className="font-semibold text-gray-900 dark:text-white">{result.basicInfo.phone}</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-4">
                                                     <div className="flex items-center space-x-3">
-                                                        <Mail className="w-5 h-5 text-gray-400" />
+                                                        <Mail className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                         <div>
-                                                            <p className="text-sm text-gray-500">邮箱</p>
-                                                            <p className="font-semibold text-gray-900">{result.basicInfo.email}</p>
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">邮箱</p>
+                                                            <p className="font-semibold text-gray-900 dark:text-white">{result.basicInfo.email}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center space-x-3">
-                                                        <MapPin className="w-5 h-5 text-gray-400" />
+                                                        <MapPin className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                         <div>
-                                                            <p className="text-sm text-gray-500">地址</p>
-                                                            <p className="font-semibold text-gray-900">{result.basicInfo.address}</p>
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">地址</p>
+                                                            <p className="font-semibold text-gray-900 dark:text-white">{result.basicInfo.address}</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
                                             <div className="flex items-center space-x-3 mb-6">
                                                 <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
                                                     <Briefcase className="w-6 h-6 text-white" />
                                                 </div>
-                                                <h3 className="text-xl font-semibold text-gray-900">求职信息</h3>
+                                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">求职信息</h3>
                                             </div>
                                             
                                             <div className="grid md:grid-cols-2 gap-6">
                                                 <div>
-                                                    <p className="text-sm text-gray-500 mb-1">求职意向</p>
-                                                    <p className="font-semibold text-gray-900">{result.jobInfo.position}</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">求职意向</p>
+                                                    <p className="font-semibold text-gray-900 dark:text-white">{result.jobInfo.position}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500 mb-1">期望薪资</p>
-                                                    <p className="font-semibold text-gray-900">{result.jobInfo.expectedSalary}</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">期望薪资</p>
+                                                    <p className="font-semibold text-gray-900 dark:text-white">{result.jobInfo.expectedSalary}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500 mb-1">工作年限</p>
-                                                    <p className="font-semibold text-gray-900">{result.background.workYears}</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">工作年限</p>
+                                                    <p className="font-semibold text-gray-900 dark:text-white">{result.background.workYears}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500 mb-1">学历背景</p>
-                                                    <p className="font-semibold text-gray-900">{result.background.education}</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">学历背景</p>
+                                                    <p className="font-semibold text-gray-900 dark:text-white">{result.background.education}</p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
                                             <div className="flex items-center space-x-3 mb-6">
                                                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
                                                     <FileText className="w-6 h-6 text-white" />
                                                 </div>
-                                                <h3 className="text-xl font-semibold text-gray-900">技能标签</h3>
+                                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">技能标签</h3>
                                             </div>
                                             
                                             <div className="flex flex-wrap gap-3">
                                                 {result.skills.map((skill, index) => (
                                                     <span
                                                         key={index}
-                                                        className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 font-medium rounded-lg border border-blue-100"
+                                                        className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 font-medium rounded-lg border border-blue-100 dark:border-blue-800"
                                                     >
                                                         {skill}
                                                     </span>
@@ -309,16 +309,16 @@ export default function Analyze() {
                                             </div>
                                         </div>
 
-                                        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
                                             <div className="flex items-center space-x-3 mb-6">
                                                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
                                                     <GraduationCap className="w-6 h-6 text-white" />
                                                 </div>
-                                                <h3 className="text-xl font-semibold text-gray-900">AI 分析报告</h3>
+                                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">AI 分析报告</h3>
                                             </div>
                                             
-                                            <div className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
-                                                <p className="text-gray-700 leading-relaxed">
+                                            <div className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl">
+                                                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                                                     {result.analysis}
                                                 </p>
                                             </div>

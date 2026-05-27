@@ -142,7 +142,7 @@ export default function Home() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
             <Navbar />
             
             <main>
@@ -154,12 +154,12 @@ export default function Home() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6 }}
                             >
-                                <div className="inline-flex items-center px-4 py-2 bg-blue-50 border border-blue-200 rounded-full mb-6">
-                                    <BarChart3 className="w-4 h-4 text-blue-600 mr-2" />
-                                    <span className="text-sm font-medium text-blue-700">AI 赋能的招聘新时代</span>
+                                <div className="inline-flex items-center px-4 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-full mb-6">
+                                    <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" />
+                                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">AI 赋能的招聘新时代</span>
                                 </div>
                                 
-                                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
                                     智能简历分析系统
                                     <br />
                                     <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
@@ -167,7 +167,7 @@ export default function Home() {
                                     </span>
                                 </h1>
                                 
-                                <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
+                                <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-3xl mx-auto">
                                     利用 AI 技术快速解析、分析和对比简历，帮助您找到最合适的候选人，
                                     提升招聘效率，降低招聘成本。
                                 </p>
@@ -182,7 +182,7 @@ export default function Home() {
                                     </Link>
                                     <Link
                                         to="/home/history"
-                                        className="inline-flex items-center px-8 py-4 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                                        className="inline-flex items-center px-8 py-4 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold rounded-xl border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
                                     >
                                         查看历史
                                     </Link>
@@ -201,10 +201,10 @@ export default function Home() {
                             transition={{ duration: 0.6 }}
                             className="text-center mb-16"
                         >
-                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                                 核心功能
                             </h2>
-                            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                                 我们提供全方位的简历分析解决方案，满足您的各种招聘需求
                             </p>
                         </motion.div>
@@ -222,17 +222,17 @@ export default function Home() {
                                         whileHover={{ y: -8 }}
                                     >
                                         <Link to={feature.path} className="block">
-                                            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 h-full">
+                                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 h-full">
                                                 <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mb-6`}>
                                                     <Icon className="w-7 h-7 text-white" />
                                                 </div>
-                                                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                                                     {feature.title}
                                                 </h3>
-                                                <p className="text-gray-600 mb-6">
+                                                <p className="text-gray-600 dark:text-gray-400 mb-6">
                                                     {feature.description}
                                                 </p>
-                                                <div className="flex items-center text-blue-600 font-medium">
+                                                <div className="flex items-center text-blue-600 dark:text-blue-400 font-medium">
                                                     立即体验
                                                     <ArrowRight className="w-4 h-4 ml-2" />
                                                 </div>
@@ -245,7 +245,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+                <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
                     <div className="max-w-7xl mx-auto">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -254,10 +254,10 @@ export default function Home() {
                             transition={{ duration: 0.6 }}
                             className="text-center mb-16"
                         >
-                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                                 为什么选择我们
                             </h2>
-                            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                                 我们的系统具有显著的优势，让您的招聘工作更加高效
                             </p>
                         </motion.div>
@@ -277,10 +277,10 @@ export default function Home() {
                                         <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                                             <Icon className="w-8 h-8 text-white" />
                                         </div>
-                                        <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                                             {benefit.title}
                                         </h3>
-                                        <p className="text-gray-600">
+                                        <p className="text-gray-600 dark:text-gray-400">
                                             {benefit.description}
                                         </p>
                                     </motion.div>

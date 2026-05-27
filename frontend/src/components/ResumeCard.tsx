@@ -41,9 +41,9 @@ export default function ResumeCard({
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -4 }}
             className={`
-                bg-white rounded-2xl shadow-sm border-2 transition-all duration-200 overflow-hidden
+                bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 transition-all duration-200 overflow-hidden
                 ${selectable ? "cursor-pointer" : ""}
-                ${selected ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-100 hover:border-gray-200"}
+                ${selected ? "border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800" : "border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600"}
             `}
             onClick={() => selectable && onSelect?.(resume.id)}
         >
@@ -54,10 +54,10 @@ export default function ResumeCard({
                             {getInitials(resume.basicInfo.name)}
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                 {resume.basicInfo.name}
                             </h3>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {resume.jobInfo.position || "未知岗位"}
                             </p>
                         </div>
@@ -68,19 +68,19 @@ export default function ResumeCard({
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                         <Mail className="w-4 h-4 text-gray-400" />
                         <span className="truncate">{resume.basicInfo.email}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                         <Phone className="w-4 h-4 text-gray-400" />
                         <span>{resume.basicInfo.phone}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                         <GraduationCap className="w-4 h-4 text-gray-400" />
                         <span>{resume.background.education}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                         <Briefcase className="w-4 h-4 text-gray-400" />
                         <span>{resume.background.workYears}工作经验</span>
                     </div>
@@ -92,13 +92,13 @@ export default function ResumeCard({
                             {resume.skills.slice(0, 5).map((skill, index) => (
                                 <span
                                     key={index}
-                                    className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
+                                    className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-md"
                                 >
                                     {skill}
                                 </span>
                             ))}
                             {resume.skills.length > 5 && (
-                                <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-md">
+                                <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs rounded-md">
                                     +{resume.skills.length - 5}
                                 </span>
                             )}
@@ -106,8 +106,8 @@ export default function ResumeCard({
                     </div>
                 )}
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="flex items-center space-x-2 text-xs text-gray-400">
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center space-x-2 text-xs text-gray-400 dark:text-gray-500">
                         <Calendar className="w-4 h-4" />
                         <span>{new Date(resume.uploadedAt).toLocaleDateString("zh-CN")}</span>
                     </div>
@@ -117,7 +117,7 @@ export default function ResumeCard({
                                 to={`/home/analyze`}
                                 state={{ resumeId: resume.id }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                             >
                                 <Eye className="w-4 h-4" />
                             </Link>
@@ -127,7 +127,7 @@ export default function ResumeCard({
                                         e.stopPropagation();
                                         onDelete(resume.id);
                                     }}
-                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>

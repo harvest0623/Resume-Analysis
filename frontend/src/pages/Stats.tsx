@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
     BarChart3,
@@ -32,7 +32,7 @@ function StatCard({ title, value, icon: Icon, color, change, suffix }: StatCardP
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
         >
             <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center`}>
@@ -40,7 +40,7 @@ function StatCard({ title, value, icon: Icon, color, change, suffix }: StatCardP
                 </div>
                 {change !== undefined && (
                     <div className={`flex items-center space-x-1 text-sm font-medium ${
-                        change > 0 ? "text-emerald-600" : change < 0 ? "text-red-600" : "text-gray-500"
+                        change > 0 ? "text-emerald-600 dark:text-emerald-400" : change < 0 ? "text-red-600 dark:text-red-400" : "text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500"
                     }`}>
                         {change > 0 ? (
                             <ArrowUpRight className="w-4 h-4" />
@@ -53,10 +53,10 @@ function StatCard({ title, value, icon: Icon, color, change, suffix }: StatCardP
                     </div>
                 )}
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-1">
+            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
                 {value}{suffix}
             </p>
-            <p className="text-sm text-gray-500">{title}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500">{title}</p>
         </motion.div>
     );
 }
@@ -72,8 +72,8 @@ function SkillBar({ skill, count, maxCount }: SkillBarProps) {
 
     return (
         <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium text-gray-700 w-24 truncate">{skill}</span>
-            <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-400 dark:text-gray-500 w-24 truncate">{skill}</span>
+            <div className="flex-1 h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${percentage}%` }}
@@ -81,7 +81,7 @@ function SkillBar({ skill, count, maxCount }: SkillBarProps) {
                     className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
                 />
             </div>
-            <span className="text-sm text-gray-500 w-10 text-right">{count}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500 w-10 text-right">{count}</span>
         </div>
     );
 }
@@ -181,7 +181,7 @@ export default function Stats() {
         : 0;
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -192,10 +192,10 @@ export default function Stats() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="mb-8">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                             数据统计
                         </h1>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500">
                             查看简历分析的整体数据概览
                         </p>
                     </div>
@@ -203,15 +203,15 @@ export default function Stats() {
                     {isLoading ? (
                         <div className="flex items-center justify-center py-16">
                             <div className="text-center">
-                                <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
-                                <p className="text-gray-500">加载中...</p>
+                                <div className="w-12 h-12 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+                                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500">加载中...</p>
                             </div>
                         </div>
                     ) : resumes.length === 0 ? (
-                        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-                            <BarChart3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">暂无数据</h3>
-                            <p className="text-gray-500">请先上传并分析一些简历</p>
+                        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600">
+                            <BarChart3 className="w-16 h-16 text-gray-300 dark:text-gray-600 dark:text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">暂无数据</h3>
+                            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500">请先上传并分析一些简历</p>
                         </div>
                     ) : (
                         <>
@@ -249,13 +249,13 @@ export default function Stats() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                 >
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-6">评分分布</h3>
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">评分分布</h3>
                                     <div className="space-y-6">
                                         <div className="flex items-center space-x-4">
-                                            <div className="w-20 text-sm font-medium text-emerald-600">优秀 (80+)</div>
-                                            <div className="flex-1 h-8 bg-gray-100 rounded-lg overflow-hidden">
+                                            <div className="w-20 text-sm font-medium text-emerald-600 dark:text-emerald-400">优秀 (80+)</div>
+                                            <div className="flex-1 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${(stats.scoreDistribution.high / stats.totalResumes) * 100}%` }}
@@ -267,8 +267,8 @@ export default function Stats() {
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-4">
-                                            <div className="w-20 text-sm font-medium text-amber-600">良好 (60-79)</div>
-                                            <div className="flex-1 h-8 bg-gray-100 rounded-lg overflow-hidden">
+                                            <div className="w-20 text-sm font-medium text-amber-600 dark:text-amber-400">良好 (60-79)</div>
+                                            <div className="flex-1 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${(stats.scoreDistribution.medium / stats.totalResumes) * 100}%` }}
@@ -280,8 +280,8 @@ export default function Stats() {
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-4">
-                                            <div className="w-20 text-sm font-medium text-red-600">待提升 (&lt;60)</div>
-                                            <div className="flex-1 h-8 bg-gray-100 rounded-lg overflow-hidden">
+                                            <div className="w-20 text-sm font-medium text-red-600 dark:text-red-400">待提升 (&lt;60)</div>
+                                            <div className="flex-1 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${(stats.scoreDistribution.low / stats.totalResumes) * 100}%` }}
@@ -299,9 +299,9 @@ export default function Stats() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3 }}
-                                    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                 >
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-6">热门技能 TOP 8</h3>
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">热门技能 TOP 8</h3>
                                     <div className="space-y-4">
                                         {stats.topSkills.map((item, index) => (
                                             <SkillBar
@@ -320,22 +320,22 @@ export default function Stats() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
-                                    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                 >
                                     <div className="flex items-center space-x-3 mb-6">
                                         <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
                                             <GraduationCap className="w-5 h-5 text-white" />
                                         </div>
-                                        <h3 className="text-xl font-semibold text-gray-900">学历分布</h3>
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">学历分布</h3>
                                     </div>
                                     <div className="space-y-4">
                                         {Object.entries(stats.educationDistribution)
                                             .sort(([, a], [, b]) => b - a)
                                             .map(([edu, count]) => (
                                                 <div key={edu} className="flex items-center justify-between">
-                                                    <span className="text-gray-700">{edu}</span>
+                                                    <span className="text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-400 dark:text-gray-500">{edu}</span>
                                                     <div className="flex items-center space-x-3">
-                                                        <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                                        <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${(count / stats.totalResumes) * 100}%` }}
@@ -343,7 +343,7 @@ export default function Stats() {
                                                                 className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full"
                                                             />
                                                         </div>
-                                                        <span className="text-sm font-medium text-gray-500 w-8 text-right">{count}</span>
+                                                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500 w-8 text-right">{count}</span>
                                                     </div>
                                                 </div>
                                             ))}
@@ -354,13 +354,13 @@ export default function Stats() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.5 }}
-                                    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700"
                                 >
                                     <div className="flex items-center space-x-3 mb-6">
                                         <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
                                             <Briefcase className="w-5 h-5 text-white" />
                                         </div>
-                                        <h3 className="text-xl font-semibold text-gray-900">岗位分布</h3>
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">岗位分布</h3>
                                     </div>
                                     <div className="space-y-4">
                                         {Object.entries(stats.positionDistribution)
@@ -368,9 +368,9 @@ export default function Stats() {
                                             .slice(0, 6)
                                             .map(([pos, count]) => (
                                                 <div key={pos} className="flex items-center justify-between">
-                                                    <span className="text-gray-700 truncate flex-1 mr-4">{pos}</span>，
+                                                    <span className="text-gray-700 dark:text-gray-300 dark:text-gray-600 dark:text-gray-400 dark:text-gray-500 truncate flex-1 mr-4">{pos}</span>，
                                                     <div className="flex items-center space-x-3">
-                                                        <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                                        <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${(count / stats.totalResumes) * 100}%` }}
@@ -378,7 +378,7 @@ export default function Stats() {
                                                                 className="h-full bg-gradient-to-r from-amber-500 to-orange-600 rounded-full"
                                                             />
                                                         </div>
-                                                        <span className="text-sm font-medium text-gray-500 w-8 text-right">{count}</span>
+                                                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500 w-8 text-right">{count}</span>
                                                     </div>
                                                 </div>
                                             ))}

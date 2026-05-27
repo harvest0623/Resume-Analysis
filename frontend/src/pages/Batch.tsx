@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+﻿import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Upload,
@@ -130,7 +130,7 @@ export default function Batch() {
     const getStatusIcon = (status: FileWithStatus["status"]) => {
         switch (status) {
             case "pending":
-                return <FileText className="w-5 h-5 text-gray-400" />;
+                return <FileText className="w-5 h-5 text-gray-400 dark:text-gray-500" />;
             case "uploading":
             case "analyzing":
                 return <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />;
@@ -161,7 +161,7 @@ export default function Batch() {
     const pendingCount = files.filter((f) => f.status === "pending").length;
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -172,10 +172,10 @@ export default function Batch() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="text-center mb-12">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                             批量分析
                         </h1>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                             一次性上传多份简历，系统将自动进行批量分析
                         </p>
                     </div>
@@ -187,8 +187,8 @@ export default function Batch() {
                             transition={{ delay: 0.1 }}
                             className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-200 ${
                                 isDragging
-                                    ? "border-blue-500 bg-blue-50"
-                                    : "border-gray-300 hover:border-gray-400"
+                                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                                    : "border-gray-300 dark:border-gray-600 hover:border-gray-400"
                             }`}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
@@ -201,11 +201,11 @@ export default function Batch() {
                                 onChange={handleFileSelect}
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                             />
-                            <Upload className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            <p className="text-xl font-semibold text-gray-700 mb-2">
+                            <Upload className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 拖放 PDF 文件到此处
                             </p>
-                            <p className="text-gray-500">
+                            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                 或点击选择文件（支持多选）
                             </p>
                         </motion.div>
@@ -219,16 +219,16 @@ export default function Batch() {
                             >
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center space-x-4">
-                                        <h3 className="text-lg font-semibold text-gray-900">
+                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                             已选择 {files.length} 个文件
                                         </h3>
                                         {doneCount > 0 && (
-                                            <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium">
+                                            <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-full text-sm font-medium">
                                                 完成 {doneCount}
                                             </span>
                                         )}
                                         {errorCount > 0 && (
-                                            <span className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-sm font-medium">
+                                            <span className="px-3 py-1 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full text-sm font-medium">
                                                 失败 {errorCount}
                                             </span>
                                         )}
@@ -237,7 +237,7 @@ export default function Batch() {
                                         <button
                                             onClick={clearAll}
                                             disabled={isProcessing}
-                                            className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                                            className="px-4 py-2 text-gray-600 dark:text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:text-white hover:bg-gray-100 dark:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
                                         >
                                             清空
                                         </button>
@@ -263,7 +263,7 @@ export default function Batch() {
                                     </div>
                                 </div>
 
-                                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600 overflow-hidden">
                                     <AnimatePresence>
                                         {files.map((file) => (
                                             <motion.div
@@ -271,16 +271,16 @@ export default function Batch() {
                                                 initial={{ opacity: 0, height: 0 }}
                                                 animate={{ opacity: 1, height: "auto" }}
                                                 exit={{ opacity: 0, height: 0 }}
-                                                className="border-b border-gray-100 last:border-b-0"
+                                                className="border-b border-gray-100 dark:border-gray-700 last:border-b-0"
                                             >
-                                                <div className="flex items-center justify-between p-4 hover:bg-gray-50">
+                                                <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:bg-gray-700/50">
                                                     <div className="flex items-center space-x-4 flex-1 min-w-0">
                                                         {getStatusIcon(file.status)}
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-gray-900 truncate">
+                                                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                                                                 {file.file.name}
                                                             </p>
-                                                            <p className="text-xs text-gray-500">
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                                 {(file.file.size / 1024 / 1024).toFixed(2)} MB
                                                             </p>
                                                         </div>
@@ -289,10 +289,10 @@ export default function Batch() {
                                                         <span
                                                             className={`text-sm ${
                                                                 file.status === "done"
-                                                                    ? "text-emerald-600 font-medium"
+                                                                    ? "text-emerald-600 dark:text-emerald-400 font-medium"
                                                                     : file.status === "error"
-                                                                    ? "text-red-600"
-                                                                    : "text-gray-500"
+                                                                    ? "text-red-600 dark:text-red-400"
+                                                                    : "text-gray-500 dark:text-gray-400 dark:text-gray-500"
                                                             }`}
                                                         >
                                                             {getStatusText(file)}
@@ -301,7 +301,7 @@ export default function Batch() {
                                                             <button
                                                                 onClick={() => removeFile(file.id)}
                                                                 disabled={isProcessing}
-                                                                className="p-1 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+                                                                className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors disabled:opacity-50"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
                                                             </button>
@@ -317,10 +317,10 @@ export default function Batch() {
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl"
+                                        className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl"
                                     >
                                         <div className="flex items-center space-x-3">
-                                            <AlertCircle className="w-5 h-5 text-blue-600" />
+                                            <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                             <p className="text-sm text-blue-700">
                                                 正在处理中，请勿关闭页面...
                                             </p>
@@ -343,13 +343,13 @@ export default function Batch() {
                                         animate={{ opacity: 1, y: 0 }}
                                         className="mt-6 text-center"
                                     >
-                                        <p className="text-lg font-semibold text-gray-900 mb-4">
+                                        <p className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                                             批量分析完成！成功 {doneCount} 份
                                             {errorCount > 0 && `，失败 ${errorCount} 份`}
                                         </p>
                                         <a
                                             href="/home/history"
-                                            className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                                            className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 dark:text-gray-300 font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:bg-gray-700/50 transition-all duration-200"
                                         >
                                             <span>查看历史记录</span>
                                             <ArrowRight className="w-4 h-4" />

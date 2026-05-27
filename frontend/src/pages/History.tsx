@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { History, Search, Trash2, RefreshCcw, FileText } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -39,7 +39,7 @@ export default function HistoryPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
             
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -51,17 +51,17 @@ export default function HistoryPage() {
                 >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
                         <div>
-                            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                                 历史记录
                             </h1>
-                            <p className="text-lg text-gray-600">
+                            <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                                 管理您所有分析过的简历
                             </p>
                         </div>
                         <button
                             onClick={loadHistory}
                             disabled={isLoading}
-                            className="mt-4 md:mt-0 inline-flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-all duration-200"
+                            className="mt-4 md:mt-0 inline-flex items-center space-x-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-all duration-200"
                         >
                             <RefreshCcw className={`w-5 h-5 ${isLoading ? "animate-spin" : ""}`} />
                             <span>刷新</span>
@@ -70,13 +70,13 @@ export default function HistoryPage() {
 
                     <div className="mb-8">
                         <div className="relative">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="搜索候选人姓名、邮箱或岗位..."
                                 value={searchKeyword}
                                 onChange={(e) => setSearchKeyword(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white"
                             />
                         </div>
                     </div>
@@ -84,8 +84,8 @@ export default function HistoryPage() {
                     {isLoading ? (
                         <div className="flex items-center justify-center py-16">
                             <div className="text-center">
-                                <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
-                                <p className="text-gray-500">加载中...</p>
+                                <div className="w-12 h-12 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+                                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">加载中...</p>
                             </div>
                         </div>
                     ) : resumes.length > 0 ? (
@@ -105,21 +105,21 @@ export default function HistoryPage() {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-                            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <FileText className="w-10 h-10 text-gray-400" />
+                        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+                            <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <FileText className="w-10 h-10 text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500" />
                             </div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                 {searchKeyword ? "未找到匹配的简历" : "暂无历史记录"}
                             </h3>
-                            <p className="text-gray-500 mb-6">
+                            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-6">
                                 {searchKeyword 
                                     ? "尝试使用其他关键词搜索"
                                     : "开始上传并分析您的第一份简历吧"
                                 }
                             </p>
                             {!searchKeyword && (
-                                <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
+                                <div className="flex items-center justify-center space-x-2 text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                     <History className="w-4 h-4" />
                                     <span>分析过的简历将显示在这里</span>
                                 </div>

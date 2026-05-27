@@ -187,11 +187,11 @@ export default function Jobs() {
     const getStatusBadge = (status: Job["status"]) => {
         switch (status) {
             case "active":
-                return "bg-emerald-50 text-emerald-600 border-emerald-200";
+                return "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
             case "closed":
-                return "bg-gray-50 text-gray-600 border-gray-200";
+                return "bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600";
             case "draft":
-                return "bg-amber-50 text-amber-600 border-amber-200";
+                return "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800";
         }
     };
 
@@ -207,7 +207,7 @@ export default function Jobs() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -219,10 +219,10 @@ export default function Jobs() {
                 >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
                         <div>
-                            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                                 职位管理
                             </h1>
-                            <p className="text-lg text-gray-600">
+                            <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                                 管理和发布招聘职位
                             </p>
                         </div>
@@ -237,13 +237,13 @@ export default function Jobs() {
 
                     <div className="flex flex-col md:flex-row gap-4 mb-8">
                         <div className="flex-1 relative">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="搜索职位名称或部门..."
                                 value={searchKeyword}
                                 onChange={(e) => setSearchKeyword(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white"
                             />
                         </div>
                         <div className="flex gap-2">
@@ -254,7 +254,7 @@ export default function Jobs() {
                                     className={`px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                                         filterStatus === status
                                             ? "bg-blue-600 text-white"
-                                            : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+                                            : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 dark:text-gray-600 border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                                     }`}
                                 >
                                     {status === "all" ? "全部" : getStatusText(status as Job["status"])}
@@ -270,15 +270,15 @@ export default function Jobs() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}
-                                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-200"
+                                className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-200"
                             >
                                 <div className="p-6">
                                     <div className="flex items-start justify-between mb-4">
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                                                 {job.title}
                                             </h3>
-                                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                            <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                 <Building2 className="w-4 h-4" />
                                                 <span>{job.department}</span>
                                             </div>
@@ -293,43 +293,43 @@ export default function Jobs() {
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-3 mb-4">
-                                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                            <MapPin className="w-4 h-4 text-gray-400" />
+                                        <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                            <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                             <span>{job.location}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                            <DollarSign className="w-4 h-4 text-gray-400" />
+                                        <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                            <DollarSign className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                             <span>{job.salary}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                            <Clock className="w-4 h-4 text-gray-400" />
+                                        <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                            <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                             <span>{job.experience}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                            <Users className="w-4 h-4 text-gray-400" />
+                                        <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                            <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                             <span>{job.applicants} 人申请</span>
                                         </div>
                                     </div>
 
-                                    <p className="text-sm text-gray-500 mb-4 line-clamp-2">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-4 line-clamp-2">
                                         {job.description}
                                     </p>
 
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                        <div className="flex items-center space-x-2 text-xs text-gray-400">
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center space-x-2 text-xs text-gray-400 dark:text-gray-500">
                                             <Calendar className="w-4 h-4" />
                                             <span>{job.createdAt}</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <button
                                                 onClick={() => handleEdit(job)}
-                                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors"
                                             >
                                                 <Edit3 className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(job.id)}
-                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:text-red-400 hover:bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -341,12 +341,12 @@ export default function Jobs() {
                     </div>
 
                     {filteredJobs.length === 0 && (
-                        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-                            <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600">
+                            <Briefcase className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                 暂无职位
                             </h3>
-                            <p className="text-gray-500">点击"发布职位"创建新的招聘职位</p>
+                            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">点击"发布职位"创建新的招聘职位</p>
                         </div>
                     )}
                 </motion.div>
@@ -364,24 +364,24 @@ export default function Jobs() {
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                            className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                         >
-                            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                                <h2 className="text-xl font-semibold text-gray-900">
+                            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                                     {editingJob ? "编辑职位" : "发布新职位"}
                                 </h2>
                                 <button
                                     onClick={() => setShowModal(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-gray-100 dark:bg-gray-700 rounded-lg transition-colors"
                                 >
-                                    <X className="w-5 h-5 text-gray-500" />
+                                    <X className="w-5 h-5 text-gray-500 dark:text-gray-400 dark:text-gray-500" />
                                 </button>
                             </div>
 
                             <div className="p-6 space-y-6">
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                             职位名称
                                         </label>
                                         <input
@@ -390,12 +390,12 @@ export default function Jobs() {
                                             onChange={(e) =>
                                                 setFormData({ ...formData, title: e.target.value })
                                             }
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             placeholder="例如：高级前端工程师"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                             所属部门
                                         </label>
                                         <input
@@ -404,12 +404,12 @@ export default function Jobs() {
                                             onChange={(e) =>
                                                 setFormData({ ...formData, department: e.target.value })
                                             }
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             placeholder="例如：技术部"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                             工作地点
                                         </label>
                                         <input
@@ -418,12 +418,12 @@ export default function Jobs() {
                                             onChange={(e) =>
                                                 setFormData({ ...formData, location: e.target.value })
                                             }
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             placeholder="例如：北京"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                             薪资范围
                                         </label>
                                         <input
@@ -432,12 +432,12 @@ export default function Jobs() {
                                             onChange={(e) =>
                                                 setFormData({ ...formData, salary: e.target.value })
                                             }
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             placeholder="例如：25-40K"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                             工作类型
                                         </label>
                                         <select
@@ -445,7 +445,7 @@ export default function Jobs() {
                                             onChange={(e) =>
                                                 setFormData({ ...formData, type: e.target.value })
                                             }
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         >
                                             <option value="全职">全职</option>
                                             <option value="兼职">兼职</option>
@@ -454,7 +454,7 @@ export default function Jobs() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                             经验要求
                                         </label>
                                         <input
@@ -462,14 +462,14 @@ export default function Jobs() {
                                             value={formData.experience}
                                             onChange={(e) =>
                                                 setFormData({ ...formData, experience: e.target.value })
-                                            }className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            }className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             placeholder="例如：3-5年"
                                         />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600 mb-2">
                                         职位描述
                                     </label>
                                     <textarea
@@ -478,16 +478,16 @@ export default function Jobs() {
                                             setFormData({ ...formData, description: e.target.value })
                                         }
                                         rows={4}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                                         placeholder="请输入职位描述..."
                                     />
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-100">
+                            <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-100 dark:border-gray-700">
                                 <button
                                     onClick={() => setShowModal(false)}
-                                    className="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                                    className="px-6 py-3 text-gray-600 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:bg-gray-700 rounded-xl transition-colors"
                                 >
                                     取消
                                 </button>

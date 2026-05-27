@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, RefreshCcw, CheckCircle, ArrowRight, TrendingUp, TrendingDown, Equal, Trophy } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -54,7 +54,7 @@ export default function Compare() {
     };
 
     const getScoreIcon = (score1: number, score2: number, index: number) => {
-        if (score1 === score2) return <Equal className="w-5 h-5 text-gray-400" />;
+        if (score1 === score2) return <Equal className="w-5 h-5 text-gray-400 dark:text-gray-500" />;
         if ((index === 0 && score1 > score2) || (index === 1 && score2 > score1)) {
             return <TrendingUp className="w-5 h-5 text-emerald-500" />;
         }
@@ -62,13 +62,13 @@ export default function Compare() {
     };
 
     const getScoreColor = (score: number) => {
-        if (score >= 80) return "text-emerald-600 bg-emerald-50";
-        if (score >= 60) return "text-amber-600 bg-amber-50";
-        return "text-red-600 bg-red-50";
+        if (score >= 80) return "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20";
+        if (score >= 60) return "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20";
+        return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20";
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
             
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -79,10 +79,10 @@ export default function Compare() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="text-center mb-12">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                             简历对比分析
                         </h1>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                             选择两份简历进行对比，帮助您做出更好的招聘决策
                         </p>
                     </div>
@@ -97,7 +97,7 @@ export default function Compare() {
                             >
                                 <div className="mb-8">
                                     <div className="flex items-center justify-between mb-6">
-                                        <p className="text-gray-600">
+                                        <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500">
                                             已选择 {selectedResumes.length}/2 份简历
                                         </p>
                                         {selectedResumes.length === 2 && (
@@ -136,10 +136,10 @@ export default function Compare() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-                                        <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                        <p className="text-gray-500 mb-4">暂无可对比的简历</p>
-                                        <p className="text-sm text-gray-400">请先上传并分析一些简历</p>
+                                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+                                        <Users className="w-16 h-16 text-gray-300 dark:text-gray-600 dark:text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                                        <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-4">暂无可对比的简历</p>
+                                        <p className="text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500">请先上传并分析一些简历</p>
                                     </div>
                                 )}
                             </motion.div>
@@ -153,11 +153,11 @@ export default function Compare() {
                                 <div className="flex items-center justify-between mb-8">
                                     <div className="flex items-center space-x-3">
                                         <CheckCircle className="w-8 h-8 text-emerald-500" />
-                                        <h2 className="text-2xl font-bold text-gray-900">对比完成</h2>
+                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">对比完成</h2>
                                     </div>
                                     <button
                                         onClick={reset}
-                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
                                     >
                                         <RefreshCcw className="w-5 h-5" />
                                         <span>重新对比</span>
@@ -172,13 +172,13 @@ export default function Compare() {
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.1 }}
                                         >
-                                            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
                                                 <div className="flex items-center justify-between mb-6">
-                                                    <h3 className="text-xl font-semibold text-gray-900">
+                                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                                                         候选人 {index + 1}
                                                     </h3>
                                                     {comparisonResult.comparison.strengths[resume.id]?.length > 0 && (
-                                                        <div className="flex items-center space-x-1 text-emerald-600">
+                                                        <div className="flex items-center space-x-1 text-emerald-600 dark:text-emerald-400">
                                                             <Trophy className="w-5 h-5" />
                                                             <span className="text-sm font-medium">优势明显</span>
                                                         </div>
@@ -188,12 +188,12 @@ export default function Compare() {
                                                     <div className={`inline-flex items-center justify-center w-24 h-24 rounded-2xl ${getScoreColor(resume.scores.overall)}`}>
                                                         <span className="text-3xl font-bold">{resume.scores.overall}</span>
                                                     </div>
-                                                    <p className="text-sm text-gray-500 mt-2">综合评分</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-2">综合评分</p>
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <p className="font-semibold text-gray-900 text-lg">{resume.basicInfo.name}</p>
-                                                    <p className="text-gray-600">{resume.jobInfo.position}</p>
-                                                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                                    <p className="font-semibold text-gray-900 dark:text-white text-lg">{resume.basicInfo.name}</p>
+                                                    <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500">{resume.jobInfo.position}</p>
+                                                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                         <span>{resume.background.education}</span>
                                                         <span>•</span>
                                                         <span>{resume.background.workYears}</span>
@@ -204,8 +204,8 @@ export default function Compare() {
                                     ))}
                                 </div>
 
-                                <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-8">
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-6">评分对比</h3>
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">评分对比</h3>
                                     <div className="space-y-6">
                                         {[
                                             { label: "综合评分", key: "overall" },
@@ -215,7 +215,7 @@ export default function Compare() {
                                         ].map((item) => (
                                             <div key={item.key} className="space-y-3">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-gray-700 font-medium">{item.label}</span>
+                                                    <span className="text-gray-700 dark:text-gray-300 font-medium">{item.label}</span>
                                                     <div className="flex items-center space-x-2">
                                                         {getScoreIcon(
                                                             comparisonResult.resumes[0].scores[item.key as keyof ResumeData["scores"]],
@@ -227,14 +227,14 @@ export default function Compare() {
                                                 <div className="flex items-center space-x-4">
                                                     <div className="flex-1">
                                                         <div className="flex items-center justify-between mb-1">
-                                                            <span className="text-sm text-gray-500">
+                                                            <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                                 {comparisonResult.resumes[0].basicInfo.name}
                                                             </span>
                                                             <span className="text-sm font-semibold">
                                                                 {comparisonResult.resumes[0].scores[item.key as keyof ResumeData["scores"]]}
                                                             </span>
                                                         </div>
-                                                        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                                        <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${comparisonResult.resumes[0].scores[item.key as keyof ResumeData["scores"]]}%` }}
@@ -248,11 +248,11 @@ export default function Compare() {
                                                             <span className="text-sm font-semibold">
                                                                 {comparisonResult.resumes[1].scores[item.key as keyof ResumeData["scores"]]}
                                                             </span>
-                                                            <span className="text-sm text-gray-500">
+                                                            <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                                 {comparisonResult.resumes[1].basicInfo.name}
                                                             </span>
                                                         </div>
-                                                        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                                        <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${comparisonResult.resumes[1].scores[item.key as keyof ResumeData["scores"]]}%` }}
@@ -271,7 +271,7 @@ export default function Compare() {
                                     {comparisonResult.resumes.map((resume, index) => (
                                         <div key={resume.id} className="space-y-6">
                                             {comparisonResult.comparison.strengths[resume.id]?.length > 0 && (
-                                                <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-200">
+                                                <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl p-6 border border-emerald-200 dark:border-emerald-800">
                                                     <h4 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center space-x-2">
                                                         <TrendingUp className="w-5 h-5" />
                                                         <span>优势</span>
@@ -287,7 +287,7 @@ export default function Compare() {
                                                 </div>
                                             )}
                                             {comparisonResult.comparison.weaknesses[resume.id]?.length > 0 && (
-                                                <div className="bg-red-50 rounded-2xl p-6 border border-red-200">
+                                                <div className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-6 border border-red-200 dark:border-red-800">
                                                     <h4 className="text-lg font-semibold text-red-800 mb-4 flex items-center space-x-2">
                                                         <TrendingDown className="w-5 h-5" />
                                                         <span>劣势</span>
@@ -306,12 +306,12 @@ export default function Compare() {
                                     ))}
                                 </div>
 
-                                <div className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-200">
-                                    <h4 className="text-xl font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                                <div className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-8 border border-purple-200">
+                                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
                                         <Trophy className="w-6 h-6 text-purple-600" />
                                         <span>AI 推荐建议</span>
                                     </h4>
-                                    <p className="text-gray-700 leading-relaxed">
+                                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                                         {comparisonResult.comparison.recommendation}
                                     </p>
                                 </div>

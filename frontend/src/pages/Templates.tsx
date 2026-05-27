@@ -122,7 +122,7 @@ export default function Templates() {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navbar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -133,23 +133,23 @@ export default function Templates() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="text-center mb-12">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                             简历模板
                         </h1>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500 max-w-2xl mx-auto">
                             精选多款专业简历模板，助您打造完美简历
                         </p>
                     </div>
 
                     <div className="flex flex-col md:flex-row gap-4 mb-8">
                         <div className="flex-1 relative">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="搜索模板..."
                                 value={searchKeyword}
                                 onChange={(e) => setSearchKeyword(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white"
                             />
                         </div>
                         <div className="flex gap-2 overflow-x-auto pb-2">
@@ -160,7 +160,7 @@ export default function Templates() {
                                     className={`px-4 py-3 rounded-xl font-medium whitespace-nowrap transition-all duration-200 ${
                                         selectedCategory === category
                                             ? "bg-blue-600 text-white"
-                                            : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+                                            : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 dark:text-gray-600 border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
                                     }`}
                                 >
                                     {category}
@@ -179,7 +179,7 @@ export default function Templates() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
                                     whileHover={{ y: -8 }}
-                                    className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
                                 >
                                     <div
                                         className={`h-48 ${template.thumbnail} flex items-center justify-center`}
@@ -188,9 +188,9 @@ export default function Templates() {
                                             <div
                                                 className={`w-20 h-28 bg-white rounded-lg shadow-lg mx-auto mb-4 flex items-center justify-center`}
                                             >
-                                                <Icon className="w-10 h-10 text-gray-400" />
+                                                <Icon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
                                             </div>
-                                            <p className="text-sm font-medium text-gray-600">
+                                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-500">
                                                 {template.name}
                                             </p>
                                         </div>
@@ -199,22 +199,22 @@ export default function Templates() {
                                     <div className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
-                                                <h3 className="text-lg font-semibold text-gray-900">
+                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                                     {template.name}
                                                 </h3>
-                                                <span className="text-sm text-gray-500">
+                                                <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                     {template.category}
                                                 </span>
                                             </div>
                                             <div className="flex items-center space-x-1">
                                                 <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                                <span className="text-sm font-medium text-gray-700">
+                                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
                                                     {template.rating}
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-4 line-clamp-2">
                                             {template.description}
                                         </p>
 
@@ -222,22 +222,22 @@ export default function Templates() {
                                             {template.tags.map((tag) => (
                                                 <span
                                                     key={tag}
-                                                    className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
+                                                    className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 dark:text-gray-600 text-xs rounded-md"
                                                 >
                                                     {tag}
                                                 </span>
                                             ))}
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                            <div className="flex items-center space-x-1 text-sm text-gray-500">
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                                            <div className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                 <Download className="w-4 h-4" />
                                                 <span>{template.downloads} 次下载</span>
                                             </div>
                                             <div className="flex items-center space-x-2">
                                                 <button
                                                     onClick={() => setPreviewTemplate(template)}
-                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors"
                                                 >
                                                     <Eye className="w-5 h-5" />
                                                 </button>
@@ -254,12 +254,12 @@ export default function Templates() {
                     </div>
 
                     {filteredTemplates.length === 0 && (
-                        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-                            <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600">
+                            <FileText className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                 未找到匹配的模板
                             </h3>
-                            <p className="text-gray-500">尝试使用其他关键词或分类筛选</p>
+                            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">尝试使用其他关键词或分类筛选</p>
                         </div>
                     )}
                 </motion.div>
@@ -275,19 +275,19 @@ export default function Templates() {
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-8">
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-bold text-gray-900">
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                                     {previewTemplate.name}
                                 </h2>
                                 <button
                                     onClick={() => setPreviewTemplate(null)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-gray-100 dark:bg-gray-700 rounded-lg transition-colors"
                                 >
-                                    <span className="text-gray-500">✕</span>
+                                    <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500">✕</span>
                                 </button>
                             </div>
 
@@ -296,12 +296,12 @@ export default function Templates() {
                             >
                                 <div className="text-center">
                                     <div className="w-48 h-64 bg-white rounded-lg shadow-2xl mx-auto mb-4 flex items-center justify-center">
-                                        <previewTemplate.icon className="w-16 h-16 text-gray-400" />
+                                        <previewTemplate.icon className="w-16 h-16 text-gray-400 dark:text-gray-500" />
                                     </div>
                                 </div>
                             </div>
 
-                            <p className="text-gray-600 mb-6">
+                            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-6">
                                 {previewTemplate.description}
                             </p>
 
@@ -311,7 +311,7 @@ export default function Templates() {
                                         <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
                                         <span className="font-medium">{previewTemplate.rating}</span>
                                     </div>
-                                    <span className="text-gray-500">
+                                    <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                         {previewTemplate.downloads} 次下载
                                     </span>
                                 </div>
