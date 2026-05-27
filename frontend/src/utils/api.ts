@@ -1,4 +1,4 @@
-import { ResumeData, MatchResult, ComparisonResult } from "@/types/resume";
+import { ResumeData, MatchResult, ComparisonResult, BatchUploadResult, BatchTaskStatus, BatchTaskResults } from "@/types/resume";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
 
@@ -37,6 +37,64 @@ export const api = {
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.error || "Analysis failed");
+        }
+
+        return response.json();
+    },
+
+    async batchUpload(files: File[]): Promise<BatchUploadResult> {
+        const formData = new FormData();
+        files.forEach((file) => {
+            formData.append("files", file);
+        });
+
+        const response = await fetch(`${API_BASE}/resume/batch/upload`, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Batch upload failed");
+        }
+
+        return response.json();
+    },
+
+    async batchAnalyze(files: { id: string; filename: string }[], useCoze: boolean = false): Promise<{ batchId: string; status: string; totalCount: number }> {
+        const response = await fetch(`${API_BASE}/resume/batch/analyze`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ files, useCoze }),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Batch analysis failed");
+        }
+
+        return response.json();
+    },
+
+    async getBatchStatus(batchId: string): Promise<BatchTaskStatus> {
+        const response = await fetch(`${API_BASE}/batch/${batchId}/status`);
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to get batch status");
+        }
+
+        return response.json();
+    },
+
+    async getBatchResults(batchId: string): Promise<BatchTaskResults> {
+        const response = await fetch(`${API_BASE}/batch/${batchId}/results`);
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to get batch results");
         }
 
         return response.json();

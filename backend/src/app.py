@@ -1,6 +1,8 @@
 import os
 import uuid
+import threading
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -25,20 +27,122 @@ UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 history_store = HistoryStore()
+batch_tasks = {}
+batch_tasks_lock = threading.Lock()
 
-# 初始化两种分析器
 resume_analyzer = ResumeAnalyzer
 coze_analyzer = CozeAnalyzer()
+
+MAX_BATCH_CONCURRENCY = 3
+MAX_BATCH_FILES = 50
+MAX_SINGLE_FILE_SIZE = 10 * 1024 * 1024
 
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def _analyze_single_resume(resume_id, filename, use_coze):
+    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{resume_id}.pdf")
+
+    if not os.path.exists(pdf_path):
+        raise FileNotFoundError(f"Resume file not found: {resume_id}")
+
+    parser = PDFParser(pdf_path)
+    text = parser.get_text()
+    lines = parser.get_lines()
+
+    extractor = TextExtractor(text, lines)
+    extracted_data = extractor.extract_all()
+
+    if use_coze:
+        try:
+            coze_result = coze_analyzer.analyze_resume(
+                resume_text=text,
+                basic_info=extracted_data.get('basicInfo', {})
+            )
+            analysis_result = {
+                'scores': coze_result.get('scores', {}),
+                'analysis': coze_result.get('analysis', ''),
+                'suggestions': coze_result.get('suggestions', []),
+                'aiProvider': 'coze'
+            }
+            if 'skills' not in analysis_result.get('scores', {}):
+                analyzer = ResumeAnalyzer(extracted_data)
+                rule_result = analyzer.analyze()
+                analysis_result['scores'] = {
+                    **rule_result['scores'],
+                    **analysis_result['scores']
+                }
+        except Exception as e:
+            print(f"Coze analysis failed for {resume_id}, falling back to rules: {e}")
+            analyzer = ResumeAnalyzer(extracted_data)
+            analysis_result = analyzer.analyze()
+            analysis_result['aiProvider'] = 'rule'
+            analysis_result['cozeError'] = str(e)
+    else:
+        analyzer = ResumeAnalyzer(extracted_data)
+        analysis_result = analyzer.analyze()
+        analysis_result['aiProvider'] = 'rule'
+
+    resume_data = {
+        'id': resume_id,
+        'filename': filename,
+        'uploadedAt': datetime.now().isoformat(),
+        **extracted_data,
+        **analysis_result
+    }
+
+    history_store.add(resume_data)
+    return resume_data
+
+
+def _process_batch_task(batch_id, file_tasks, use_coze):
+    with batch_tasks_lock:
+        batch_tasks[batch_id]['status'] = 'processing'
+        batch_tasks[batch_id]['totalCount'] = len(file_tasks)
+
+    def process_one(file_task):
+        resume_id = file_task['id']
+        filename = file_task['filename']
+        try:
+            with batch_tasks_lock:
+                batch_tasks[batch_id]['currentProcessing'].append(resume_id)
+
+            result = _analyze_single_resume(resume_id, filename, use_coze)
+
+            with batch_tasks_lock:
+                batch_tasks[batch_id]['completedCount'] += 1
+                batch_tasks[batch_id]['results'].append(result)
+                batch_tasks[batch_id]['currentProcessing'].remove(resume_id)
+
+            return result
+        except Exception as e:
+            with batch_tasks_lock:
+                batch_tasks[batch_id]['failedCount'] += 1
+                batch_tasks[batch_id]['errors'].append({
+                    'id': resume_id,
+                    'filename': filename,
+                    'error': str(e)
+                })
+                if resume_id in batch_tasks[batch_id]['currentProcessing']:
+                    batch_tasks[batch_id]['currentProcessing'].remove(resume_id)
+            return None
+
+    with ThreadPoolExecutor(max_workers=MAX_BATCH_CONCURRENCY) as executor:
+        futures = {executor.submit(process_one, ft): ft for ft in file_tasks}
+        for future in as_completed(futures):
+            future.result()
+
+    with batch_tasks_lock:
+        batch_tasks[batch_id]['status'] = 'completed'
+        batch_tasks[batch_id]['completedAt'] = datetime.now().isoformat()
 
 
 @app.route('/api/health', methods=['GET'])
@@ -159,6 +263,142 @@ def get_resume(resume_id):
         return jsonify(resume)
     else:
         return jsonify({'error': 'Resume not found'}), 404
+
+
+@app.route('/api/resume/batch/upload', methods=['POST'])
+def batch_upload():
+    if 'files' not in request.files:
+        return jsonify({'error': 'No files part'}), 400
+
+    files = request.files.getlist('files')
+
+    if not files or len(files) == 0:
+        return jsonify({'error': 'No files selected'}), 400
+
+    if len(files) > MAX_BATCH_FILES:
+        return jsonify({'error': f'Too many files. Maximum is {MAX_BATCH_FILES}'}), 400
+
+    uploaded = []
+    errors = []
+
+    for file in files:
+        if file.filename == '':
+            errors.append({'filename': 'unknown', 'error': 'Empty filename'})
+            continue
+
+        if not allowed_file(file.filename):
+            errors.append({'filename': file.filename, 'error': 'Only PDF files are allowed'})
+            continue
+
+        file.seek(0, 2)
+        file_size = file.tell()
+        file.seek(0)
+
+        if file_size > MAX_SINGLE_FILE_SIZE:
+            errors.append({'filename': file.filename, 'error': f'File too large. Maximum is {MAX_SINGLE_FILE_SIZE // (1024*1024)}MB'})
+            continue
+
+        filename = secure_filename(file.filename)
+        file_id = str(uuid.uuid4())
+        save_filename = f"{file_id}.pdf"
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], save_filename)
+        file.save(save_path)
+
+        uploaded.append({
+            'id': file_id,
+            'filename': filename,
+            'status': 'uploaded'
+        })
+
+    return jsonify({
+        'uploaded': uploaded,
+        'errors': errors,
+        'total': len(files),
+        'successCount': len(uploaded),
+        'errorCount': len(errors)
+    })
+
+
+@app.route('/api/resume/batch/analyze', methods=['POST'])
+def batch_analyze():
+    data = request.get_json()
+    file_tasks = data.get('files', [])
+    use_coze = data.get('useCoze', False)
+
+    if not file_tasks:
+        return jsonify({'error': 'No files to analyze'}), 400
+
+    batch_id = str(uuid.uuid4())
+
+    with batch_tasks_lock:
+        batch_tasks[batch_id] = {
+            'id': batch_id,
+            'status': 'pending',
+            'useCoze': use_coze,
+            'totalCount': len(file_tasks),
+            'completedCount': 0,
+            'failedCount': 0,
+            'results': [],
+            'errors': [],
+            'currentProcessing': [],
+            'createdAt': datetime.now().isoformat(),
+            'completedAt': None
+        }
+
+    thread = threading.Thread(
+        target=_process_batch_task,
+        args=(batch_id, file_tasks, use_coze),
+        daemon=True
+    )
+    thread.start()
+
+    return jsonify({
+        'batchId': batch_id,
+        'status': 'pending',
+        'totalCount': len(file_tasks)
+    })
+
+
+@app.route('/api/batch/<batch_id>/status', methods=['GET'])
+def get_batch_status(batch_id):
+    with batch_tasks_lock:
+        task = batch_tasks.get(batch_id)
+
+    if not task:
+        return jsonify({'error': 'Batch task not found'}), 404
+
+    return jsonify({
+        'id': task['id'],
+        'status': task['status'],
+        'totalCount': task['totalCount'],
+        'completedCount': task['completedCount'],
+        'failedCount': task['failedCount'],
+        'currentProcessing': task['currentProcessing'],
+        'errors': task['errors'],
+        'createdAt': task['createdAt'],
+        'completedAt': task['completedAt']
+    })
+
+
+@app.route('/api/batch/<batch_id>/results', methods=['GET'])
+def get_batch_results(batch_id):
+    with batch_tasks_lock:
+        task = batch_tasks.get(batch_id)
+
+    if not task:
+        return jsonify({'error': 'Batch task not found'}), 404
+
+    return jsonify({
+        'id': task['id'],
+        'status': task['status'],
+        'totalCount': task['totalCount'],
+        'completedCount': task['completedCount'],
+        'failedCount': task['failedCount'],
+        'results': task['results'],
+        'errors': task['errors'],
+        'createdAt': task['createdAt'],
+        'completedAt': task['completedAt']
+    })
 
 
 @app.route('/api/resume/compare', methods=['POST'])

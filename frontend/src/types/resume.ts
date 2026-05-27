@@ -50,3 +50,27 @@ export interface ComparisonResult {
         recommendation: string;
     };
 }
+
+export interface BatchUploadResult {
+    uploaded: { id: string; filename: string; status: string }[];
+    errors: { filename: string; error: string }[];
+    total: number;
+    successCount: number;
+    errorCount: number;
+}
+
+export interface BatchTaskStatus {
+    id: string;
+    status: 'pending' | 'processing' | 'completed';
+    totalCount: number;
+    completedCount: number;
+    failedCount: number;
+    currentProcessing: string[];
+    errors: { id: string; filename: string; error: string }[];
+    createdAt: string;
+    completedAt: string | null;
+}
+
+export interface BatchTaskResults extends BatchTaskStatus {
+    results: ResumeData[];
+}
