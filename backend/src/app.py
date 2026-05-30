@@ -12,6 +12,7 @@ from parser.text_extractor import TextExtractor
 from analyzer.resume_analyzer import ResumeAnalyzer
 from analyzer.coze_analyzer import CozeAnalyzer
 from analyzer.matcher import Matcher
+from analyzer.advanced_matcher import AdvancedMatcher, ComparisonConfig, create_custom_config, validate_config
 from storage.history_store import HistoryStore
 
 app = Flask(__name__)
@@ -405,6 +406,7 @@ def get_batch_results(batch_id):
 def compare_resumes():
     data = request.get_json()
     resume_ids = data.get('resumeIds', [])
+    config_data = data.get('config', {})
     
     if len(resume_ids) != 2:
         return jsonify({'error': 'Exactly two resume IDs are required'}), 400
@@ -415,52 +417,81 @@ def compare_resumes():
     if not resume1 or not resume2:
         return jsonify({'error': 'One or both resumes not found'}), 404
     
-    score1 = resume1.get('scores', {}).get('overall', 0)
-    score2 = resume2.get('scores', {}).get('overall', 0)
+    config = None
+    if config_data:
+        try:
+            config = create_custom_config(
+                skills_weight=config_data.get('skillsWeight', 0.45),
+                experience_weight=config_data.get('experienceWeight', 0.30),
+                education_weight=config_data.get('educationWeight', 0.25),
+                skill_match_threshold=config_data.get('skillMatchThreshold', 0.6),
+                experience_years_weight=config_data.get('experienceYearsWeight', 0.4),
+                project_quality_weight=config_data.get('projectQualityWeight', 0.3),
+                position_match_weight=config_data.get('positionMatchWeight', 0.3),
+                education_level_weight=config_data.get('educationLevelWeight', 0.5),
+                major_match_weight=config_data.get('majorMatchWeight', 0.3),
+                university_rank_weight=config_data.get('universityRankWeight', 0.2)
+            )
+            is_valid, message = validate_config(config)
+            if not is_valid:
+                return jsonify({'error': f'Invalid configuration: {message}'}), 400
+        except Exception as e:
+            return jsonify({'error': f'Invalid configuration: {str(e)}'}), 400
     
-    diff = abs(score1 - score2)
+    job_description = data.get('jobDescription', '')
+    requirements = data.get('requirements', '')
     
-    strengths = {
-        resume_ids[0]: [],
-        resume_ids[1]: []
-    }
+    matcher = AdvancedMatcher(job_description, requirements, config)
     
-    weaknesses = {
-        resume_ids[0]: [],
-        resume_ids[1]: []
-    }
+    result = matcher.compare_resumes(resume1, resume2)
     
-    if score1 > score2:
-        strengths[resume_ids[0]].append('综合评分较高')
-        weaknesses[resume_ids[1]].append('综合评分较低')
-    elif score2 > score1:
-        strengths[resume_ids[1]].append('综合评分较高')
-        weaknesses[resume_ids[0]].append('综合评分较低')
-    
-    if resume1.get('scores', {}).get('skills', 0) > resume2.get('scores', {}).get('skills', 0):
-        strengths[resume_ids[0]].append('技能评分较高')
-        weaknesses[resume_ids[1]].append('技能评分较低')
-    else:
-        strengths[resume_ids[1]].append('技能评分较高')
-        weaknesses[resume_ids[0]].append('技能评分较低')
-    
-    recommendation = ""
-    if diff >= 20:
-        recommendation = f"{resume1.get('basicInfo', {}).get('name', '候选人1')} 明显优于另一候选人"
-    elif diff >= 10:
-        recommendation = f"{resume1.get('basicInfo', {}).get('name', '候选人1')} 略优于另一候选人"
-    else:
-        recommendation = "两位候选人实力相当，建议进一步考察"
-    
+    return jsonify(result)
+
+
+@app.route('/api/resume/compare/config', methods=['GET'])
+def get_comparison_config():
+    default_config = ComparisonConfig()
     return jsonify({
-        'resumes': [resume1, resume2],
-        'comparison': {
-            'overallDiff': diff,
-            'strengths': strengths,
-            'weaknesses': weaknesses,
-            'recommendation': recommendation
-        }
+        'skillsWeight': default_config.skills_weight,
+        'experienceWeight': default_config.experience_weight,
+        'educationWeight': default_config.education_weight,
+        'skillMatchThreshold': default_config.skill_match_threshold,
+        'experienceYearsWeight': default_config.experience_years_weight,
+        'projectQualityWeight': default_config.project_quality_weight,
+        'positionMatchWeight': default_config.position_match_weight,
+        'educationLevelWeight': default_config.education_level_weight,
+        'majorMatchWeight': default_config.major_match_weight,
+        'universityRankWeight': default_config.university_rank_weight
     })
+
+
+@app.route('/api/resume/compare/validate-config', methods=['POST'])
+def validate_comparison_config():
+    data = request.get_json()
+    
+    try:
+        config = create_custom_config(
+            skills_weight=data.get('skillsWeight', 0.45),
+            experience_weight=data.get('experienceWeight', 0.30),
+            education_weight=data.get('educationWeight', 0.25),
+            skill_match_threshold=data.get('skillMatchThreshold', 0.6),
+            experience_years_weight=data.get('experienceYearsWeight', 0.4),
+            project_quality_weight=data.get('projectQualityWeight', 0.3),
+            position_match_weight=data.get('positionMatchWeight', 0.3),
+            education_level_weight=data.get('educationLevelWeight', 0.5),
+            major_match_weight=data.get('majorMatchWeight', 0.3),
+            university_rank_weight=data.get('universityRankWeight', 0.2)
+        )
+        is_valid, message = validate_config(config)
+        return jsonify({
+            'valid': is_valid,
+            'message': message
+        })
+    except Exception as e:
+        return jsonify({
+            'valid': False,
+            'message': str(e)
+        }), 400
 
 
 @app.route('/api/match', methods=['POST'])

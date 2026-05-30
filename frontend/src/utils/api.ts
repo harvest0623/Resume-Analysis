@@ -1,4 +1,4 @@
-import { ResumeData, MatchResult, ComparisonResult, BatchUploadResult, BatchTaskStatus, BatchTaskResults } from "@/types/resume";
+import { ResumeData, MatchResult, ComparisonResult, EnhancedComparisonResult, ComparisonConfig, BatchUploadResult, BatchTaskStatus, BatchTaskResults } from "@/types/resume";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
 
@@ -109,13 +109,18 @@ export const api = {
         return response.json();
     },
 
-    async compareResumes(resumeIds: string[]): Promise<ComparisonResult> {
+    async compareResumes(resumeIds: string[], config?: ComparisonConfig, jobDescription?: string, requirements?: string): Promise<EnhancedComparisonResult> {
         const response = await fetch(`${API_BASE}/resume/compare`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ resumeIds }),
+            body: JSON.stringify({ 
+                resumeIds,
+                config,
+                jobDescription,
+                requirements 
+            }),
         });
 
         if (!response.ok) {
@@ -123,6 +128,26 @@ export const api = {
             throw new Error(error.error || "Comparison failed");
         }
 
+        return response.json();
+    },
+
+    async getComparisonConfig(): Promise<ComparisonConfig> {
+        const response = await fetch(`${API_BASE}/resume/compare/config`);
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to get config");
+        }
+        return response.json();
+    },
+
+    async validateComparisonConfig(config: ComparisonConfig): Promise<{ valid: boolean; message: string }> {
+        const response = await fetch(`${API_BASE}/resume/compare/validate-config`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(config),
+        });
         return response.json();
     },
 

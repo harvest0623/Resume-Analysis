@@ -84,6 +84,49 @@
       "analysis": "该候选人综合表现有待提高，建议谨慎考虑。 技能方面需要加强，建议补充相关技术学习。 工作经验相对较少，需要更多实践机会。 教育背景良好，具备基本的知识体系。",
       "aiProvider": "rule",
       "cozeError": "Coze API 调用失败: 402 - {\"msg\":\"此应用已停止服务\\n可联系开发者充值积分，充值后即可正常访问\"}"
+    },
+    "5d247ada-6625-4bb7-a73b-483e181f1852": {
+      "id": "5d247ada-6625-4bb7-a73b-483e181f1852",
+      "filename": "--18679460523.pdf",
+      "uploadedAt": "2026-05-29T17:47:36.713540",
+      "basicInfo": {
+        "name": "黄鹤",
+        "phone": "18679460523",
+        "email": "3367741939@qq.com",
+        "address": "https://github.com/harvest0623/React-Playground 预览地址：http://47.118.25.23:8084"
+      },
+      "jobInfo": {
+        "position": "前端工程师",
+        "expectedSalary": "面议"
+      },
+      "background": {
+        "workYears": "未知",
+        "education": "本科",
+        "projects": [
+          "React-Playground（React在线编译平台） 2026.01 - 2026.03",
+          "项目介绍：开发现代的在线 React 代码编辑与预览平台，基于浏览器编译技术实现实时开发，无需本地环境配置",
+          "技术栈：React 19 + TypeScript 5 + Vite 7 + Monaco Editor + Babel Standalone + Allotment + Sass/SCSS"
+        ]
+      },
+      "skills": [
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Node.js",
+        "MySQL",
+        "Git",
+        "CSS",
+        "SASS",
+        "LESS"
+      ],
+      "scores": {
+        "overall": 71,
+        "skills": 87,
+        "experience": 50,
+        "education": 75
+      },
+      "analysis": "该候选人综合表现良好，符合大部分岗位要求。 技能方面非常突出，掌握多种主流技术栈。 工作经验相对较少，需要更多实践机会。 教育背景良好，具备基本的知识体系。",
+      "aiProvider": "rule"
     }
   }
 }

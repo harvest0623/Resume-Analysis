@@ -16,6 +16,8 @@ export interface ResumeData {
         workYears: string;
         education: string;
         projects: string[];
+        major?: string;
+        university?: string;
     };
     skills: string[];
     scores: {
@@ -48,6 +50,88 @@ export interface ComparisonResult {
         strengths: { [key: string]: string[] };
         weaknesses: { [key: string]: string[] };
         recommendation: string;
+    };
+}
+
+export interface ComparisonConfig {
+    skillsWeight: number;
+    experienceWeight: number;
+    educationWeight: number;
+    skillMatchThreshold: number;
+    experienceYearsWeight: number;
+    projectQualityWeight: number;
+    positionMatchWeight: number;
+    educationLevelWeight: number;
+    majorMatchWeight: number;
+    universityRankWeight: number;
+}
+
+export interface SkillDetail {
+    name: string;
+    weight: number;
+    proficiency: string;
+    score: number;
+}
+
+export interface SkillsDetails {
+    matched: SkillDetail[];
+    unmatched: string[];
+    bonus: string[];
+    categoryScores: Record<string, number[]>;
+    baseScore: number;
+    bonusScore: number;
+    categoryBonus: number;
+    industry: string;
+}
+
+export interface ExperienceDetails {
+    years: number;
+    yearsScore: number;
+    positionMatch: number;
+    projectScore: number;
+    totalScore: number;
+}
+
+export interface EducationDetails {
+    educationLevel: number;
+    majorMatch: number;
+    universityRank: number;
+    totalScore: number;
+}
+
+export interface EnhancedComparisonResult {
+    resumes: [ResumeData, ResumeData];
+    results: [{
+        matchScore: number;
+        details: {
+            skillsMatch: number;
+            experienceMatch: number;
+            educationMatch: number;
+            priorityWeights: Record<string, number>;
+        };
+        skillsDetails: SkillsDetails;
+        experienceDetails: ExperienceDetails;
+        educationDetails: EducationDetails;
+        highlights: string[];
+    }, {
+        matchScore: number;
+        details: {
+            skillsMatch: number;
+            experienceMatch: number;
+            educationMatch: number;
+            priorityWeights: Record<string, number>;
+        };
+        skillsDetails: SkillsDetails;
+        experienceDetails: ExperienceDetails;
+        educationDetails: EducationDetails;
+        highlights: string[];
+    }];
+    comparison: {
+        overallDiff: number;
+        strengths: { [key: string]: string[] };
+        weaknesses: { [key: string]: string[] };
+        recommendation: string;
+        priorityWeights: Record<string, number>;
     };
 }
 

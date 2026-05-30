@@ -1,18 +1,38 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, RefreshCcw, CheckCircle, ArrowRight, TrendingUp, TrendingDown, Equal, Trophy } from "lucide-react";
+import { Users, RefreshCcw, CheckCircle, ArrowRight, TrendingUp, TrendingDown, Equal, Trophy, Settings, ChevronDown, ChevronUp, Briefcase, GraduationCap, Code, Target } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
 import ResumeCard from "@/components/ResumeCard";
 import { api } from "@/utils/api";
 import { useResumeStore } from "@/store/resumeStore";
-import { ResumeData, ComparisonResult } from "@/types/resume";
+import { ResumeData, EnhancedComparisonResult, ComparisonConfig } from "@/types/resume";
 
 export default function Compare() {
     const [selectedResumes, setSelectedResumes] = useState<string[]>([]);
-    const [comparisonResult, setComparisonResult] = useState<ComparisonResult | null>(null);
+    const [comparisonResult, setComparisonResult] = useState<EnhancedComparisonResult | null>(null);
     const [isComparing, setIsComparing] = useState(false);
     const { resumes, setResumes } = useResumeStore();
+    const [showConfig, setShowConfig] = useState(false);
+    const [config, setConfig] = useState<ComparisonConfig>({
+        skillsWeight: 0.45,
+        experienceWeight: 0.30,
+        educationWeight: 0.25,
+        skillMatchThreshold: 0.6,
+        experienceYearsWeight: 0.4,
+        projectQualityWeight: 0.3,
+        positionMatchWeight: 0.3,
+        educationLevelWeight: 0.5,
+        majorMatchWeight: 0.3,
+        universityRankWeight: 0.2
+    });
+    const [jobDescription, setJobDescription] = useState("");
+    const [requirements, setRequirements] = useState("");
+    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+        skills: true,
+        experience: true,
+        education: true
+    });
 
     useEffect(() => {
         const loadHistory = async () => {
@@ -39,7 +59,12 @@ export default function Compare() {
 
         setIsComparing(true);
         try {
-            const result = await api.compareResumes(selectedResumes);
+            const result = await api.compareResumes(
+                selectedResumes,
+                showConfig ? config : undefined,
+                jobDescription,
+                requirements
+            );
             setComparisonResult(result);
         } catch (err) {
             console.error("Comparison failed:", err);
@@ -51,6 +76,35 @@ export default function Compare() {
     const reset = () => {
         setSelectedResumes([]);
         setComparisonResult(null);
+    };
+
+    const toggleSection = (section: string) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
+
+    const handleConfigChange = (key: keyof ComparisonConfig, value: number) => {
+        setConfig(prev => ({
+            ...prev,
+            [key]: value
+        }));
+    };
+
+    const resetConfig = () => {
+        setConfig({
+            skillsWeight: 0.45,
+            experienceWeight: 0.30,
+            educationWeight: 0.25,
+            skillMatchThreshold: 0.6,
+            experienceYearsWeight: 0.4,
+            projectQualityWeight: 0.3,
+            positionMatchWeight: 0.3,
+            educationLevelWeight: 0.5,
+            majorMatchWeight: 0.3,
+            universityRankWeight: 0.2
+        });
     };
 
     const getScoreIcon = (score1: number, score2: number, index: number) => {
@@ -100,26 +154,175 @@ export default function Compare() {
                                         <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500">
                                             已选择 {selectedResumes.length}/2 份简历
                                         </p>
-                                        {selectedResumes.length === 2 && (
+                                        <div className="flex items-center space-x-3">
                                             <button
-                                                onClick={handleCompare}
-                                                disabled={isComparing}
-                                                className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                                                onClick={() => setShowConfig(!showConfig)}
+                                                className="inline-flex items-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-lg border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200"
                                             >
-                                                {isComparing ? (
-                                                    <>
-                                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                        <span>对比中...</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Users className="w-5 h-5" />
-                                                        <span>开始对比</span>
-                                                    </>
-                                                )}
+                                                <Settings className="w-4 h-4" />
+                                                <span>配置规则</span>
+                                                {showConfig ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                             </button>
-                                        )}
+                                            {selectedResumes.length === 2 && (
+                                                <button
+                                                    onClick={handleCompare}
+                                                    disabled={isComparing}
+                                                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                                                >
+                                                    {isComparing ? (
+                                                        <>
+                                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                            <span>对比中...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Users className="w-5 h-5" />
+                                                            <span>开始对比</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
+
+                                    <AnimatePresence>
+                                        {showConfig && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                className="mb-6 overflow-hidden"
+                                            >
+                                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">自定义规则配置</h3>
+                                                        <button
+                                                            onClick={resetConfig}
+                                                            className="text-sm text-blue-600 hover:text-blue-700"
+                                                        >
+                                                            重置默认
+                                                        </button>
+                                                    </div>
+
+                                                    <div className="grid md:grid-cols-2 gap-6">
+                                                        <div>
+                                                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">岗位描述</h4>
+                                                            <textarea
+                                                                value={jobDescription}
+                                                                onChange={(e) => setJobDescription(e.target.value)}
+                                                                placeholder="输入岗位描述，帮助更精准地评估匹配度..."
+                                                                className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                                                                rows={3}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">岗位要求</h4>
+                                                            <textarea
+                                                                value={requirements}
+                                                                onChange={(e) => setRequirements(e.target.value)}
+                                                                placeholder="输入具体要求，如技能、经验、学历等..."
+                                                                className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                                                                rows={3}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-6">
+                                                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">维度权重配置</h4>
+                                                        <div className="grid grid-cols-3 gap-4">
+                                                            <div>
+                                                                <label className="block text-xs text-gray-500 mb-1">技能权重</label>
+                                                                <input
+                                                                    type="range"
+                                                                    min="0"
+                                                                    max="100"
+                                                                    value={config.skillsWeight * 100}
+                                                                    onChange={(e) => handleConfigChange('skillsWeight', Number(e.target.value) / 100)}
+                                                                    className="w-full"
+                                                                />
+                                                                <span className="text-xs text-gray-500">{Math.round(config.skillsWeight * 100)}%</span>
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs text-gray-500 mb-1">经验权重</label>
+                                                                <input
+                                                                    type="range"
+                                                                    min="0"
+                                                                    max="100"
+                                                                    value={config.experienceWeight * 100}
+                                                                    onChange={(e) => handleConfigChange('experienceWeight', Number(e.target.value) / 100)}
+                                                                    className="w-full"
+                                                                />
+                                                                <span className="text-xs text-gray-500">{Math.round(config.experienceWeight * 100)}%</span>
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs text-gray-500 mb-1">学历权重</label>
+                                                                <input
+                                                                    type="range"
+                                                                    min="0"
+                                                                    max="100"
+                                                                    value={config.educationWeight * 100}
+                                                                    onChange={(e) => handleConfigChange('educationWeight', Number(e.target.value) / 100)}
+                                                                    className="w-full"
+                                                                />
+                                                                <span className="text-xs text-gray-500">{Math.round(config.educationWeight * 100)}%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                        <div>
+                                                            <label className="block text-xs text-gray-500 mb-1">工作年限权重</label>
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="100"
+                                                                value={config.experienceYearsWeight * 100}
+                                                                onChange={(e) => handleConfigChange('experienceYearsWeight', Number(e.target.value) / 100)}
+                                                                className="w-full"
+                                                            />
+                                                            <span className="text-xs text-gray-500">{Math.round(config.experienceYearsWeight * 100)}%</span>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-xs text-gray-500 mb-1">项目质量权重</label>
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="100"
+                                                                value={config.projectQualityWeight * 100}
+                                                                onChange={(e) => handleConfigChange('projectQualityWeight', Number(e.target.value) / 100)}
+                                                                className="w-full"
+                                                            />
+                                                            <span className="text-xs text-gray-500">{Math.round(config.projectQualityWeight * 100)}%</span>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-xs text-gray-500 mb-1">学历层次权重</label>
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="100"
+                                                                value={config.educationLevelWeight * 100}
+                                                                onChange={(e) => handleConfigChange('educationLevelWeight', Number(e.target.value) / 100)}
+                                                                className="w-full"
+                                                            />
+                                                            <span className="text-xs text-gray-500">{Math.round(config.educationLevelWeight * 100)}%</span>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-xs text-gray-500 mb-1">专业匹配权重</label>
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="100"
+                                                                value={config.majorMatchWeight * 100}
+                                                                onChange={(e) => handleConfigChange('majorMatchWeight', Number(e.target.value) / 100)}
+                                                                className="w-full"
+                                                            />
+                                                            <span className="text-xs text-gray-500">{Math.round(config.majorMatchWeight * 100)}%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
 
                                 {resumes.length > 0 ? (
@@ -267,6 +470,158 @@ export default function Compare() {
                                     </div>
                                 </div>
 
+                                <div className="grid lg:grid-cols-3 gap-6 mb-8">
+                                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                                        <button
+                                            onClick={() => toggleSection('skills')}
+                                            className="w-full flex items-center justify-between mb-4"
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <Code className="w-5 h-5 text-blue-600" />
+                                                <h4 className="font-semibold text-gray-900 dark:text-white">技能分析</h4>
+                                            </div>
+                                            {expandedSections.skills ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                        </button>
+                                        {expandedSections.skills && comparisonResult.results && (
+                                            <div className="space-y-4">
+                                                {comparisonResult.results.map((result, index) => (
+                                                    <div key={index}>
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                                {comparisonResult.resumes[index].basicInfo.name}
+                                                            </span>
+                                                            <span className="text-sm font-semibold text-blue-600">
+                                                                {result.details.skillsMatch}分
+                                                            </span>
+                                                        </div>
+                                                        <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                            <motion.div
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: `${result.details.skillsMatch}%` }}
+                                                                transition={{ duration: 0.8 }}
+                                                                className="h-full bg-blue-500 rounded-full"
+                                                            />
+                                                        </div>
+                                                        {result.skillsDetails.matched.length > 0 && (
+                                                            <div className="mt-2 flex flex-wrap gap-1">
+                                                                {result.skillsDetails.matched.slice(0, 5).map((skill, i) => (
+                                                                    <span key={i} className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs rounded-full">
+                                                                        {skill.name}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                                        <button
+                                            onClick={() => toggleSection('experience')}
+                                            className="w-full flex items-center justify-between mb-4"
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <Briefcase className="w-5 h-5 text-amber-600" />
+                                                <h4 className="font-semibold text-gray-900 dark:text-white">经验分析</h4>
+                                            </div>
+                                            {expandedSections.experience ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                        </button>
+                                        {expandedSections.experience && comparisonResult.results && (
+                                            <div className="space-y-4">
+                                                {comparisonResult.results.map((result, index) => (
+                                                    <div key={index}>
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                                {comparisonResult.resumes[index].basicInfo.name}
+                                                            </span>
+                                                            <span className="text-sm font-semibold text-amber-600">
+                                                                {result.details.experienceMatch}分
+                                                            </span>
+                                                        </div>
+                                                        <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                            <motion.div
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: `${result.details.experienceMatch}%` }}
+                                                                transition={{ duration: 0.8 }}
+                                                                className="h-full bg-amber-500 rounded-full"
+                                                            />
+                                                        </div>
+                                                        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                                            工作年限：{result.experienceDetails.years}年 | 
+                                                            岗位匹配：{result.experienceDetails.positionMatch}分
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                                        <button
+                                            onClick={() => toggleSection('education')}
+                                            className="w-full flex items-center justify-between mb-4"
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <GraduationCap className="w-5 h-5 text-emerald-600" />
+                                                <h4 className="font-semibold text-gray-900 dark:text-white">学历分析</h4>
+                                            </div>
+                                            {expandedSections.education ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                        </button>
+                                        {expandedSections.education && comparisonResult.results && (
+                                            <div className="space-y-4">
+                                                {comparisonResult.results.map((result, index) => (
+                                                    <div key={index}>
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                                {comparisonResult.resumes[index].basicInfo.name}
+                                                            </span>
+                                                            <span className="text-sm font-semibold text-emerald-600">
+                                                                {result.details.educationMatch}分
+                                                            </span>
+                                                        </div>
+                                                        <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                            <motion.div
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: `${result.details.educationMatch}%` }}
+                                                                transition={{ duration: 0.8 }}
+                                                                className="h-full bg-emerald-500 rounded-full"
+                                                            />
+                                                        </div>
+                                                        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                                            学历层次：{comparisonResult.resumes[index].background.education}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {comparisonResult.comparison.priorityWeights && (
+                                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+                                        <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
+                                            <Target className="w-5 h-5 text-purple-600" />
+                                            <span>权重分配</span>
+                                        </h4>
+                                        <div className="flex items-center space-x-4">
+                                            {Object.entries(comparisonResult.comparison.priorityWeights).map(([key, value]) => (
+                                                <div key={key} className="flex-1">
+                                                    <div className="text-center">
+                                                        <div className="text-2xl font-bold text-purple-600">
+                                                            {Math.round(value * 100)}%
+                                                        </div>
+                                                        <div className="text-xs text-gray-500 mt-1">
+                                                            {key === 'skills' ? '技能' : key === 'experience' ? '经验' : '学历'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="grid md:grid-cols-2 gap-8">
                                     {comparisonResult.resumes.map((resume, index) => (
                                         <div key={resume.id} className="space-y-6">
@@ -297,6 +652,22 @@ export default function Compare() {
                                                             <li key={i} className="flex items-start space-x-2 text-red-700">
                                                                 <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                                                 <span>{weakness}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            {comparisonResult.results && comparisonResult.results[index].highlights.length > 0 && (
+                                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
+                                                    <h4 className="text-lg font-semibold text-blue-800 mb-4 flex items-center space-x-2">
+                                                        <Trophy className="w-5 h-5" />
+                                                        <span>亮点</span>
+                                                    </h4>
+                                                    <ul className="space-y-2">
+                                                        {comparisonResult.results[index].highlights.map((highlight, i) => (
+                                                            <li key={i} className="flex items-start space-x-2 text-blue-700">
+                                                                <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                                <span>{highlight}</span>
                                                             </li>
                                                         ))}
                                                     </ul>
