@@ -109,7 +109,7 @@ export const api = {
         return response.json();
     },
 
-    async compareResumes(resumeIds: string[], config?: ComparisonConfig, jobDescription?: string, requirements?: string): Promise<EnhancedComparisonResult> {
+    async compareResumes(resumeIds: string[], config?: ComparisonConfig, jobDescription?: string, requirements?: string, useCoze: boolean = false): Promise<EnhancedComparisonResult> {
         const response = await fetch(`${API_BASE}/resume/compare`, {
             method: "POST",
             headers: {
@@ -119,7 +119,8 @@ export const api = {
                 resumeIds,
                 config,
                 jobDescription,
-                requirements 
+                requirements,
+                useCoze
             }),
         });
 

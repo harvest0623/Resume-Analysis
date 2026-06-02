@@ -99,39 +99,30 @@ export interface EducationDetails {
     totalScore: number;
 }
 
+export interface SingleResumeComparisonResult {
+    matchScore: number;
+    details: {
+        skillsMatch: number;
+        experienceMatch: number;
+        educationMatch: number;
+        priorityWeights: Record<string, number>;
+    };
+    skillsDetails: SkillsDetails;
+    experienceDetails: ExperienceDetails;
+    educationDetails: EducationDetails;
+    highlights: string[];
+}
+
 export interface EnhancedComparisonResult {
-    resumes: [ResumeData, ResumeData];
-    results: [{
-        matchScore: number;
-        details: {
-            skillsMatch: number;
-            experienceMatch: number;
-            educationMatch: number;
-            priorityWeights: Record<string, number>;
-        };
-        skillsDetails: SkillsDetails;
-        experienceDetails: ExperienceDetails;
-        educationDetails: EducationDetails;
-        highlights: string[];
-    }, {
-        matchScore: number;
-        details: {
-            skillsMatch: number;
-            experienceMatch: number;
-            educationMatch: number;
-            priorityWeights: Record<string, number>;
-        };
-        skillsDetails: SkillsDetails;
-        experienceDetails: ExperienceDetails;
-        educationDetails: EducationDetails;
-        highlights: string[];
-    }];
+    resumes: ResumeData[];
+    results: SingleResumeComparisonResult[];
     comparison: {
         overallDiff: number;
         strengths: { [key: string]: string[] };
         weaknesses: { [key: string]: string[] };
         recommendation: string;
         priorityWeights: Record<string, number>;
+        ranking?: { id: string; name: string; rank: number; score: number }[];
     };
 }
 

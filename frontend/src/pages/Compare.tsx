@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, RefreshCcw, CheckCircle, ArrowRight, TrendingUp, TrendingDown, Equal, Trophy, Settings, ChevronDown, ChevronUp, Briefcase, GraduationCap, Code, Target } from "lucide-react";
+import { Users, RefreshCcw, CheckCircle, ArrowRight, TrendingUp, TrendingDown, Trophy, Settings, ChevronDown, ChevronUp, Briefcase, GraduationCap, Code, Target, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
 import ResumeCard from "@/components/ResumeCard";
@@ -12,8 +12,10 @@ export default function Compare() {
     const [selectedResumes, setSelectedResumes] = useState<string[]>([]);
     const [comparisonResult, setComparisonResult] = useState<EnhancedComparisonResult | null>(null);
     const [isComparing, setIsComparing] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const { resumes, setResumes } = useResumeStore();
     const [showConfig, setShowConfig] = useState(false);
+    const [useCoze, setUseCoze] = useState(false);
     const [config, setConfig] = useState<ComparisonConfig>({
         skillsWeight: 0.45,
         experienceWeight: 0.30,
@@ -49,25 +51,32 @@ export default function Compare() {
     const toggleResume = (id: string) => {
         if (selectedResumes.includes(id)) {
             setSelectedResumes(selectedResumes.filter((r) => r !== id));
-        } else if (selectedResumes.length < 2) {
+        } else if (selectedResumes.length < 5) {
             setSelectedResumes([...selectedResumes, id]);
         }
     };
 
     const handleCompare = async () => {
-        if (selectedResumes.length !== 2) return;
+        if (selectedResumes.length < 2) return;
 
         setIsComparing(true);
+        setError(null);
         try {
             const result = await api.compareResumes(
                 selectedResumes,
                 showConfig ? config : undefined,
                 jobDescription,
-                requirements
+                requirements,
+                useCoze
             );
-            setComparisonResult(result);
-        } catch (err) {
+            if (result && result.resumes && result.results && result.comparison) {
+                setComparisonResult(result);
+            } else {
+                throw new Error("返回数据格式错误");
+            }
+        } catch (err: any) {
             console.error("Comparison failed:", err);
+            setError(err.message || "对比分析失败，请稍后重试");
         } finally {
             setIsComparing(false);
         }
@@ -107,14 +116,6 @@ export default function Compare() {
         });
     };
 
-    const getScoreIcon = (score1: number, score2: number, index: number) => {
-        if (score1 === score2) return <Equal className="w-5 h-5 text-gray-400 dark:text-gray-500" />;
-        if ((index === 0 && score1 > score2) || (index === 1 && score2 > score1)) {
-            return <TrendingUp className="w-5 h-5 text-emerald-500" />;
-        }
-        return <TrendingDown className="w-5 h-5 text-red-500" />;
-    };
-
     const getScoreColor = (score: number) => {
         if (score >= 80) return "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20";
         if (score >= 60) return "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20";
@@ -137,7 +138,7 @@ export default function Compare() {
                             简历对比分析
                         </h1>
                         <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
-                            选择两份简历进行对比，帮助您做出更好的招聘决策
+                            选择2-5份简历进行对比，帮助您做出更好的招聘决策
                         </p>
                     </div>
 
@@ -151,8 +152,8 @@ export default function Compare() {
                             >
                                 <div className="mb-8">
                                     <div className="flex items-center justify-between mb-6">
-                                        <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500">
-                                            已选择 {selectedResumes.length}/2 份简历
+                                        <p className="text-gray-600 dark:text-gray-400">
+                                            已选择 {selectedResumes.length}/5 份简历（至少选择2份）
                                         </p>
                                         <div className="flex items-center space-x-3">
                                             <button
@@ -163,11 +164,15 @@ export default function Compare() {
                                                 <span>配置规则</span>
                                                 {showConfig ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                             </button>
-                                            {selectedResumes.length === 2 && (
+                                            {selectedResumes.length >= 2 && (
                                                 <button
                                                     onClick={handleCompare}
                                                     disabled={isComparing}
-                                                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                                                    className={`inline-flex items-center space-x-2 px-6 py-3 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
+                                                        useCoze 
+                                                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600' 
+                                                            : 'bg-gradient-to-r from-blue-600 to-indigo-600'
+                                                    }`}
                                                 >
                                                     {isComparing ? (
                                                         <>
@@ -176,14 +181,57 @@ export default function Compare() {
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <Users className="w-5 h-5" />
-                                                            <span>开始对比</span>
+                                                            {useCoze ? <Sparkles className="w-5 h-5" /> : <Users className="w-5 h-5" />}
+                                                            <span>{useCoze ? 'AI 对比' : '规则对比'}（{selectedResumes.length}份）</span>
                                                         </>
                                                     )}
                                                 </button>
                                             )}
                                         </div>
                                     </div>
+
+                                    <div className="flex items-center justify-center mb-6">
+                                        <div className="inline-flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+                                            <button
+                                                onClick={() => setUseCoze(false)}
+                                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                    !useCoze 
+                                                        ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
+                                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                                }`}
+                                            >
+                                                <Code className="w-4 h-4" />
+                                                <span>规则分析</span>
+                                            </button>
+                                            <button
+                                                onClick={() => setUseCoze(true)}
+                                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                    useCoze 
+                                                        ? 'bg-white dark:bg-gray-700 text-purple-600 shadow-sm' 
+                                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                                }`}
+                                            >
+                                                <Sparkles className="w-4 h-4" />
+                                                <span>AI 智能分析</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {error && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <div className="w-5 h-5 text-red-500">⚠</div>
+                                                <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+                                            </div>
+                                            <p className="text-red-600 dark:text-red-500 text-xs mt-2">
+                                                已自动切换到规则分析模式
+                                            </p>
+                                        </motion.div>
+                                    )}
 
                                     <AnimatePresence>
                                         {showConfig && (
@@ -367,36 +415,60 @@ export default function Compare() {
                                     </button>
                                 </div>
 
-                                <div className="grid lg:grid-cols-2 gap-8 mb-8">
+                                {comparisonResult.comparison.ranking && (
+                                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-6 shadow-sm border border-amber-200 dark:border-amber-800 mb-8">
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
+                                            <Trophy className="w-6 h-6 text-amber-600" />
+                                            <span>候选人排名</span>
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {comparisonResult.comparison.ranking.map((item, index) => (
+                                                <div key={item.id} className={`flex items-center justify-between p-3 rounded-xl ${index === 0 ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-white dark:bg-gray-800'}`}>
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${index === 0 ? 'bg-amber-500 text-white' : index === 1 ? 'bg-gray-400 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`}>
+                                                            {item.rank}
+                                                        </div>
+                                                        <span className="font-medium text-gray-900 dark:text-white">{item.name}</span>
+                                                    </div>
+                                                    <span className={`text-lg font-bold ${index === 0 ? 'text-amber-600' : 'text-gray-600 dark:text-gray-400'}`}>{item.score}分</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="grid lg:grid-cols-3 gap-6 mb-8">
                                     {comparisonResult.resumes.map((resume, index) => (
                                         <motion.div
                                             key={resume.id}
-                                            initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: index * 0.1 }}
                                         >
-                                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
-                                                <div className="flex items-center justify-between mb-6">
-                                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                                                        候选人 {index + 1}
+                                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 h-full">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                                        {resume.basicInfo.name}
                                                     </h3>
-                                                    {comparisonResult.comparison.strengths[resume.id]?.length > 0 && (
-                                                        <div className="flex items-center space-x-1 text-emerald-600 dark:text-emerald-400">
-                                                            <Trophy className="w-5 h-5" />
-                                                            <span className="text-sm font-medium">优势明显</span>
-                                                        </div>
+                                                    {comparisonResult.comparison.ranking && (
+                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                            comparisonResult.comparison.ranking[index]?.rank === 1 
+                                                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' 
+                                                                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                                                        }`}>
+                                                            第{comparisonResult.comparison.ranking[index]?.rank || index + 1}名
+                                                        </span>
                                                     )}
                                                 </div>
-                                                <div className="text-center mb-6">
-                                                    <div className={`inline-flex items-center justify-center w-24 h-24 rounded-2xl ${getScoreColor(resume.scores.overall)}`}>
-                                                        <span className="text-3xl font-bold">{resume.scores.overall}</span>
+                                                <div className="text-center mb-4">
+                                                    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl ${getScoreColor(comparisonResult.results[index].matchScore)}`}>
+                                                        <span className="text-2xl font-bold">{comparisonResult.results[index].matchScore}</span>
                                                     </div>
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-2">综合评分</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">匹配分数</p>
                                                 </div>
-                                                <div className="space-y-3">
-                                                    <p className="font-semibold text-gray-900 dark:text-white text-lg">{resume.basicInfo.name}</p>
-                                                    <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500">{resume.jobInfo.position}</p>
-                                                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                                                <div className="space-y-2 text-sm">
+                                                    <p className="text-gray-600 dark:text-gray-400">{resume.jobInfo.position}</p>
+                                                    <div className="flex items-center space-x-3 text-gray-500 dark:text-gray-400">
                                                         <span>{resume.background.education}</span>
                                                         <span>•</span>
                                                         <span>{resume.background.workYears}</span>
@@ -411,60 +483,30 @@ export default function Compare() {
                                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">评分对比</h3>
                                     <div className="space-y-6">
                                         {[
-                                            { label: "综合评分", key: "overall" },
                                             { label: "技能评分", key: "skills" },
                                             { label: "经验评分", key: "experience" },
                                             { label: "学历评分", key: "education" },
                                         ].map((item) => (
                                             <div key={item.key} className="space-y-3">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-gray-700 dark:text-gray-300 font-medium">{item.label}</span>
-                                                    <div className="flex items-center space-x-2">
-                                                        {getScoreIcon(
-                                                            comparisonResult.resumes[0].scores[item.key as keyof ResumeData["scores"]],
-                                                            comparisonResult.resumes[1].scores[item.key as keyof ResumeData["scores"]],
-                                                            0
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center space-x-4">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-1">
-                                                            <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                                                                {comparisonResult.resumes[0].basicInfo.name}
-                                                            </span>
-                                                            <span className="text-sm font-semibold">
-                                                                {comparisonResult.resumes[0].scores[item.key as keyof ResumeData["scores"]]}
-                                                            </span>
-                                                        </div>
-                                                        <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                <span className="text-gray-700 dark:text-gray-300 font-medium">{item.label}</span>
+                                                {comparisonResult.results.map((result, idx) => (
+                                                    <div key={idx} className="flex items-center space-x-3">
+                                                        <span className="text-sm text-gray-500 dark:text-gray-400 w-20 truncate">
+                                                            {comparisonResult.resumes[idx].basicInfo.name}
+                                                        </span>
+                                                        <div className="flex-1 h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
-                                                                animate={{ width: `${comparisonResult.resumes[0].scores[item.key as keyof ResumeData["scores"]]}%` }}
-                                                                transition={{ duration: 0.8, delay: 0.2 }}
-                                                                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                                                                animate={{ width: `${item.key === 'skills' ? result.details.skillsMatch : item.key === 'experience' ? result.details.experienceMatch : result.details.educationMatch}%` }}
+                                                                transition={{ duration: 0.8, delay: idx * 0.1 }}
+                                                                className={`h-full rounded-full ${idx === 0 ? 'bg-gradient-to-r from-blue-500 to-blue-600' : idx === 1 ? 'bg-gradient-to-r from-indigo-500 to-indigo-600' : idx === 2 ? 'bg-gradient-to-r from-purple-500 to-purple-600' : idx === 3 ? 'bg-gradient-to-r from-pink-500 to-pink-600' : 'bg-gradient-to-r from-rose-500 to-rose-600'}`}
                                                             />
                                                         </div>
+                                                        <span className="text-sm font-semibold w-12 text-right">
+                                                            {item.key === 'skills' ? result.details.skillsMatch : item.key === 'experience' ? result.details.experienceMatch : result.details.educationMatch}
+                                                        </span>
                                                     </div>
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-1">
-                                                            <span className="text-sm font-semibold">
-                                                                {comparisonResult.resumes[1].scores[item.key as keyof ResumeData["scores"]]}
-                                                            </span>
-                                                            <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                                                                {comparisonResult.resumes[1].basicInfo.name}
-                                                            </span>
-                                                        </div>
-                                                        <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                            <motion.div
-                                                                initial={{ width: 0 }}
-                                                                animate={{ width: `${comparisonResult.resumes[1].scores[item.key as keyof ResumeData["scores"]]}%` }}
-                                                                transition={{ duration: 0.8, delay: 0.2 }}
-                                                                className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                ))}
                                             </div>
                                         ))}
                                     </div>
@@ -622,19 +664,25 @@ export default function Compare() {
                                     </div>
                                 )}
 
-                                <div className="grid md:grid-cols-2 gap-8">
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {comparisonResult.resumes.map((resume, index) => (
-                                        <div key={resume.id} className="space-y-6">
+                                        <div key={resume.id} className="space-y-4">
+                                            <h4 className="font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
+                                                <span>{resume.basicInfo.name}</span>
+                                                {comparisonResult.comparison.ranking && comparisonResult.comparison.ranking[index]?.rank === 1 && (
+                                                    <Trophy className="w-4 h-4 text-amber-500" />
+                                                )}
+                                            </h4>
                                             {comparisonResult.comparison.strengths[resume.id]?.length > 0 && (
-                                                <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl p-6 border border-emerald-200 dark:border-emerald-800">
-                                                    <h4 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center space-x-2">
-                                                        <TrendingUp className="w-5 h-5" />
+                                                <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                                                    <h5 className="text-sm font-semibold text-emerald-800 mb-3 flex items-center space-x-1">
+                                                        <TrendingUp className="w-4 h-4" />
                                                         <span>优势</span>
-                                                    </h4>
+                                                    </h5>
                                                     <ul className="space-y-2">
                                                         {comparisonResult.comparison.strengths[resume.id].map((strength, i) => (
-                                                            <li key={i} className="flex items-start space-x-2 text-emerald-700">
-                                                                <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                            <li key={i} className="flex items-start space-x-2 text-sm text-emerald-700">
+                                                                <CheckCircle className="w-3 h-3 mt-1 flex-shrink-0" />
                                                                 <span>{strength}</span>
                                                             </li>
                                                         ))}
@@ -642,15 +690,15 @@ export default function Compare() {
                                                 </div>
                                             )}
                                             {comparisonResult.comparison.weaknesses[resume.id]?.length > 0 && (
-                                                <div className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-6 border border-red-200 dark:border-red-800">
-                                                    <h4 className="text-lg font-semibold text-red-800 mb-4 flex items-center space-x-2">
-                                                        <TrendingDown className="w-5 h-5" />
+                                                <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
+                                                    <h5 className="text-sm font-semibold text-red-800 mb-3 flex items-center space-x-1">
+                                                        <TrendingDown className="w-4 h-4" />
                                                         <span>劣势</span>
-                                                    </h4>
+                                                    </h5>
                                                     <ul className="space-y-2">
                                                         {comparisonResult.comparison.weaknesses[resume.id].map((weakness, i) => (
-                                                            <li key={i} className="flex items-start space-x-2 text-red-700">
-                                                                <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                            <li key={i} className="flex items-start space-x-2 text-sm text-red-700">
+                                                                <ArrowRight className="w-3 h-3 mt-1 flex-shrink-0" />
                                                                 <span>{weakness}</span>
                                                             </li>
                                                         ))}
@@ -658,15 +706,15 @@ export default function Compare() {
                                                 </div>
                                             )}
                                             {comparisonResult.results && comparisonResult.results[index].highlights.length > 0 && (
-                                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
-                                                    <h4 className="text-lg font-semibold text-blue-800 mb-4 flex items-center space-x-2">
-                                                        <Trophy className="w-5 h-5" />
+                                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                                                    <h5 className="text-sm font-semibold text-blue-800 mb-3 flex items-center space-x-1">
+                                                        <Trophy className="w-4 h-4" />
                                                         <span>亮点</span>
-                                                    </h4>
+                                                    </h5>
                                                     <ul className="space-y-2">
                                                         {comparisonResult.results[index].highlights.map((highlight, i) => (
-                                                            <li key={i} className="flex items-start space-x-2 text-blue-700">
-                                                                <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                            <li key={i} className="flex items-start space-x-2 text-sm text-blue-700">
+                                                                <CheckCircle className="w-3 h-3 mt-1 flex-shrink-0" />
                                                                 <span>{highlight}</span>
                                                             </li>
                                                         ))}

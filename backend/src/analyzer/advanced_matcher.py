@@ -693,6 +693,106 @@ class AdvancedMatcher:
         }
 
 
+    def compare_multiple_resumes(self, resumes: List[Dict[str, Any]]) -> Dict[str, Any]:
+        if len(resumes) < 2 or len(resumes) > 5:
+            raise ValueError("需要2-5份简历进行比较")
+        
+        results = [self.match_resume(resume) for resume in resumes]
+        
+        sorted_indices = sorted(range(len(results)), key=lambda i: results[i]['matchScore'], reverse=True)
+        
+        ranking = []
+        for rank, idx in enumerate(sorted_indices, 1):
+            ranking.append({
+                'id': resumes[idx].get('id', f'resume{idx}'),
+                'name': resumes[idx].get('basicInfo', {}).get('name', f'候选人{rank}'),
+                'rank': rank,
+                'score': results[idx]['matchScore']
+            })
+        
+        strengths = {}
+        weaknesses = {}
+        
+        for i, resume in enumerate(resumes):
+            rid = resume.get('id', f'resume{i}')
+            strengths[rid] = []
+            weaknesses[rid] = []
+            
+            best_score = results[sorted_indices[0]]['matchScore']
+            current_score = results[i]['matchScore']
+            
+            if current_score == best_score:
+                strengths[rid].append(f"综合匹配度最高（{current_score}分）")
+            elif best_score - current_score >= 20:
+                weaknesses[rid].append(f"综合匹配度明显落后（{current_score}分 vs 最高{best_score}分）")
+            elif best_score - current_score >= 10:
+                weaknesses[rid].append(f"综合匹配度稍低（{current_score}分 vs 最高{best_score}分）")
+            
+            best_skills = max(r['details']['skillsMatch'] for r in results)
+            current_skills = results[i]['details']['skillsMatch']
+            if current_skills == best_skills and len(resumes) > 2:
+                strengths[rid].append(f"技能匹配度最高（{current_skills}分）")
+            elif best_skills - current_skills >= 15:
+                weaknesses[rid].append(f"技能匹配度较低（{current_skills}分 vs 最高{best_skills}分）")
+            
+            best_exp = max(r['details']['experienceMatch'] for r in results)
+            current_exp = results[i]['details']['experienceMatch']
+            if current_exp == best_exp and len(resumes) > 2:
+                strengths[rid].append(f"工作经验最丰富（{current_exp}分）")
+            elif best_exp - current_exp >= 15:
+                weaknesses[rid].append(f"工作经验相对不足（{current_exp}分 vs 最高{best_exp}分）")
+            
+            best_edu = max(r['details']['educationMatch'] for r in results)
+            current_edu = results[i]['details']['educationMatch']
+            if current_edu == best_edu and len(resumes) > 2:
+                strengths[rid].append(f"学历背景最优（{current_edu}分）")
+            elif best_edu - current_edu >= 15:
+                weaknesses[rid].append(f"学历背景相对较低（{current_edu}分 vs 最高{best_edu}分）")
+            
+            if not strengths[rid]:
+                strengths[rid].append("整体表现均衡")
+        
+        top_name = ranking[0]['name']
+        top_score = ranking[0]['score']
+        
+        if len(resumes) == 2:
+            diff = abs(results[0]['matchScore'] - results[1]['matchScore'])
+            if diff >= 20:
+                recommendation = f"{top_name} 明显更适合该岗位（{top_score}分）"
+            elif diff >= 10:
+                recommendation = f"{top_name} 略微更适合该岗位（{top_score}分）"
+            elif diff >= 5:
+                recommendation = "两位候选人实力相近，建议进一步面试考察"
+            else:
+                recommendation = "两位候选人匹配度相当，建议综合考虑其他因素"
+        else:
+            second_score = ranking[1]['score'] if len(ranking) > 1 else 0
+            diff = top_score - second_score
+            if diff >= 15:
+                recommendation = f"强烈推荐 {top_name}（{top_score}分），与其他候选人差距明显"
+            elif diff >= 8:
+                recommendation = f"推荐 {top_name}（{top_score}分），具有一定优势"
+            elif diff >= 3:
+                recommendation = f"{top_name} 略有优势（{top_score}分），建议重点面试前两位候选人"
+            else:
+                recommendation = f"前几位候选人实力相近，建议综合面试表现决定，当前 {top_name} 略有优势（{top_score}分）"
+        
+        score_range = max(r['matchScore'] for r in results) - min(r['matchScore'] for r in results)
+        
+        return {
+            'resumes': resumes,
+            'results': results,
+            'comparison': {
+                'overallDiff': round(score_range, 1),
+                'strengths': strengths,
+                'weaknesses': weaknesses,
+                'recommendation': recommendation,
+                'priorityWeights': results[0]['details']['priorityWeights'],
+                'ranking': ranking
+            }
+        }
+
+
 def create_custom_config(skills_weight: float = 0.45, experience_weight: float = 0.30,
                          education_weight: float = 0.25, **kwargs) -> ComparisonConfig:
     config = ComparisonConfig(

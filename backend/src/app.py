@@ -407,15 +407,17 @@ def compare_resumes():
     data = request.get_json()
     resume_ids = data.get('resumeIds', [])
     config_data = data.get('config', {})
+    use_coze = data.get('useCoze', False)
     
-    if len(resume_ids) != 2:
-        return jsonify({'error': 'Exactly two resume IDs are required'}), 400
+    if len(resume_ids) < 2 or len(resume_ids) > 5:
+        return jsonify({'error': '需要选择2-5份简历进行比较'}), 400
     
-    resume1 = history_store.get(resume_ids[0])
-    resume2 = history_store.get(resume_ids[1])
-    
-    if not resume1 or not resume2:
-        return jsonify({'error': 'One or both resumes not found'}), 404
+    resumes = []
+    for rid in resume_ids:
+        resume = history_store.get(rid)
+        if not resume:
+            return jsonify({'error': f'简历 {rid} 未找到'}), 404
+        resumes.append(resume)
     
     config = None
     if config_data:
@@ -441,9 +443,55 @@ def compare_resumes():
     job_description = data.get('jobDescription', '')
     requirements = data.get('requirements', '')
     
-    matcher = AdvancedMatcher(job_description, requirements, config)
+    if use_coze:
+        try:
+            resume_texts = []
+            for resume in resumes:
+                pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{resume['id']}.pdf")
+                if os.path.exists(pdf_path):
+                    parser = PDFParser(pdf_path)
+                    text = parser.get_text()
+                else:
+                    text = resume.get('analysis', '')
+                
+                resume_texts.append({
+                    "id": resume['id'],
+                    "text": text,
+                    "basic_info": resume.get('basicInfo', {}),
+                    "background": resume.get('background', {}),
+                    "skills": resume.get('skills', [])
+                })
+            
+            config_dict = None
+            if config:
+                config_dict = {
+                    "skills_weight": config.skills_weight,
+                    "experience_weight": config.experience_weight,
+                    "education_weight": config.education_weight
+                }
+            
+            coze_result = coze_analyzer.compare_resumes(
+                resumes=resume_texts,
+                job_description=job_description,
+                requirements=requirements,
+                config=config_dict
+            )
+            
+            if 'resumes' in coze_result and 'results' in coze_result and 'comparison' in coze_result:
+                coze_result['resumes'] = resumes
+                return jsonify(coze_result)
+            
+            matcher = AdvancedMatcher(job_description, requirements, config)
+            result = matcher.compare_multiple_resumes(resumes)
+            result['aiProvider'] = 'coze'
+            result['cozeResult'] = coze_result
+            return jsonify(result)
+        except Exception as e:
+            print(f"Coze comparison failed, falling back to rules: {e}")
     
-    result = matcher.compare_resumes(resume1, resume2)
+    matcher = AdvancedMatcher(job_description, requirements, config)
+    result = matcher.compare_multiple_resumes(resumes)
+    result['aiProvider'] = 'rule'
     
     return jsonify(result)
 

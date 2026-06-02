@@ -2,31 +2,22 @@ import os
 import json
 import requests
 from dotenv import load_dotenv
+from typing import List, Dict, Any, Optional
 
-# 加载 .env 文件，从项目根目录加载
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '..', '.env'))
 
 
 class CozeAnalyzer:
     def __init__(self):
-        self.api_key = os.getenv('COZE_API_KEY')
-        self.workflow_url = os.getenv('COZE_WORKFLOW_URL')
+        self.analyze_api_key = os.getenv('COZE_API_KEY_ANALYZE') or os.getenv('COZE_API_KEY')
+        self.analyze_workflow_url = os.getenv('COZE_WORKFLOW_URL_ANALYZE') or os.getenv('COZE_WORKFLOW_URL')
+        self.compare_api_key = os.getenv('COZE_API_KEY_COMPARE') or os.getenv('COZE_API_KEY')
+        self.compare_workflow_url = os.getenv('COZE_WORKFLOW_URL_COMPARE')
 
     def analyze_resume(self, resume_text: str, basic_info: dict = None) -> dict:
-        """
-        调用 Coze 工作流分析简历
+        if not self.analyze_api_key or not self.analyze_workflow_url:
+            raise ValueError("请配置 COZE_API_KEY_ANALYZE 和 COZE_WORKFLOW_URL_ANALYZE 环境变量")
 
-        Args:
-            resume_text: 简历文本内容
-            basic_info: 基本信息字典（姓名、邮箱、电话等）
-
-        Returns:
-            dict: 包含分析结果的字典
-        """
-        if not self.api_key or not self.workflow_url:
-            raise ValueError("请配置 COZE_API_KEY 和 COZE_WORKFLOW_URL 环境变量")
-
-        # 构建发送给 Coze 工作流的输入
         info = basic_info or {}
         input_data = {
             "resume_text": resume_text,
@@ -38,11 +29,10 @@ class CozeAnalyzer:
         }
 
         try:
-            # 调用 Coze 工作流 API
             response = requests.post(
-                self.workflow_url,
+                self.analyze_workflow_url,
                 headers={
-                    "Authorization": f"Bearer {self.api_key}",
+                    "Authorization": f"Bearer {self.analyze_api_key}",
                     "Content-Type": "application/json"
                 },
                 json=input_data,
@@ -60,19 +50,57 @@ class CozeAnalyzer:
         except requests.exceptions.RequestException as e:
             raise Exception(f"Coze API 请求错误: {str(e)}")
 
+    def compare_resumes(
+        self,
+        resumes: List[Dict[str, Any]],
+        job_description: str = "",
+        requirements: str = "",
+        config: Optional[Dict[str, float]] = None
+    ) -> dict:
+        if not self.compare_api_key or not self.compare_workflow_url:
+            raise ValueError("请配置 COZE_API_KEY_COMPARE 和 COZE_WORKFLOW_URL_COMPARE 环境变量")
+
+        if len(resumes) < 2 or len(resumes) > 5:
+            raise ValueError("需要2-5份简历进行比较")
+
+        default_config = {
+            "skills_weight": 0.45,
+            "experience_weight": 0.30,
+            "education_weight": 0.25
+        }
+        if config:
+            default_config.update(config)
+
+        input_data = {
+            "resumes": resumes,
+            "job_description": job_description,
+            "requirements": requirements,
+            "config": default_config
+        }
+
+        try:
+            response = requests.post(
+                self.compare_workflow_url,
+                headers={
+                    "Authorization": f"Bearer {self.compare_api_key}",
+                    "Content-Type": "application/json"
+                },
+                json=input_data,
+                timeout=120
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                return self._parse_compare_result(result, resumes)
+            else:
+                raise Exception(f"Coze Compare API 调用失败: {response.status_code} - {response.text}")
+
+        except requests.exceptions.Timeout:
+            raise Exception("Coze Compare API 请求超时，请稍后重试")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Coze Compare API 请求错误: {str(e)}")
+
     def _parse_coze_result(self, coze_response: dict) -> dict:
-        """
-        解析 Coze 工作流返回的结果
-
-        Args:
-            coze_response: Coze API 返回的原始数据
-
-        Returns:
-            dict: 标准化后的分析结果
-        """
-        # 根据 Coze 工作流的实际返回格式进行解析
-        # 以下是一个示例解析逻辑，请根据实际的 Coze 工作流输出格式进行调整
-
         if 'data' in coze_response:
             data = coze_response['data']
         elif 'output' in coze_response:
@@ -82,7 +110,6 @@ class CozeAnalyzer:
         else:
             data = coze_response
 
-        # 提取评分
         scores = {
             'overall': data.get('overall_score', data.get('overall', 70)),
             'skills': data.get('skills_score', data.get('skills', 70)),
@@ -90,33 +117,176 @@ class CozeAnalyzer:
             'education': data.get('education_score', data.get('education', 70))
         }
 
-        # 提取分析报告
         analysis = data.get('analysis', data.get('comment', data.get('summary', '')))
-
-        # 提取建议
         suggestions = data.get('suggestions', data.get('recommendations', []))
 
         return {
             'scores': scores,
             'analysis': analysis,
             'suggestions': suggestions,
-            'coze_result': data  # 保留原始数据以便调试
+            'coze_result': data
+        }
+
+    def _parse_compare_result(self, coze_response: dict, resumes: List[Dict[str, Any]] = None) -> dict:
+        if 'data' in coze_response:
+            data = coze_response['data']
+        elif 'output' in coze_response:
+            data = coze_response['output']
+        elif 'result' in coze_response:
+            data = coze_response['result']
+        else:
+            data = coze_response
+
+        if 'resumes' in data and 'results' in data and 'comparison' in data:
+            return data
+
+        results = []
+        if 'results' in data and isinstance(data['results'], list):
+            for i, result in enumerate(data['results']):
+                results.append({
+                    'matchScore': result.get('matchScore', result.get('score', 70)),
+                    'details': {
+                        'skillsMatch': result.get('skillsMatch', result.get('skills_score', 70)),
+                        'experienceMatch': result.get('experienceMatch', result.get('experience_score', 70)),
+                        'educationMatch': result.get('educationMatch', result.get('education_score', 70)),
+                        'priorityWeights': result.get('priorityWeights', {'skills': 0.45, 'experience': 0.30, 'education': 0.25})
+                    },
+                    'skillsDetails': result.get('skillsDetails', {
+                        'matched': [],
+                        'unmatched': [],
+                        'bonus': [],
+                        'category_scores': {},
+                        'base_score': 0,
+                        'bonus_score': 0,
+                        'category_bonus': 0,
+                        'industry': '互联网'
+                    }),
+                    'experienceDetails': result.get('experienceDetails', {
+                        'years': 0,
+                        'years_score': 0,
+                        'position_match': 0,
+                        'project_score': 0,
+                        'total_score': 0
+                    }),
+                    'educationDetails': result.get('educationDetails', {
+                        'education_level': 0,
+                        'major_match': 0,
+                        'university_rank': 0,
+                        'total_score': 0
+                    }),
+                    'highlights': result.get('highlights', ['AI 分析完成'])
+                })
+        
+        if not results and resumes:
+            for i, resume in enumerate(resumes):
+                score = data.get(f'resume_{i}_score', data.get(f'score_{i}', 70))
+                results.append({
+                    'matchScore': score,
+                    'details': {
+                        'skillsMatch': data.get(f'resume_{i}_skills', 70),
+                        'experienceMatch': data.get(f'resume_{i}_experience', 70),
+                        'educationMatch': data.get(f'resume_{i}_education', 70),
+                        'priorityWeights': {'skills': 0.45, 'experience': 0.30, 'education': 0.25}
+                    },
+                    'skillsDetails': {
+                        'matched': [],
+                        'unmatched': [],
+                        'bonus': [],
+                        'category_scores': {},
+                        'base_score': 0,
+                        'bonus_score': 0,
+                        'category_bonus': 0,
+                        'industry': '互联网'
+                    },
+                    'experienceDetails': {
+                        'years': 0,
+                        'years_score': 0,
+                        'position_match': 0,
+                        'project_score': 0,
+                        'total_score': 0
+                    },
+                    'educationDetails': {
+                        'education_level': 0,
+                        'major_match': 0,
+                        'university_rank': 0,
+                        'total_score': 0
+                    },
+                    'highlights': data.get(f'resume_{i}_highlights', ['AI 分析完成'])
+                })
+
+        if not results:
+            scores = data.get('scores', [])
+            if isinstance(scores, list):
+                for i, score in enumerate(scores):
+                    if isinstance(score, dict):
+                        results.append({
+                            'matchScore': score.get('overall', score.get('total', 70)),
+                            'details': {
+                                'skillsMatch': score.get('skills', 70),
+                                'experienceMatch': score.get('experience', 70),
+                                'educationMatch': score.get('education', 70),
+                                'priorityWeights': {'skills': 0.45, 'experience': 0.30, 'education': 0.25}
+                            },
+                            'skillsDetails': {'matched': [], 'unmatched': [], 'bonus': [], 'category_scores': {}, 'base_score': 0, 'bonus_score': 0, 'category_bonus': 0, 'industry': '互联网'},
+                            'experienceDetails': {'years': 0, 'years_score': 0, 'position_match': 0, 'project_score': 0, 'total_score': 0},
+                            'educationDetails': {'education_level': 0, 'major_match': 0, 'university_rank': 0, 'total_score': 0},
+                            'highlights': ['AI 分析完成']
+                        })
+
+        ranking = []
+        if results:
+            sorted_indices = sorted(range(len(results)), key=lambda i: results[i]['matchScore'], reverse=True)
+            for rank, idx in enumerate(sorted_indices, 1):
+                name = resumes[idx].get('basic_info', {}).get('name', f'候选人{rank}') if resumes else f'候选人{rank}'
+                ranking.append({
+                    'id': resumes[idx].get('id', f'resume_{idx}') if resumes else f'resume_{idx}',
+                    'name': name,
+                    'rank': rank,
+                    'score': results[idx]['matchScore']
+                })
+
+        strengths = {}
+        weaknesses = {}
+        if results and resumes:
+            best_score = max(r['matchScore'] for r in results)
+            for i, resume in enumerate(resumes):
+                rid = resume.get('id', f'resume_{i}')
+                strengths[rid] = []
+                weaknesses[rid] = []
+                current_score = results[i]['matchScore']
+                if current_score == best_score:
+                    strengths[rid].append(f"综合匹配度最高（{current_score}分）")
+                elif best_score - current_score >= 10:
+                    weaknesses[rid].append(f"综合匹配度较低（{current_score}分 vs 最高{best_score}分）")
+
+        top_name = ranking[0]['name'] if ranking else '候选人'
+        top_score = ranking[0]['score'] if ranking else 0
+        if len(ranking) > 1:
+            second_score = ranking[1]['score']
+            diff = top_score - second_score
+            if diff >= 15:
+                recommendation = f"强烈推荐 {top_name}（{top_score}分），与其他候选人差距明显"
+            elif diff >= 8:
+                recommendation = f"推荐 {top_name}（{top_score}分），具有一定优势"
+            else:
+                recommendation = f"前几位候选人实力相近，当前 {top_name} 略有优势（{top_score}分）"
+        else:
+            recommendation = f"AI 分析完成，{top_name} 得分 {top_score}分"
+
+        return {
+            'resumes': resumes or [],
+            'results': results,
+            'comparison': {
+                'overallDiff': round(max(r['matchScore'] for r in results) - min(r['matchScore'] for r in results), 1) if results else 0,
+                'strengths': strengths,
+                'weaknesses': weaknesses,
+                'recommendation': recommendation,
+                'priorityWeights': {'skills': 0.45, 'experience': 0.30, 'education': 0.25},
+                'ranking': ranking
+            }
         }
 
     def batch_analyze(self, resumes: list) -> list:
-        """
-        批量分析简历
-
-        Args:
-            resumes: 包含简历文本和基本信息的列表
-            [
-                {"text": "...", "basic_info": {...}},
-                ...
-            ]
-
-        Returns:
-            list: 分析结果列表
-        """
         results = []
         for resume in resumes:
             try:
