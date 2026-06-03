@@ -11,6 +11,9 @@ import {
   AlertTriangle,
   Target,
   BookOpen,
+  Zap,
+  Bot,
+  Settings,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
@@ -25,10 +28,13 @@ interface SuggestionCategory {
     suggestions: string[];
 }
 
+type OptimizationMethod = "rule" | "coze";
+
 export default function Optimize() {
     const [selectedResume, setSelectedResume] = useState<ResumeData | null>(null);
     const [suggestions, setSuggestions] = useState<SuggestionCategory[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [optimizationMethod, setOptimizationMethod] = useState<OptimizationMethod>("rule");
     const { resumes, setResumes } = useResumeStore();
 
     useEffect(() => {
@@ -43,10 +49,18 @@ export default function Optimize() {
         loadHistory();
     }, [setResumes]);
 
-    const generateSuggestions = (resume: ResumeData) => {
+    const generateSuggestions = async (resume: ResumeData) => {
         setIsGenerating(true);
         setSelectedResume(resume);
 
+        if (optimizationMethod === "rule") {
+            generateRuleSuggestions(resume);
+        } else {
+            await generateCozeSuggestions(resume);
+        }
+    };
+
+    const generateRuleSuggestions = (resume: ResumeData) => {
         setTimeout(() => {
             const categories: SuggestionCategory[] = [];
 
@@ -133,6 +147,66 @@ export default function Optimize() {
         }, 1500);
     };
 
+    const generateCozeSuggestions = async (resume: ResumeData) => {
+        try {
+            const result = await api.optimizeResume(resume.id);
+            
+            const categories: SuggestionCategory[] = [];
+
+            if (result.analysis) {
+                categories.push({
+                    title: "AI 综合分析",
+                    icon: Bot,
+                    color: "from-violet-500 to-purple-600",
+                    suggestions: [result.analysis],
+                });
+            }
+
+            if (result.suggestions && result.suggestions.length > 0) {
+                categories.push({
+                    title: "AI 优化建议",
+                    icon: Sparkles,
+                    color: "from-cyan-500 to-blue-600",
+                    suggestions: result.suggestions,
+                });
+            }
+
+            if (result.categories && result.categories.length > 0) {
+                result.categories.forEach((cat: any) => {
+                    if (cat.title && cat.suggestions) {
+                        categories.push({
+                            title: cat.title,
+                            icon: Bot,
+                            color: "from-violet-500 to-purple-600",
+                            suggestions: Array.isArray(cat.suggestions) ? cat.suggestions : [cat.suggestions],
+                        });
+                    }
+                });
+            }
+
+            if (categories.length === 0) {
+                categories.push({
+                    title: "AI 分析结果",
+                    icon: Bot,
+                    color: "from-violet-500 to-purple-600",
+                    suggestions: ["Coze AI 分析完成，暂无具体建议"],
+                });
+            }
+
+            setSuggestions(categories);
+        } catch (error) {
+            console.error("Coze optimization failed:", error);
+            setSuggestions([{
+                title: "分析失败",
+                icon: AlertTriangle,
+                color: "from-red-500 to-rose-600",
+                suggestions: ["Coze AI 优化建议生成失败，请检查配置或稍后重试"],
+            }]);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     const reset = () => {
         setSelectedResume(null);
         setSuggestions([]);
@@ -153,9 +227,88 @@ export default function Optimize() {
                         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                             简历优化建议
                         </h1>
-                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-8">
                             选择一份简历，获取 AI 生成的优化建议
                         </p>
+                        
+                        <div className="max-w-2xl mx-auto">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                选择优化方式
+                            </p>
+                            <div className="grid grid-cols-2 gap-4">
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => setOptimizationMethod("rule")}
+                                    className={`relative p-5 rounded-2xl border-2 transition-all duration-200 text-left ${
+                                        optimizationMethod === "rule"
+                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20"
+                                            : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600"
+                                    }`}
+                                >
+                                    {optimizationMethod === "rule" && (
+                                        <div className="absolute top-3 right-3">
+                                            <CheckCircle className="w-5 h-5 text-blue-500" />
+                                        </div>
+                                    )}
+                                    <div className="flex items-center space-x-3 mb-2">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                                            optimizationMethod === "rule"
+                                                ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                                                : "bg-gray-100 dark:bg-gray-700"
+                                        }`}>
+                                            <Settings className="w-5 h-5 text-white dark:text-gray-300" />
+                                        </div>
+                                        <h3 className={`font-semibold ${
+                                            optimizationMethod === "rule"
+                                                ? "text-blue-700 dark:text-blue-300"
+                                                : "text-gray-900 dark:text-white"
+                                        }`}>
+                                            规则式优化
+                                        </h3>
+                                    </div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                        基于预设规则快速分析，提供标准化的优化建议
+                                    </p>
+                                </motion.button>
+
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => setOptimizationMethod("coze")}
+                                    className={`relative p-5 rounded-2xl border-2 transition-all duration-200 text-left ${
+                                        optimizationMethod === "coze"
+                                            ? "border-violet-500 bg-violet-50 dark:bg-violet-900/20 shadow-lg shadow-violet-500/20"
+                                            : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600"
+                                    }`}
+                                >
+                                    {optimizationMethod === "coze" && (
+                                        <div className="absolute top-3 right-3">
+                                            <CheckCircle className="w-5 h-5 text-violet-500" />
+                                        </div>
+                                    )}
+                                    <div className="flex items-center space-x-3 mb-2">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                                            optimizationMethod === "coze"
+                                                ? "bg-gradient-to-br from-violet-500 to-purple-600"
+                                                : "bg-gray-100 dark:bg-gray-700"
+                                        }`}>
+                                            <Bot className="w-5 h-5 text-white dark:text-gray-300" />
+                                        </div>
+                                        <h3 className={`font-semibold ${
+                                            optimizationMethod === "coze"
+                                                ? "text-violet-700 dark:text-violet-300"
+                                                : "text-gray-900 dark:text-white"
+                                        }`}>
+                                            Coze AI 优化
+                                        </h3>
+                                    </div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                        使用 Coze AI 深度分析，提供个性化优化建议
+                                    </p>
+                                </motion.button>
+                            </div>
+                        </div>
                     </div>
 
                     <AnimatePresence mode="wait">

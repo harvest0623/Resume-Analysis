@@ -13,6 +13,10 @@ class CozeAnalyzer:
         self.analyze_workflow_url = os.getenv('COZE_WORKFLOW_URL_ANALYZE') or os.getenv('COZE_WORKFLOW_URL')
         self.compare_api_key = os.getenv('COZE_API_KEY_COMPARE') or os.getenv('COZE_API_KEY')
         self.compare_workflow_url = os.getenv('COZE_WORKFLOW_URL_COMPARE')
+        self.optimize_api_key = os.getenv('COZE_API_KEY_OPTIMIZE') or os.getenv('COZE_API_KEY')
+        self.optimize_workflow_url = os.getenv('COZE_WORKFLOW_URL_OPTIMIZE')
+        self.generate_api_key = os.getenv('COZE_API_KEY_GENERATE')
+        self.generate_workflow_url = os.getenv('COZE_WORKFLOW_URL_GENERATE')
 
     def analyze_resume(self, resume_text: str, basic_info: dict = None) -> dict:
         if not self.analyze_api_key or not self.analyze_workflow_url:
@@ -286,6 +290,66 @@ class CozeAnalyzer:
             }
         }
 
+    def optimize_resume(self, resume_text: str, basic_info: dict = None) -> dict:
+        if not self.optimize_api_key or not self.optimize_workflow_url:
+            raise ValueError("请配置 COZE_API_KEY_OPTIMIZE 和 COZE_WORKFLOW_URL_OPTIMIZE 环境变量")
+
+        info = basic_info or {}
+        input_data = {
+            "resume_text": resume_text,
+            "basic_info": {
+                "name": info.get('name', ''),
+                "phone": info.get('phone', ''),
+                "email": info.get('email', '')
+            }
+        }
+
+        try:
+            response = requests.post(
+                self.optimize_workflow_url,
+                headers={
+                    "Authorization": f"Bearer {self.optimize_api_key}",
+                    "Content-Type": "application/json"
+                },
+                json=input_data,
+                timeout=90
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                return self._parse_optimize_result(result)
+            else:
+                raise Exception(f"Coze Optimize API 调用失败: {response.status_code} - {response.text}")
+
+        except requests.exceptions.Timeout:
+            raise Exception("Coze Optimize API 请求超时，请稍后重试")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Coze Optimize API 请求错误: {str(e)}")
+
+    def _parse_optimize_result(self, coze_response: dict) -> dict:
+        if 'data' in coze_response:
+            data = coze_response['data']
+        elif 'output' in coze_response:
+            data = coze_response['output']
+        elif 'result' in coze_response:
+            data = coze_response['result']
+        else:
+            data = coze_response
+
+        analysis = data.get('analysis', data.get('summary', data.get('comment', '')))
+        suggestions = data.get('suggestions', data.get('recommendations', data.get('tips', [])))
+        categories = data.get('categories', [])
+
+        if not isinstance(suggestions, list):
+            suggestions = [str(suggestions)] if suggestions else []
+
+        return {
+            'analysis': analysis,
+            'suggestions': suggestions,
+            'categories': categories,
+            'coze_result': data
+        }
+
     def batch_analyze(self, resumes: list) -> list:
         results = []
         for resume in resumes:
@@ -308,3 +372,84 @@ class CozeAnalyzer:
                     'suggestions': []
                 })
         return results
+
+    def generate_resume(self, resume_data: dict) -> dict:
+        """根据用户输入生成简历内容"""
+        if not self.generate_api_key or not self.generate_workflow_url:
+            raise ValueError("请配置 COZE_API_KEY_GENERATE 和 COZE_WORKFLOW_URL_GENERATE 环境变量")
+
+        # 构建输入数据
+        input_data = {
+            "basic_info": {
+                "name": resume_data.get('name', ''),
+                "phone": resume_data.get('phone', ''),
+                "email": resume_data.get('email', ''),
+                "target_position": resume_data.get('targetPosition', ''),
+                "work_years": resume_data.get('workYears', '')
+            },
+            "education": {
+                "education": resume_data.get('education', ''),
+                "school": resume_data.get('school', ''),
+                "major": resume_data.get('major', '')
+            },
+            "experience": {
+                "work_experience": resume_data.get('workExperience', ''),
+                "internship_experience": resume_data.get('internshipExperience', ''),
+                "projects": resume_data.get('projects', '')
+            },
+            "skills": resume_data.get('skills', []),
+            "blog": resume_data.get('blog', ''),
+            "self_intro": resume_data.get('selfIntro', ''),
+            "custom_modules": resume_data.get('customModules', [])
+        }
+
+        try:
+            response = requests.post(
+                self.generate_workflow_url,
+                headers={
+                    "Authorization": f"Bearer {self.generate_api_key}",
+                    "Content-Type": "application/json"
+                },
+                json=input_data,
+                timeout=90
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                return self._parse_generate_result(result)
+            else:
+                raise Exception(f"Coze 生成简历 API 调用失败: {response.status_code} - {response.text}")
+
+        except requests.exceptions.Timeout:
+            raise Exception("Coze API 请求超时，请稍后重试")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Coze API 请求错误: {str(e)}")
+
+    def _parse_generate_result(self, coze_response: dict) -> dict:
+        """解析 Coze 生成简历的返回结果"""
+        if 'data' in coze_response:
+            data = coze_response['data']
+        elif 'output' in coze_response:
+            data = coze_response['output']
+        elif 'result' in coze_response:
+            data = coze_response['result']
+        else:
+            data = coze_response
+
+        sections = data.get('sections', [])
+        summary = data.get('summary', '')
+
+        # 确保 sections 格式正确
+        parsed_sections = []
+        for section in sections:
+            if isinstance(section, dict):
+                parsed_sections.append({
+                    'title': section.get('title', ''),
+                    'content': section.get('content', ''),
+                    'order': section.get('order', len(parsed_sections) + 1)
+                })
+
+        return {
+            'sections': parsed_sections,
+            'summary': summary
+        }

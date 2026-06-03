@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
     FileText,
@@ -13,6 +14,7 @@ import {
     Building2,
     GraduationCap,
     TrendingUp,
+    Edit3,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
@@ -108,6 +110,7 @@ const templates: Template[] = [
 const categories = ["全部", "通用", "技术", "设计", "商务", "校园", "销售"];
 
 export default function Templates() {
+    const navigate = useNavigate();
     const [searchKeyword, setSearchKeyword] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("全部");
     const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
@@ -238,12 +241,16 @@ export default function Templates() {
                                                 <button
                                                     onClick={() => setPreviewTemplate(template)}
                                                     className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors"
+                                                    title="预览"
                                                 >
                                                     <Eye className="w-5 h-5" />
                                                 </button>
-                                                <button className="inline-flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-200">
-                                                    <Download className="w-4 h-4" />
-                                                    <span>下载</span>
+                                                <button
+                                                    onClick={() => navigate(`/home/editor?template=${template.id}`)}
+                                                    className="inline-flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-200"
+                                                >
+                                                    <Edit3 className="w-4 h-4" />
+                                                    <span>使用此模板</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -315,9 +322,15 @@ export default function Templates() {
                                         {previewTemplate.downloads} 次下载
                                     </span>
                                 </div>
-                                <button className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
-                                    <Download className="w-5 h-5" />
-                                    <span>下载模板</span>
+                                <button
+                                    onClick={() => {
+                                        setPreviewTemplate(null);
+                                        navigate(`/home/editor?template=${previewTemplate.id}`);
+                                    }}
+                                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                                >
+                                    <Edit3 className="w-5 h-5" />
+                                    <span>使用此模板编辑</span>
                                 </button>
                             </div>
                         </div>

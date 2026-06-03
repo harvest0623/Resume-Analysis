@@ -542,6 +542,48 @@ def validate_comparison_config():
         }), 400
 
 
+@app.route('/api/resume/optimize', methods=['POST'])
+def optimize_resume():
+    data = request.get_json()
+    resume_id = data.get('id')
+    
+    if not resume_id:
+        return jsonify({'error': 'Resume ID is required'}), 400
+    
+    resume = history_store.get(resume_id)
+    if not resume:
+        return jsonify({'error': 'Resume not found'}), 404
+    
+    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{resume_id}.pdf")
+    
+    resume_text = ""
+    if os.path.exists(pdf_path):
+        try:
+            parser = PDFParser(pdf_path)
+            resume_text = parser.get_text()
+        except Exception as e:
+            print(f"Failed to parse PDF: {e}")
+            resume_text = resume.get('analysis', '')
+    else:
+        resume_text = resume.get('analysis', '')
+    
+    try:
+        coze_result = coze_analyzer.optimize_resume(
+            resume_text=resume_text,
+            basic_info=resume.get('basicInfo', {})
+        )
+        
+        return jsonify({
+            'id': resume_id,
+            'analysis': coze_result.get('analysis', ''),
+            'suggestions': coze_result.get('suggestions', []),
+            'categories': coze_result.get('categories', []),
+            'aiProvider': 'coze-optimize'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/match', methods=['POST'])
 def match_resumes():
     data = request.get_json()
@@ -586,6 +628,55 @@ def delete_history(resume_id):
         return jsonify({'success': True})
     else:
         return jsonify({'error': 'Resume not found'}), 404
+
+
+@app.route('/api/resume/generate', methods=['POST'])
+def generate_resume():
+    """AI 生成简历"""
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': '请提供简历数据'}), 400
+
+    # 验证必填字段
+    basic_info = data.get('basicInfo', {})
+    if not basic_info.get('name'):
+        return jsonify({'error': '姓名为必填项'}), 400
+    if not basic_info.get('email'):
+        return jsonify({'error': '邮箱为必填项'}), 400
+
+    try:
+        # 调用 Coze API 生成简历
+        resume_data = {
+            'name': basic_info.get('name', ''),
+            'phone': basic_info.get('phone', ''),
+            'email': basic_info.get('email', ''),
+            'targetPosition': basic_info.get('targetPosition', ''),
+            'workYears': basic_info.get('workYears', ''),
+            'education': data.get('education', ''),
+            'school': data.get('school', ''),
+            'major': data.get('major', ''),
+            'workExperience': data.get('workExperience', ''),
+            'internshipExperience': data.get('internshipExperience', ''),
+            'projects': data.get('projects', ''),
+            'skills': data.get('skills', []),
+            'blog': data.get('blog', ''),
+            'selfIntro': data.get('selfIntro', ''),
+            'customModules': data.get('customModules', [])
+        }
+
+        result = coze_analyzer.generate_resume(resume_data)
+
+        return jsonify({
+            'success': True,
+            'sections': result.get('sections', []),
+            'summary': result.get('summary', '')
+        })
+
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': f'生成简历失败: {str(e)}'}), 500
 
 
 if __name__ == '__main__':

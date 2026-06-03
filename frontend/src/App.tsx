@@ -12,6 +12,7 @@ import Talent from "@/pages/Talent";
 import Interview from "@/pages/Interview";
 import Templates from "@/pages/Templates";
 import Generate from "@/pages/Generate";
+import Editor from "@/pages/Editor";
 import Pipeline from "@/pages/Pipeline";
 import Export from "@/pages/Export";
 import Settings from "@/pages/Settings";
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/home/interview" element={<Interview />} />
         <Route path="/home/templates" element={<Templates />} />
         <Route path="/home/generate" element={<Generate />} />
+        <Route path="/home/editor" element={<Editor />} />
         <Route path="/home/pipeline" element={<Pipeline />} />
         <Route path="/home/export" element={<Export />} />
         <Route path="/home/settings" element={<Settings />} />

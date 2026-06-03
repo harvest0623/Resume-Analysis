@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { 
   FileText, Users, Search, History, ArrowRight, Sparkles, Zap, Shield, BarChart3, 
   Upload, Lightbulb, PieChart, Briefcase, Calendar, Funnel, Download, 
-  FileStack, UserCheck, Sparkle
+  FileStack, UserCheck, Sparkle, Edit3
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
@@ -47,6 +47,14 @@ export default function Home() {
             description: "填写基本信息，AI 为您生成专业的简历内容",
             path: "/home/generate",
             color: "from-violet-500 to-violet-600",
+            category: "简历工具",
+        },
+        {
+            icon: Edit3,
+            title: "简历编辑器",
+            description: "在线编辑简历，支持实时预览、模块管理和多种导出格式",
+            path: "/home/editor",
+            color: "from-blue-500 to-indigo-600",
             category: "简历工具",
         },
         {

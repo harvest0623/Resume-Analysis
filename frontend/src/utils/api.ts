@@ -183,6 +183,23 @@ export const api = {
         return response.json();
     },
 
+    async optimizeResume(id: string): Promise<{ id: string; analysis: string; suggestions: string[]; categories: any[]; aiProvider: string }> {
+        const response = await fetch(`${API_BASE}/resume/optimize`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id }),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Optimization failed");
+        }
+
+        return response.json();
+    },
+
     async deleteHistory(id: string): Promise<{ success: boolean }> {
         const response = await fetch(`${API_BASE}/history/${id}`, {
             method: "DELETE",
@@ -191,6 +208,41 @@ export const api = {
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.error || "Delete failed");
+        }
+
+        return response.json();
+    },
+
+    async generateResume(data: {
+        basicInfo: {
+            name: string;
+            phone: string;
+            email: string;
+            targetPosition: string;
+            workYears: string;
+        };
+        education: string;
+        school: string;
+        major: string;
+        workExperience: string;
+        internshipExperience: string;
+        projects: string;
+        skills: string[];
+        blog: string;
+        selfIntro: string;
+        customModules: { title: string; fields: { label: string; value: string }[] }[];
+    }): Promise<{ success: boolean; sections: { title: string; content: string; order: number }[]; summary: string }> {
+        const response = await fetch(`${API_BASE}/resume/generate`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Generate failed");
         }
 
         return response.json();
