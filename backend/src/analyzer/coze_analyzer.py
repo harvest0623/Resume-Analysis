@@ -17,6 +17,8 @@ class CozeAnalyzer:
         self.optimize_workflow_url = os.getenv('COZE_WORKFLOW_URL_OPTIMIZE')
         self.generate_api_key = os.getenv('COZE_API_KEY_GENERATE')
         self.generate_workflow_url = os.getenv('COZE_WORKFLOW_URL_GENERATE')
+        self.match_api_key = os.getenv('COZE_API_KEY_MATCH')
+        self.match_workflow_url = os.getenv('COZE_WORKFLOW_URL_MATCH')
 
     def analyze_resume(self, resume_text: str, basic_info: dict = None) -> dict:
         if not self.analyze_api_key or not self.analyze_workflow_url:
@@ -350,7 +352,84 @@ class CozeAnalyzer:
             'coze_result': data
         }
 
-    def batch_analyze(self, resumes: list) -> list:
+    def match_resumes(
+        self,
+        resumes: List[Dict[str, Any]],
+        job_description: str = "",
+        requirements: str = "",
+        filters: Optional[Dict[str, Any]] = None
+    ) -> dict:
+        """岗位智能匹配：基于岗位描述和筛选条件，从简历库中筛选最匹配的候选人"""
+        if not self.match_api_key or not self.match_workflow_url:
+            raise ValueError("请配置 COZE_API_KEY_MATCH 和 COZE_WORKFLOW_URL_MATCH 环境变量")
+
+        input_data = {
+            "resumes": resumes,
+            "job_description": job_description,
+            "requirements": requirements,
+            "filters": filters or {}
+        }
+
+        try:
+            response = requests.post(
+                self.match_workflow_url,
+                headers={
+                    "Authorization": f"Bearer {self.match_api_key}",
+                    "Content-Type": "application/json"
+                },
+                json=input_data,
+                timeout=120
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                return self._parse_match_result(result, resumes)
+            else:
+                raise Exception(f"Coze Match API 调用失败: {response.status_code} - {response.text}")
+
+        except requests.exceptions.Timeout:
+            raise Exception("Coze Match API 请求超时，请稍后重试")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Coze Match API 请求错误: {str(e)}")
+
+    def _parse_match_result(self, coze_response: dict, resumes: List[Dict[str, Any]] = None) -> dict:
+        """解析 Coze 岗位匹配的返回结果"""
+        if 'data' in coze_response:
+            data = coze_response['data']
+        elif 'output' in coze_response:
+            data = coze_response['output']
+        elif 'result' in coze_response:
+            data = coze_response['result']
+        else:
+            data = coze_response
+
+        matches = []
+        raw_matches = data.get('matches', [])
+
+        for i, match in enumerate(raw_matches):
+            match_result = {
+                'resumeId': match.get('resumeId', match.get('id', f'resume_{i}')),
+                'matchScore': match.get('matchScore', match.get('score', 0)),
+                'details': match.get('details', {}),
+                'highlights': match.get('highlights', []),
+                'filterPassed': match.get('filterPassed', True),
+                'rejectReasons': match.get('rejectReasons', [])
+            }
+
+            if 'details' not in match or not match['details']:
+                match_result['details'] = {
+                    'skillsMatch': match.get('skillsMatch', 0),
+                    'experienceMatch': match.get('experienceMatch', 0),
+                    'educationMatch': match.get('educationMatch', 0),
+                    'industryMatch': match.get('industryMatch', 0),
+                    'projectMatch': match.get('projectMatch', 0)
+                }
+
+            matches.append(match_result)
+
+        matches.sort(key=lambda x: x['matchScore'], reverse=True)
+
+        return {'matches': matches}
         results = []
         for resume in resumes:
             try:

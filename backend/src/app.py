@@ -589,21 +589,45 @@ def match_resumes():
     data = request.get_json()
     job_description = data.get('jobDescription', '')
     requirements = data.get('requirements', '')
-    
-    matcher = Matcher(job_description, requirements)
-    all_resumes = history_store.get_all()
-    
-    matches = []
-    for resume in all_resumes:
-        match_result = matcher.match_resume(resume)
-        matches.append({
-            'resumeId': resume.get('id'),
-            **match_result
-        })
-    
-    matches.sort(key=lambda x: x['matchScore'], reverse=True)
-    
-    return jsonify({'matches': matches})
+    filters = data.get('filters', None)
+    use_coze = data.get('useCoze', False)
+
+    if use_coze:
+        try:
+            all_resumes = history_store.get_all()
+            resumes_for_coze = []
+            for resume in all_resumes:
+                resumes_for_coze.append({
+                    'id': resume.get('id', ''),
+                    'text': resume.get('text', ''),
+                    'basic_info': resume.get('basicInfo', {}),
+                    'background': resume.get('background', {}),
+                    'skills': resume.get('skills', [])
+                })
+
+            coze_result = coze_analyzer.match_resumes(
+                resumes=resumes_for_coze,
+                job_description=job_description,
+                requirements=requirements,
+                filters=filters
+            )
+            return jsonify(coze_result)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    else:
+        matcher = Matcher(job_description, requirements, filters)
+        all_resumes = history_store.get_all()
+
+        matches = []
+        for resume in all_resumes:
+            match_result = matcher.match_resume(resume)
+            matches.append({
+                'resumeId': resume.get('id'),
+                **match_result
+            })
+
+        matches.sort(key=lambda x: x['matchScore'], reverse=True)
+        return jsonify({'matches': matches})
 
 
 @app.route('/api/history', methods=['GET'])

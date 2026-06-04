@@ -1,4 +1,4 @@
-import { ResumeData, MatchResult, ComparisonResult, EnhancedComparisonResult, ComparisonConfig, BatchUploadResult, BatchTaskStatus, BatchTaskResults } from "@/types/resume";
+import { ResumeData, MatchResult, ExtendedMatchResult, ComparisonResult, EnhancedComparisonResult, ComparisonConfig, BatchUploadResult, BatchTaskStatus, BatchTaskResults, MatchFilters } from "@/types/resume";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
 
@@ -152,13 +152,13 @@ export const api = {
         return response.json();
     },
 
-    async matchResumes(jobDescription: string, requirements: string): Promise<{ matches: MatchResult[] }> {
+    async matchResumes(jobDescription: string, requirements: string, filters?: any, useCoze: boolean = false): Promise<{ matches: any[] }> {
         const response = await fetch(`${API_BASE}/match`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ jobDescription, requirements }),
+            body: JSON.stringify({ jobDescription, requirements, filters, useCoze }),
         });
 
         if (!response.ok) {
