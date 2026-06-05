@@ -23,6 +23,8 @@
 [<img src="https://img.shields.io/badge/Zustand-5.0.3-0070f3?logo=npm&logoColor=0070f3" alt="Zustand"/>](https://zustand-demo.pmnd.rs/)
 [<img src="https://img.shields.io/badge/Lucide_React-0.511.0-333333?logo=lucide&logoColor=333333" alt="Lucide React"/>](https://lucide.dev/)
 [<img src="https://img.shields.io/badge/React_Dropzone-14.2.9-333333?logo=npm&logoColor=333333" alt="React Dropzone"/>](https://react-dropzone.js.org/)
+[<img src="https://img.shields.io/badge/clsx-2.1.1-000000?logo=npm&logoColor=000000" alt="clsx"/>](https://github.com/lukeed/clsx)
+[<img src="https://img.shields.io/badge/tailwind--merge-3.0.2-38B2AC?logo=tailwindcss&logoColor=38B2AC" alt="tailwind-merge"/>](https://github.com/dcastil/tailwind-merge)
 
 > **一个功能强大的智能简历分析系统**，帮助招聘人员快速筛选和分析大量简历。支持 **Coze AI 工作流** 深度分析，自动解析 PDF 简历，提取关键信息，并利用 AI 模型进行评分和关键词匹配，提升招聘效率。
 
@@ -91,6 +93,86 @@
   - 易于维护和扩展
   - 代码结构清晰
 
+### 📤 批量分析
+- **多文件上传**
+  - 一次性上传多份 PDF 简历
+  - 自动排队处理，实时显示进度
+  - 批量解析和 AI 评分
+
+- **结果汇总**
+  - 批量结果对比展示
+  - 支持排序和筛选
+  - 一键导出分析报告
+
+### ✏️ 简历编辑器
+- **在线编辑**
+  - 支持基本信息、教育背景、工作经历等模块
+  - 实时预览编辑效果
+  - 模块可拖拽排序、显示/隐藏
+
+- **丰富模块**
+  - 基本信息、教育经历、工作经历
+  - 项目经验、实习经历、专业技能
+  - 自我评价、自定义模块
+
+### ✨ AI 简历生成
+- **智能生成**
+  - 填写基本信息，AI 自动生成完整简历
+  - 支持自定义模块和字段
+  - 一键复制或导出
+
+### 📅 面试管理
+- **面试安排**
+  - 创建和管理面试日程
+  - 支持现场、视频、电话多种面试类型
+  - 候选人信息一目了然
+
+- **反馈记录**
+  - 记录面试反馈和评分
+  - 面试状态跟踪
+
+### 🎯 招聘流程
+- **流程可视化**
+  - 可视化展示招聘各阶段转化率
+  - 从投递到录用的全流程追踪
+  - 数据驱动招聘决策
+
+### 👥 人才库
+- **候选人管理**
+  - 统一管理所有候选人信息
+  - 支持收藏、筛选、搜索
+  - 网格/列表双视图
+
+### 💼 职位管理
+- **职位发布**
+  - 创建和管理招聘岗位
+  - 设置薪资、地点、要求等
+  - 职位状态实时跟踪
+
+### 📈 数据统计
+- **全局概览**
+  - 简历分析数量、平均评分统计
+  - 技能分布、学历分布可视化
+  - 趋势变化追踪
+
+### 📄 报告导出
+- **多格式导出**
+  - 支持 PDF、Excel 等格式
+  - 简历分析报告、候选人列表
+  - 对比报告、面试统计
+
+### 🎨 简历模板
+- **丰富模板**
+  - 多种专业简历模板
+  - 按行业分类筛选
+  - 预览和下载
+
+### ⚙️ 系统设置
+- **个性化配置**
+  - 个人信息管理
+  - 通知设置
+  - 外观主题切换
+
 ## 🚀 功能特性
 - **🧠 智能简历分析**：上传 PDF 简历，自动解析并 AI 多维度评分
 - **⚖️ 简历比较功能**：对比两份简历的各项指标，高亮差异和优势
@@ -100,6 +182,17 @@
 - **📱 响应式设计**：完美适配桌面和移动设备
 - **📤 拖拽上传**：支持文件拖拽和点击上传，操作便捷
 - **⚡ 实时反馈**：加载状态和错误提示，提升用户体验
+- **📤 批量分析**：一次性上传多份简历，系统自动进行批量分析处理
+- **✏️ 简历编辑**：在线编辑简历，支持实时预览、模块管理和多种导出格式
+- **✨ AI 生成简历**：填写基本信息，AI 为您生成专业的简历内容
+- **📅 面试管理**：安排和管理候选人面试，记录面试反馈
+- **🎯 招聘流程**：可视化展示招聘各阶段转化率，数据驱动决策
+- **👥 人才库**：统一管理候选人信息，支持收藏、筛选、搜索
+- **💼 职位管理**：创建和管理招聘岗位，设置薪资、地点、要求
+- **📈 数据统计**：全局数据概览，技能分布、学历分布可视化
+- **📄 报告导出**：支持 PDF、Excel 等格式导出各类招聘数据报告
+- **🎨 简历模板**：多种专业简历模板，按行业分类筛选
+- **⚙️ 系统设置**：个人信息、通知、外观主题等个性化配置
 
 ## 🛠️ 技术栈
 
@@ -116,6 +209,8 @@
 | Recharts | 2.10.4 | 数据可视化图表 |
 | Lucide React | 0.511.0 | 现代化图标库 |
 | React Dropzone | 14.2.9 | 文件上传组件 |
+| clsx | 2.1.1 | 条件类名组合工具 |
+| tailwind-merge | 3.0.2 | Tailwind 类名冲突解决 |
 
 ### 后端 (Backend)
 | 技术 | 版本 | 用途 |
@@ -142,17 +237,43 @@ D:\Coding\Resume-Analysis\
 │   │   │   ├── Navbar.tsx          # 导航栏组件
 │   │   │   ├── ResumeUploader.tsx  # 文件上传组件
 │   │   │   ├── ResumeCard.tsx      # 简历卡片组件
-│   │   │   └── ScoreChart.tsx      # 评分图表组件
+│   │   │   ├── ScoreChart.tsx      # 评分图表组件
+│   │   │   ├── BackButton.tsx      # 返回按钮组件
+│   │   │   ├── Empty.tsx           # 空状态组件
+│   │   │   ├── ScrollToTop.tsx     # 滚动置顶组件
+│   │   │   └── editor/             # 简历编辑器组件
+│   │   │       ├── BasicInfoEditor.tsx      # 基本信息编辑
+│   │   │       ├── EducationEditor.tsx      # 教育背景编辑
+│   │   │       ├── WorkExperienceEditor.tsx # 工作经历编辑
+│   │   │       ├── ProjectEditor.tsx        # 项目经验编辑
+│   │   │       ├── InternshipEditor.tsx     # 实习经历编辑
+│   │   │       ├── SkillsEditor.tsx         # 专业技能编辑
+│   │   │       ├── SelfEvaluationEditor.tsx # 自我评价编辑
+│   │   │       ├── CustomSectionEditor.tsx  # 自定义模块编辑
+│   │   │       └── ResumePreview.tsx        # 简历实时预览
 │   │   ├── pages/              # 页面组件
 │   │   │   ├── Home.tsx        # 首页
 │   │   │   ├── Analyze.tsx     # 简历分析
 │   │   │   ├── Compare.tsx     # 简历比较
 │   │   │   ├── History.tsx     # 历史记录
-│   │   │   └── Match.tsx       # 岗位匹配
+│   │   │   ├── Match.tsx       # 岗位匹配
+│   │   │   ├── Stats.tsx       # 数据统计
+│   │   │   ├── Batch.tsx       # 批量分析
+│   │   │   ├── Optimize.tsx    # 简历优化
+│   │   │   ├── Jobs.tsx        # 职位管理
+│   │   │   ├── Talent.tsx      # 人才库
+│   │   │   ├── Interview.tsx   # 面试管理
+│   │   │   ├── Templates.tsx   # 简历模板
+│   │   │   ├── Generate.tsx    # AI 简历生成
+│   │   │   ├── Editor.tsx      # 简历编辑器
+│   │   │   ├── Pipeline.tsx    # 招聘流程
+│   │   │   ├── Export.tsx      # 报告导出
+│   │   │   └── Settings.tsx    # 系统设置
 │   │   ├── store/              # 状态管理
 │   │   │   └── resumeStore.ts  # 简历状态管理
 │   │   ├── types/              # TypeScript 类型
-│   │   │   └── resume.ts       # 简历相关类型定义
+│   │   │   ├── resume.ts       # 简历相关类型定义
+│   │   │   └── editor.ts       # 简历编辑器类型定义
 │   │   ├── utils/              # 工具函数
 │   │   │   └── api.ts          # API 接口封装
 │   │   ├── App.tsx             # 主应用组件
@@ -174,7 +295,8 @@ D:\Coding\Resume-Analysis\
 │   │   ├── analyzer/            # 分析模块
 │   │   │   ├── resume_analyzer.py  # 规则引擎简历分析器
 │   │   │   ├── coze_analyzer.py    # Coze AI 分析器
-│   │   │   └── matcher.py          # 岗位匹配器
+│   │   │   ├── matcher.py          # 岗位匹配器
+│   │   │   └── advanced_matcher.py # 高级岗位匹配算法
 │   │   ├── storage/             # 存储模块
 │   │   │   └── history_store.py    # 历史记录存储
 │   │   ├── app.py               # Flask 主应用
@@ -423,7 +545,459 @@ export const useResumeStore = create<ResumeStore>((set) => ({
 }));
 ```
 
-### 4. API 接口设计
+### 4. 批量简历分析
+**前端 - 批量上传与分析**
+```typescript
+// frontend/src/pages/Batch.tsx
+const startBatchProcess = async () => {
+    if (localFiles.length === 0) return;
+
+    setPhase("processing");
+    setUploadErrors([]);
+
+    try {
+        const uploadResult = await api.batchUpload(localFiles.map((lf) => lf.file));
+
+        if (uploadResult.errors.length > 0) {
+            setUploadErrors(uploadResult.errors);
+        }
+
+        const batchResult = await api.batchAnalyze(
+            uploadResult.uploaded.map((u) => ({ id: u.id, filename: u.filename })),
+            useCoze
+        );
+
+        setBatchId(batchResult.batchId);
+        setTotalCount(batchResult.totalCount);
+    } catch (err) {
+        setPhase("upload");
+    }
+};
+
+// 轮询批量任务状态
+useEffect(() => {
+    if (!batchId || phase !== "processing") return;
+
+    pollRef.current = setInterval(async () => {
+        try {
+            const status = await api.getBatchStatus(batchId);
+            setCompletedCount(status.completedCount);
+            setFailedCount(status.failedCount);
+
+            if (status.status === "completed") {
+                const resultData = await api.getBatchResults(batchId);
+                setResults(resultData.results);
+                setPhase("results");
+            }
+        } catch (err) {
+            console.error("Poll error:", err);
+        }
+    }, POLL_INTERVAL);
+
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+}, [batchId, phase]);
+```
+
+### 5. AI 简历生成
+**前端 - 智能简历生成**
+```typescript
+// frontend/src/pages/Generate.tsx
+const handleGenerate = async () => {
+    setIsGenerating(true);
+    setGenerateError(null);
+
+    try {
+        const result = await api.generateResume({
+            basicInfo: {
+                name: formData.name,
+                phone: formData.phone,
+                email: formData.email,
+                targetPosition: formData.targetPosition,
+                workYears: formData.workYears,
+            },
+            education: formData.education,
+            school: formData.school,
+            major: formData.major,
+            workExperience: formData.workExperience,
+            skills: formData.skills.split(",").map((s) => s.trim()).filter((s) => s),
+            customModules: customModules.map((m) => ({
+                title: m.title,
+                fields: m.fields.map((f) => ({
+                    label: f.label,
+                    value: f.value,
+                })),
+            })),
+        });
+
+        if (result.success && result.sections) {
+            const sections: ResumeSection[] = result.sections
+                .sort((a, b) => a.order - b.order)
+                .map((s) => ({
+                    title: s.title,
+                    content: s.content,
+                }));
+            setGeneratedResume(sections);
+        }
+    } catch (error: any) {
+        // 降级到本地生成
+        const sections: ResumeSection[] = [
+            { title: "个人信息", content: `姓名：${formData.name}\n电话：${formData.phone}` },
+            { title: "求职意向", content: `目标岗位：${formData.targetPosition}` },
+            { title: "教育背景", content: `${formData.school} | ${formData.major}` },
+            { title: "专业技能", content: formData.skills.split(",").map((s) => `• ${s.trim()}`).join("\n") },
+            { title: "工作经历", content: formData.workExperience || "暂无工作经历" },
+        ];
+        setGeneratedResume(sections);
+    } finally {
+        setIsGenerating(false);
+    }
+};
+```
+
+### 6. 简历编辑器实现
+**前端 - 模块化简历编辑**
+```typescript
+// frontend/src/pages/Editor.tsx
+export default function Editor() {
+    const [resumeData, setResumeData] = useState<ResumeEditorData>(createDefaultResumeData());
+    const [sections, setSections] = useState<SectionConfig[]>(defaultSections);
+    const [activeSection, setActiveSection] = useState<SectionType>('basicInfo');
+    const [showPreview, setShowPreview] = useState(true);
+
+    // 从本地存储加载数据
+    useEffect(() => {
+        const savedData = localStorage.getItem('resume_editor_data');
+        const savedSections = localStorage.getItem('resume_editor_sections');
+        if (savedData) {
+            try { setResumeData(JSON.parse(savedData)); } catch (e) {}
+        }
+        if (savedSections) {
+            try { setSections(JSON.parse(savedSections)); } catch (e) {}
+        }
+    }, []);
+
+    // 自动保存到本地存储
+    const autoSave = useCallback(() => {
+        localStorage.setItem('resume_editor_data', JSON.stringify(resumeData));
+        localStorage.setItem('resume_editor_sections', JSON.stringify(sections));
+        setLastSaved(new Date().toLocaleTimeString());
+    }, [resumeData, sections]);
+
+    useEffect(() => {
+        const timer = setTimeout(autoSave, 1000);
+        return () => clearTimeout(timer);
+    }, [autoSave]);
+
+    // 更新简历数据
+    const updateResumeData = useCallback((updates: Partial<ResumeEditorData>) => {
+        setResumeData(prev => ({
+            ...prev,
+            ...updates,
+            updatedAt: new Date().toISOString(),
+        }));
+    }, []);
+
+    // 切换模块可见性
+    const toggleSectionVisibility = useCallback((type: SectionType) => {
+        setSections(prev =>
+            prev.map(s =>
+                s.type === type ? { ...s, visible: !s.visible } : s
+            )
+        );
+    }, []);
+
+    // 导出为 JSON
+    const exportAsJSON = () => {
+        const dataStr = JSON.stringify(resumeData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `resume_${resumeData.basicInfo.name || 'untitled'}_${new Date().toISOString().slice(0, 10)}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+}
+```
+
+### 7. 面试管理系统
+**前端 - 日历与面试管理**
+```typescript
+// frontend/src/pages/Interview.tsx
+export default function Interview() {
+    const [interviews] = useState<Interview[]>(mockInterviews);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [filterStatus, setFilterStatus] = useState<string>("all");
+
+    const getDaysInMonth = (date: Date) => {
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    };
+
+    const getFirstDayOfMonth = (date: Date) => {
+        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    };
+
+    const getInterviewsForDate = (day: number) => {
+        const dateStr = `${selectedDate.getFullYear()}-${String(
+            selectedDate.getMonth() + 1
+        ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        return interviews.filter((i) => i.date === dateStr);
+    };
+
+    const getStatusBadge = (status: Interview["status"]) => {
+        switch (status) {
+            case "scheduled":
+                return "bg-blue-50 text-blue-600 border-blue-200";
+            case "completed":
+                return "bg-emerald-50 text-emerald-600 border-emerald-200";
+            case "cancelled":
+                return "bg-red-50 text-red-600 border-red-200";
+            case "pending":
+                return "bg-amber-50 text-amber-600 border-amber-200";
+        }
+    };
+
+    const filteredInterviews =
+        filterStatus === "all"
+            ? interviews
+            : interviews.filter((i) => i.status === filterStatus);
+}
+```
+
+### 8. 招聘漏斗可视化
+**前端 - 招聘流程与转化率**
+```typescript
+// frontend/src/pages/Pipeline.tsx
+interface PipelineStage {
+    id: string;
+    name: string;
+    count: number;
+    icon: React.ElementType;
+    color: string;
+    bgColor: string;
+    conversionRate: number;
+}
+
+const mockPipeline: PipelineStage[] = [
+    { id: "applied", name: "投递", count: 156, icon: FileText, color: "text-blue-600", bgColor: "bg-blue-100", conversionRate: 100 },
+    { id: "screening", name: "筛选", count: 89, icon: Users, color: "text-indigo-600", bgColor: "bg-indigo-100", conversionRate: 57 },
+    { id: "phone", name: "电话面试", count: 45, icon: Phone, color: "text-purple-600", bgColor: "bg-purple-100", conversionRate: 51 },
+    { id: "onsite", name: "现场面试", count: 23, icon: UserCheck, color: "text-pink-600", bgColor: "bg-pink-100", conversionRate: 51 },
+    { id: "offer", name: "Offer", count: 12, icon: Handshake, color: "text-emerald-600", bgColor: "bg-emerald-100", conversionRate: 52 },
+];
+
+export default function Pipeline() {
+    const maxCount = useMemo(() => Math.max(...mockPipeline.map((s) => s.count)), []);
+
+    return (
+        <div className="space-y-6">
+            {mockPipeline.map((stage, index) => {
+                const Icon = stage.icon;
+                const widthPercentage = (stage.count / maxCount) * 100;
+
+                return (
+                    <div key={stage.id} className="flex items-center space-x-6">
+                        <div className="w-32 flex-shrink-0">
+                            <div className="flex items-center space-x-3">
+                                <div className={`w-10 h-10 ${stage.bgColor} rounded-lg flex items-center justify-center`}>
+                                    <Icon className={`w-5 h-5 ${stage.color}`} />
+                                </div>
+                                <span className="font-medium">{stage.name}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex-1">
+                            <div className="h-12 bg-gray-100 rounded-lg overflow-hidden">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${widthPercentage}%` }}
+                                    transition={{ duration: 0.8, delay: index * 0.1 }}
+                                    className={`h-full ${stage.bgColor} rounded-lg flex items-center justify-end pr-4`}
+                                >
+                                    <span className={`font-bold ${stage.color}`}>
+                                        {stage.count}
+                                    </span>
+                                </motion.div>
+                            </div>
+                        </div>
+
+                        <div className="w-24 flex-shrink-0 text-right">
+                            {index > 0 && (
+                                <div className="flex items-center justify-end space-x-1">
+                                    <ArrowRight className="w-4 h-4 text-gray-400" />
+                                    <span className="font-medium text-gray-700">
+                                        {stage.conversionRate}%
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+```
+
+### 9. 人才库管理
+**前端 - 候选人筛选与统计**
+```typescript
+// frontend/src/pages/Talent.tsx
+export default function Talent() {
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [viewMode, setViewMode] = useState<ViewMode>("grid");
+    const [sortBy, setSortBy] = useState<SortBy>("score");
+    const [filterSkill, setFilterSkill] = useState<string>("");
+    const [filterEducation, setFilterEducation] = useState<string>("");
+    const [scoreRange, setScoreRange] = useState<[number, number]>([0, 100]);
+    const { resumes } = useResumeStore();
+
+    const filteredResumes = useMemo(() => {
+        let result = [...resumes];
+
+        if (searchKeyword) {
+            const keyword = searchKeyword.toLowerCase();
+            result = result.filter(
+                (r) =>
+                    r.basicInfo.name.toLowerCase().includes(keyword) ||
+                    r.jobInfo.position.toLowerCase().includes(keyword) ||
+                    r.skills.some((s) => s.toLowerCase().includes(keyword))
+            );
+        }
+
+        if (filterSkill) {
+            result = result.filter((r) => r.skills.includes(filterSkill));
+        }
+
+        if (filterEducation) {
+            result = result.filter((r) => r.background.education === filterEducation);
+        }
+
+        if (scoreRange[0] > 0 || scoreRange[1] < 100) {
+            result = result.filter(
+                (r) => r.scores.overall >= scoreRange[0] && r.scores.overall <= scoreRange[1]
+            );
+        }
+
+        switch (sortBy) {
+            case "score":
+                result.sort((a, b) => b.scores.overall - a.scores.overall);
+                break;
+            case "name":
+                result.sort((a, b) => a.basicInfo.name.localeCompare(b.basicInfo.name));
+                break;
+            case "date":
+                result.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
+                break;
+            case "skills":
+                result.sort((a, b) => b.skills.length - a.skills.length);
+                break;
+        }
+
+        return result;
+    }, [resumes, searchKeyword, filterSkill, filterEducation, sortBy, scoreRange]);
+
+    const stats = useMemo(() => {
+        if (resumes.length === 0) return null;
+        const scores = resumes.map((r) => r.scores.overall);
+        const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+        const skillStats: Record<string, number> = {};
+        resumes.forEach((r) => {
+            r.skills.forEach((s) => { skillStats[s] = (skillStats[s] || 0) + 1; });
+        });
+        const topSkills = Object.entries(skillStats).sort(([, a], [, b]) => b - a).slice(0, 5);
+        return { total: resumes.length, avgScore: Math.round(avgScore), topSkills };
+    }, [resumes]);
+}
+```
+
+### 10. 简历优化建议
+**前端 - 规则与 AI 双模式优化**
+```typescript
+// frontend/src/pages/Optimize.tsx
+export default function Optimize() {
+    const [selectedResume, setSelectedResume] = useState<ResumeData | null>(null);
+    const [suggestions, setSuggestions] = useState<SuggestionCategory[]>([]);
+    const [optimizationMethod, setOptimizationMethod] = useState<OptimizationMethod>("rule");
+
+    const generateRuleSuggestions = (resume: ResumeData) => {
+        const categories: SuggestionCategory[] = [];
+
+        const skillSuggestions: string[] = [];
+        if (resume.skills.length < 5) {
+            skillSuggestions.push("建议增加更多相关技能标签，目前技能数量较少");
+        }
+        if (resume.scores.skills < 70) {
+            skillSuggestions.push("技能部分得分较低，建议补充更多硬技能和软技能");
+        }
+        if (skillSuggestions.length > 0) {
+            categories.push({
+                title: "技能优化",
+                icon: Target,
+                color: "from-blue-500 to-indigo-600",
+                suggestions: skillSuggestions,
+            });
+        }
+
+        const expSuggestions: string[] = [];
+        if (resume.scores.experience < 70) {
+            expSuggestions.push("工作经验描述可以更加详细，突出具体成果和贡献");
+        }
+        expSuggestions.push("使用 STAR 法则（情境-任务-行动-结果）描述工作经历");
+        categories.push({
+            title: "经验描述",
+            icon: TrendingUp,
+            color: "from-emerald-500 to-teal-600",
+            suggestions: expSuggestions,
+        });
+
+        if (resume.scores.overall < 60) {
+            categories.push({
+                title: "整体提升",
+                icon: AlertTriangle,
+                color: "from-red-500 to-rose-600",
+                suggestions: [
+                    "整体评分较低，建议全面优化简历内容",
+                    "可以参考目标岗位的JD，针对性调整简历",
+                ],
+            });
+        }
+
+        setSuggestions(categories);
+    };
+
+    const generateCozeSuggestions = async (resume: ResumeData) => {
+        try {
+            const result = await api.optimizeResume(resume.id);
+            const categories: SuggestionCategory[] = [];
+
+            if (result.analysis) {
+                categories.push({
+                    title: "AI 综合分析",
+                    icon: Bot,
+                    color: "from-violet-500 to-purple-600",
+                    suggestions: [result.analysis],
+                });
+            }
+
+            if (result.suggestions && result.suggestions.length > 0) {
+                categories.push({
+                    title: "AI 优化建议",
+                    icon: Sparkles,
+                    color: "from-cyan-500 to-blue-600",
+                    suggestions: result.suggestions,
+                });
+            }
+
+            setSuggestions(categories);
+        } catch (error) {
+            console.error("Coze optimization failed:", error);
+        }
+    };
+}
+```
+
+### 11. API 接口设计
 **前端 - API 封装**
 ```typescript
 // frontend/src/utils/api.ts
@@ -532,6 +1106,8 @@ npm run build
 - **Recharts**：数据可视化图表
 - **Lucide React**：现代化图标库
 - **React Dropzone**：文件上传组件
+- **clsx**：条件类名组合工具
+- **tailwind-merge**：Tailwind 类名冲突解决
 
 ### 后端依赖
 - **Flask**：Python Web 框架
