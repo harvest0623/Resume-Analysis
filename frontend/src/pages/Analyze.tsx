@@ -386,24 +386,23 @@ export default function Analyze() {
                                         className="mb-10"
                                     >
                                         <div className="flex items-center justify-center">
-                                            <div className="relative p-1.5 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-white/30 dark:border-gray-700/30 shadow-xl">
+                                            <div className="relative p-1 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-gray-900/5">
                                                 <motion.div
-                                                    className="absolute inset-y-1.5 rounded-xl bg-gradient-to-r shadow-lg"
-                                                    animate={{ 
-                                                        left: useCoze ? '50%' : '4px',
-                                                        right: useCoze ? '4px' : '50%'
-                                                    }}
-                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                    className="absolute top-1 bottom-1 rounded-xl shadow-md"
+                                                    animate={{ x: useCoze ? '100%' : '0%' }}
+                                                    transition={{ type: "spring", stiffness: 400, damping: 35 }}
                                                     style={{
-                                                        background: useCoze 
-                                                            ? 'linear-gradient(to right, #9333ea, #ec4899)' 
-                                                            : 'linear-gradient(to right, #2563eb, #4f46e5)'
+                                                        left: 4,
+                                                        right: 'calc(50% + 4px)',
+                                                        background: useCoze
+                                                            ? 'linear-gradient(to right, #9333ea, #ec4899)'
+                                                            : 'linear-gradient(to right, #2563eb, #4f46e5)',
                                                     }}
                                                 />
                                                 <div className="relative flex">
                                                     <button
                                                         onClick={() => setUseCoze(false)}
-                                                        className={`flex items-center space-x-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-colors duration-200 ${
+                                                        className={`relative z-10 flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-colors duration-200 ${
                                                             !useCoze ? 'text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                                         }`}
                                                     >
@@ -413,7 +412,7 @@ export default function Analyze() {
                                                     </button>
                                                     <button
                                                         onClick={() => setUseCoze(true)}
-                                                        className={`flex items-center space-x-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-colors duration-200 ${
+                                                        className={`relative z-10 flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-colors duration-200 ${
                                                             useCoze ? 'text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                                         }`}
                                                     >

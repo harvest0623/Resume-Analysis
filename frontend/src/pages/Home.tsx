@@ -7,6 +7,7 @@ import {
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Navbar from "@/components/Navbar";
+import CompareParticleEffect from "@/components/CompareParticleEffect";
 
 /* ───────── 背景系统 ───────── */
 function DotGrid() {
@@ -153,7 +154,7 @@ export default function Home() {
   const heroScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.95]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/50 dark:from-gray-950 dark:via-slate-950 dark:to-gray-900 transition-colors duration-500">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/50 dark:from-gray-950 dark:via-slate-950 dark:to-gray-900 transition-colors duration-500 relative">
       <Navbar />
 
       <main>
@@ -161,6 +162,7 @@ export default function Home() {
         <section ref={heroRef} className="relative pt-32 pb-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
           <DotGrid />
           <LayeredBackground />
+          <CompareParticleEffect active={false} />
 
           <motion.div
             style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}

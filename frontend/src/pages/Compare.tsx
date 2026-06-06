@@ -1,12 +1,66 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, RefreshCcw, CheckCircle, ArrowRight, TrendingUp, TrendingDown, Trophy, Settings, ChevronDown, ChevronUp, Briefcase, GraduationCap, Code, Target, Sparkles } from "lucide-react";
+import { Users, RefreshCcw, CheckCircle, ArrowRight, TrendingUp, TrendingDown, Trophy, Settings, ChevronDown, ChevronUp, Briefcase, GraduationCap, Code, Target, Sparkles, Zap, Crown, XCircle, Brain, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
 import ResumeCard from "@/components/ResumeCard";
+import AnimatedScoreRing from "@/components/AnimatedScoreRing";
 import { api } from "@/utils/api";
 import { useResumeStore } from "@/store/resumeStore";
 import { ResumeData, EnhancedComparisonResult, ComparisonConfig } from "@/types/resume";
+
+/* ───────── 复用 Analyze 风格组件 ───────── */
+const GlassCard = ({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+        className={`relative backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 shadow-2xl shadow-gray-900/5 dark:shadow-black/20 rounded-3xl overflow-hidden ${className}`}
+    >
+        <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-white/5 dark:to-transparent pointer-events-none" />
+        <div className="relative z-10">{children}</div>
+    </motion.div>
+);
+
+const GlowButton = ({ children, onClick, variant = "primary", className = "", disabled = false }: {
+    children: React.ReactNode; onClick?: () => void; variant?: "primary" | "secondary" | "ghost"; className?: string; disabled?: boolean
+}) => {
+    const baseClass = "relative group overflow-hidden rounded-2xl font-semibold transition-all duration-300";
+    const variants = {
+        primary: "bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5",
+        secondary: "bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-700",
+        ghost: "bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+    };
+    return (
+        <button onClick={onClick} disabled={disabled} className={`${baseClass} ${variants[variant]} ${className} disabled:opacity-50 disabled:cursor-not-allowed`}>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+            <span className="relative z-10 flex items-center justify-center space-x-2">{children}</span>
+        </button>
+    );
+};
+
+const AnimatedBackground = () => (
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full">
+            <motion.div
+                animate={{ x: [0, 100, 0], y: [0, -50, 0], rotate: [0, 180, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{ x: [0, -80, 0], y: [0, 60, 0], rotate: [360, 180, 0] }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/2 right-1/4 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-600/20 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{ x: [0, 60, 0], y: [0, -80, 0] }}
+                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl"
+            />
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-white/50 to-white dark:via-gray-900/50 dark:to-gray-900" />
+    </div>
+);
 
 export default function Compare() {
     const [selectedResumes, setSelectedResumes] = useState<string[]>([]);
@@ -123,7 +177,8 @@ export default function Compare() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen relative">
+            <AnimatedBackground />
             <Navbar />
             
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -134,12 +189,40 @@ export default function Compare() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="text-center mb-12">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                            简历对比分析
-                        </h1>
-                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
-                            选择2-5份简历进行对比，帮助您做出更好的招聘决策
-                        </p>
+                        <motion.div
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+                            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-600 rounded-3xl shadow-2xl shadow-indigo-500/30 mb-8 relative"
+                        >
+                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent" />
+                            <Users className="w-10 h-10 text-white relative z-10" />
+                            <motion.div
+                                className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 blur-xl"
+                                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                                transition={{ duration: 3, repeat: Infinity }}
+                            />
+                        </motion.div>
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                            className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6"
+                        >
+                            <span className="bg-gradient-to-r from-gray-900 via-indigo-800 to-purple-800 dark:from-white dark:via-indigo-200 dark:to-purple-200 bg-clip-text text-transparent">
+                                简历对比分析
+                            </span>
+                        </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.6 }}
+                            className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed"
+                        >
+                            选择2-5份简历进行智能对比，多维度评估助您精准决策
+                            <br className="hidden sm:block" />
+                            <span className="text-indigo-600 dark:text-indigo-400 font-medium">AI 驱动的智能招聘决策</span>
+                        </motion.p>
                     </div>
 
                     <AnimatePresence mode="wait">
@@ -151,85 +234,96 @@ export default function Compare() {
                                 exit={{ opacity: 0, y: -20 }}
                             >
                                 <div className="mb-8">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <p className="text-gray-600 dark:text-gray-400">
-                                            已选择 {selectedResumes.length}/5 份简历（至少选择2份）
-                                        </p>
-                                        <div className="flex items-center space-x-3">
-                                            <button
-                                                onClick={() => setShowConfig(!showConfig)}
-                                                className="inline-flex items-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-lg border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200"
-                                            >
-                                                <Settings className="w-4 h-4" />
-                                                <span>配置规则</span>
-                                                {showConfig ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                            </button>
-                                            {selectedResumes.length >= 2 && (
-                                                <button
-                                                    onClick={handleCompare}
-                                                    disabled={isComparing}
-                                                    className={`inline-flex items-center space-x-2 px-6 py-3 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
-                                                        useCoze 
-                                                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600' 
-                                                            : 'bg-gradient-to-r from-blue-600 to-indigo-600'
-                                                    }`}
+                                    <GlassCard className="p-8 mb-6">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <p className="text-gray-600 dark:text-gray-400 font-medium">
+                                                已选择 {selectedResumes.length}/5 份简历（至少选择2份）
+                                            </p>
+                                            <div className="flex items-center space-x-3">
+                                                <GlowButton
+                                                    onClick={() => setShowConfig(!showConfig)}
+                                                    variant="secondary"
+                                                    className="px-4 py-2.5 text-sm"
                                                 >
-                                                    {isComparing ? (
-                                                        <>
-                                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                            <span>对比中...</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            {useCoze ? <Sparkles className="w-5 h-5" /> : <Users className="w-5 h-5" />}
-                                                            <span>{useCoze ? 'AI 对比' : '规则对比'}（{selectedResumes.length}份）</span>
-                                                        </>
-                                                    )}
-                                                </button>
-                                            )}
+                                                    <Settings className="w-4 h-4" />
+                                                    <span>配置规则</span>
+                                                    {showConfig ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                                </GlowButton>
+                                                {selectedResumes.length >= 2 && (
+                                                    <GlowButton
+                                                        onClick={handleCompare}
+                                                        variant="primary"
+                                                        disabled={isComparing}
+                                                        className="px-8 py-3.5"
+                                                    >
+                                                        {isComparing ? (
+                                                            <>
+                                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                                <span>智能分析中...</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                {useCoze ? <Sparkles className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
+                                                                <span>{useCoze ? 'AI 对比' : '规则对比'}（{selectedResumes.length}份）</span>
+                                                            </>
+                                                        )}
+                                                    </GlowButton>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="flex items-center justify-center mb-6">
-                                        <div className="inline-flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
-                                            <button
-                                                onClick={() => setUseCoze(false)}
-                                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                                    !useCoze 
-                                                        ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
-                                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                                                }`}
-                                            >
-                                                <Code className="w-4 h-4" />
-                                                <span>规则分析</span>
-                                            </button>
-                                            <button
-                                                onClick={() => setUseCoze(true)}
-                                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                                    useCoze 
-                                                        ? 'bg-white dark:bg-gray-700 text-purple-600 shadow-sm' 
-                                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                                                }`}
-                                            >
-                                                <Sparkles className="w-4 h-4" />
-                                                <span>AI 智能分析</span>
-                                            </button>
+                                        <div className="flex items-center justify-center mb-6">
+                                            <div className="relative p-1 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg shadow-gray-900/5">
+                                                <motion.div
+                                                    className="absolute top-1 bottom-1 rounded-xl shadow-md"
+                                                    animate={{ x: useCoze ? '100%' : '0%' }}
+                                                    transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                                                    style={{
+                                                        left: 4,
+                                                        right: 'calc(50% + 4px)',
+                                                        background: useCoze
+                                                            ? 'linear-gradient(to right, #9333ea, #ec4899)'
+                                                            : 'linear-gradient(to right, #2563eb, #4f46e5)',
+                                                    }}
+                                                />
+                                                <div className="relative flex">
+                                                    <button
+                                                        onClick={() => setUseCoze(false)}
+                                                        className={`relative z-10 flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-colors duration-200 ${
+                                                            !useCoze ? 'text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                                        }`}
+                                                    >
+                                                        <Code className="w-4 h-4" />
+                                                        <span>规则分析</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setUseCoze(true)}
+                                                        className={`relative z-10 flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-semibold transition-colors duration-200 ${
+                                                            useCoze ? 'text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                                        }`}
+                                                    >
+                                                        <Sparkles className="w-4 h-4" />
+                                                        <span>AI 智能分析</span>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </GlassCard>
 
                                     {error && (
                                         <motion.div
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"
+                                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                                            className="mb-6 p-5 bg-red-50/80 dark:bg-red-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/30 rounded-2xl flex items-center space-x-4"
                                         >
-                                            <div className="flex items-center space-x-2">
-                                                <div className="w-5 h-5 text-red-500">⚠</div>
-                                                <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+                                            <div className="w-10 h-10 bg-red-100 dark:bg-red-900/40 rounded-xl flex items-center justify-center">
+                                                <XCircle className="w-5 h-5 text-red-500" />
                                             </div>
-                                            <p className="text-red-600 dark:text-red-500 text-xs mt-2">
-                                                已自动切换到规则分析模式
-                                            </p>
+                                            <div className="flex-1">
+                                                <p className="text-red-800 dark:text-red-300 font-semibold">{error}</p>
+                                                <p className="text-red-600 dark:text-red-500 text-xs mt-1">已自动切换到规则分析模式</p>
+                                            </div>
                                         </motion.div>
                                     )}
 
@@ -241,12 +335,12 @@ export default function Compare() {
                                                 exit={{ opacity: 0, height: 0 }}
                                                 className="mb-6 overflow-hidden"
                                             >
-                                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                                                <div className="backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 rounded-3xl p-6">
                                                     <div className="flex items-center justify-between mb-4">
                                                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">自定义规则配置</h3>
                                                         <button
                                                             onClick={resetConfig}
-                                                            className="text-sm text-blue-600 hover:text-blue-700"
+                                                            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                                                         >
                                                             重置默认
                                                         </button>
@@ -259,7 +353,7 @@ export default function Compare() {
                                                                 value={jobDescription}
                                                                 onChange={(e) => setJobDescription(e.target.value)}
                                                                 placeholder="输入岗位描述，帮助更精准地评估匹配度..."
-                                                                className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                                                                className="w-full p-3 border border-gray-200/50 dark:border-gray-600/50 rounded-xl bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-300 transition-all"
                                                                 rows={3}
                                                             />
                                                         </div>
@@ -269,7 +363,7 @@ export default function Compare() {
                                                                 value={requirements}
                                                                 onChange={(e) => setRequirements(e.target.value)}
                                                                 placeholder="输入具体要求，如技能、经验、学历等..."
-                                                                className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                                                                className="w-full p-3 border border-gray-200/50 dark:border-gray-600/50 rounded-xl bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-300 transition-all"
                                                                 rows={3}
                                                             />
                                                         </div>
@@ -387,10 +481,12 @@ export default function Compare() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
-                                        <Users className="w-16 h-16 text-gray-300 dark:text-gray-600 dark:text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                                        <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-4">暂无可对比的简历</p>
-                                        <p className="text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500">请先上传并分析一些简历</p>
+                                    <div className="text-center py-16 backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 rounded-3xl">
+                                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center mx-auto mb-4">
+                                            <Users className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+                                        </div>
+                                        <p className="text-gray-500 dark:text-gray-400 mb-4">暂无可对比的简历</p>
+                                        <p className="text-sm text-gray-400 dark:text-gray-500">请先上传并分析一些简历</p>
                                     </div>
                                 )}
                             </motion.div>
@@ -401,86 +497,134 @@ export default function Compare() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5 }}
                             >
-                                <div className="flex items-center justify-between mb-8">
-                                    <div className="flex items-center space-x-3">
-                                        <CheckCircle className="w-8 h-8 text-emerald-500" />
-                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">对比完成</h2>
+                                <div className="flex items-center justify-between mb-10">
+                                    <div className="flex items-center space-x-5">
+                                        <motion.div
+                                            initial={{ scale: 0, rotate: -180 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{ type: "spring", stiffness: 100 }}
+                                            className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/30 relative"
+                                        >
+                                            <CheckCircle className="w-7 h-7 text-white" />
+                                            <motion.div
+                                                className="absolute -inset-1 rounded-2xl bg-emerald-500/20 blur-md"
+                                                animate={{ scale: [1, 1.3, 1] }}
+                                                transition={{ duration: 2, repeat: Infinity }}
+                                            />
+                                        </motion.div>
+                                        <div>
+                                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">对比完成</h2>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">共 {comparisonResult.resumes.length} 份简历参与对比</p>
+                                        </div>
                                     </div>
-                                    <button
-                                        onClick={reset}
-                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium rounded-xl border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
-                                    >
+                                    <GlowButton onClick={reset} variant="secondary" className="px-6 py-3">
                                         <RefreshCcw className="w-5 h-5" />
                                         <span>重新对比</span>
-                                    </button>
+                                    </GlowButton>
                                 </div>
 
                                 {comparisonResult.comparison.ranking && (
-                                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-6 shadow-sm border border-amber-200 dark:border-amber-800 mb-8">
-                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-                                            <Trophy className="w-6 h-6 text-amber-600" />
+                                    <GlassCard className="p-8 mb-8" delay={0.1}>
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center space-x-3">
+                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/25">
+                                                <Crown className="w-5 h-5 text-white" />
+                                            </div>
                                             <span>候选人排名</span>
                                         </h3>
                                         <div className="space-y-3">
                                             {comparisonResult.comparison.ranking.map((item, index) => (
-                                                <div key={item.id} className={`flex items-center justify-between p-3 rounded-xl ${index === 0 ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-white dark:bg-gray-800'}`}>
-                                                    <div className="flex items-center space-x-3">
-                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${index === 0 ? 'bg-amber-500 text-white' : index === 1 ? 'bg-gray-400 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`}>
+                                                <motion.div
+                                                    key={item.id}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: index * 0.15 }}
+                                                    className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
+                                                        index === 0
+                                                            ? 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 shadow-md shadow-amber-500/10'
+                                                            : 'bg-white/60 dark:bg-gray-700/40 backdrop-blur hover:shadow-md'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg ${
+                                                            index === 0
+                                                                ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg shadow-amber-500/30'
+                                                                : index === 1
+                                                                    ? 'bg-gradient-to-br from-gray-300 to-gray-400 text-white'
+                                                                    : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                                                        }`}>
                                                             {item.rank}
                                                         </div>
-                                                        <span className="font-medium text-gray-900 dark:text-white">{item.name}</span>
+                                                        <span className="font-semibold text-gray-900 dark:text-white text-lg">{item.name}</span>
+                                                        {index === 0 && (
+                                                            <span className="text-xs px-2.5 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full font-medium">
+                                                                推荐
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                    <span className={`text-lg font-bold ${index === 0 ? 'text-amber-600' : 'text-gray-600 dark:text-gray-400'}`}>{item.score}分</span>
-                                                </div>
+                                                    <span className={`text-2xl font-bold ${index === 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                                                        {item.score}<span className="text-sm font-normal ml-1">分</span>
+                                                    </span>
+                                                </motion.div>
                                             ))}
                                         </div>
-                                    </div>
+                                    </GlassCard>
                                 )}
 
                                 <div className="grid lg:grid-cols-3 gap-6 mb-8">
-                                    {comparisonResult.resumes.map((resume, index) => (
-                                        <motion.div
-                                            key={resume.id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.1 }}
-                                        >
-                                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 h-full">
-                                                <div className="flex items-center justify-between mb-4">
-                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                                        {resume.basicInfo.name}
-                                                    </h3>
-                                                    {comparisonResult.comparison.ranking && (
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                            comparisonResult.comparison.ranking[index]?.rank === 1 
-                                                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' 
-                                                                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-                                                        }`}>
-                                                            第{comparisonResult.comparison.ranking[index]?.rank || index + 1}名
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="text-center mb-4">
-                                                    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl ${getScoreColor(comparisonResult.results[index].matchScore)}`}>
-                                                        <span className="text-2xl font-bold">{comparisonResult.results[index].matchScore}</span>
+                                    {comparisonResult.resumes.map((resume, index) => {
+                                        const isWinner = comparisonResult.comparison.ranking?.[index]?.rank === 1;
+                                        const score = comparisonResult.results[index].matchScore;
+                                        return (
+                                            <motion.div
+                                                key={resume.id}
+                                                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                transition={{ delay: index * 0.12, type: "spring" }}
+                                            >
+                                                <GlassCard className={`p-6 h-full ${isWinner ? 'ring-2 ring-indigo-400/30' : ''}`}>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                                            {resume.basicInfo.name}
+                                                        </h3>
+                                                        {comparisonResult.comparison.ranking && (
+                                                            <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                                                                isWinner
+                                                                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white'
+                                                                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                                                            }`}>
+                                                                {isWinner ? '第1名' : `第${comparisonResult.comparison.ranking[index]?.rank || index + 1}名`}
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">匹配分数</p>
-                                                </div>
-                                                <div className="space-y-2 text-sm">
-                                                    <p className="text-gray-600 dark:text-gray-400">{resume.jobInfo.position}</p>
-                                                    <div className="flex items-center space-x-3 text-gray-500 dark:text-gray-400">
-                                                        <span>{resume.background.education}</span>
-                                                        <span>•</span>
-                                                        <span>{resume.background.workYears}</span>
+                                                    <div className="flex justify-center mb-4">
+                                                        <AnimatedScoreRing
+                                                            score={score}
+                                                            size={110}
+                                                            strokeWidth={7}
+                                                            isWinner={isWinner}
+                                                        />
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))}
+                                                    <div className="space-y-2 text-sm">
+                                                        <p className="text-gray-600 dark:text-gray-400">{resume.jobInfo.position}</p>
+                                                        <div className="flex items-center space-x-3 text-gray-500 dark:text-gray-400">
+                                                            <span>{resume.background.education}</span>
+                                                            <span>•</span>
+                                                            <span>{resume.background.workYears}</span>
+                                                        </div>
+                                                    </div>
+                                                </GlassCard>
+                                            </motion.div>
+                                        );
+                                    })}
                                 </div>
 
-                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
-                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">评分对比</h3>
+                                <GlassCard className="p-8 mb-8" delay={0.2}>
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center space-x-3">
+                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                                            <Target className="w-4 h-4 text-white" />
+                                        </div>
+                                        <span>评分对比</span>
+                                    </h3>
                                     <div className="space-y-6">
                                         {[
                                             { label: "技能评分", key: "skills" },
@@ -499,7 +643,22 @@ export default function Compare() {
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${item.key === 'skills' ? result.details.skillsMatch : item.key === 'experience' ? result.details.experienceMatch : result.details.educationMatch}%` }}
                                                                 transition={{ duration: 0.8, delay: idx * 0.1 }}
-                                                                className={`h-full rounded-full ${idx === 0 ? 'bg-gradient-to-r from-blue-500 to-blue-600' : idx === 1 ? 'bg-gradient-to-r from-indigo-500 to-indigo-600' : idx === 2 ? 'bg-gradient-to-r from-purple-500 to-purple-600' : idx === 3 ? 'bg-gradient-to-r from-pink-500 to-pink-600' : 'bg-gradient-to-r from-rose-500 to-rose-600'}`}
+                                                                className={`h-full rounded-full ${idx === 0 ? 'from-indigo-500 to-blue-500' : idx === 1 ? 'from-purple-500 to-pink-500' : idx === 2 ? 'from-cyan-500 to-teal-500' : idx === 3 ? 'from-pink-500 to-rose-500' : 'from-rose-500 to-red-500'}`}
+                                                                style={{
+                                                                    backgroundImage: `linear-gradient(90deg, ${
+                                                                        idx === 0 ? '#6366f1, #3b82f6' :
+                                                                        idx === 1 ? '#a855f7, #ec4899' :
+                                                                        idx === 2 ? '#06b6d4, #14b8a6' :
+                                                                        idx === 3 ? '#ec4899, #f43f5e' :
+                                                                        '#f43f5e, #ef4444'
+                                                                    }, ${
+                                                                        idx === 0 ? '#6366f1, #3b82f6' :
+                                                                        idx === 1 ? '#a855f7, #ec4899' :
+                                                                        idx === 2 ? '#06b6d4, #14b8a6' :
+                                                                        idx === 3 ? '#ec4899, #f43f5e' :
+                                                                        '#f43f5e, #ef4444'
+                                                                    })`,
+                                                                }}
                                                             />
                                                         </div>
                                                         <span className="text-sm font-semibold w-12 text-right">
@@ -510,19 +669,21 @@ export default function Compare() {
                                             </div>
                                         ))}
                                     </div>
-                                </div>
+                                </GlassCard>
 
                                 <div className="grid lg:grid-cols-3 gap-6 mb-8">
-                                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                                    <GlassCard className="p-6" delay={0.3}>
                                         <button
                                             onClick={() => toggleSection('skills')}
                                             className="w-full flex items-center justify-between mb-4"
                                         >
                                             <div className="flex items-center space-x-2">
-                                                <Code className="w-5 h-5 text-blue-600" />
+                                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20">
+                                                    <Code className="w-4 h-4 text-white" />
+                                                </div>
                                                 <h4 className="font-semibold text-gray-900 dark:text-white">技能分析</h4>
                                             </div>
-                                            {expandedSections.skills ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                            {expandedSections.skills ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
                                         </button>
                                         {expandedSections.skills && comparisonResult.results && (
                                             <div className="space-y-4">
@@ -557,18 +718,20 @@ export default function Compare() {
                                                 ))}
                                             </div>
                                         )}
-                                    </div>
+                                    </GlassCard>
 
-                                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                                    <GlassCard className="p-6" delay={0.4}>
                                         <button
                                             onClick={() => toggleSection('experience')}
                                             className="w-full flex items-center justify-between mb-4"
                                         >
                                             <div className="flex items-center space-x-2">
-                                                <Briefcase className="w-5 h-5 text-amber-600" />
+                                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md shadow-amber-500/20">
+                                                    <Briefcase className="w-4 h-4 text-white" />
+                                                </div>
                                                 <h4 className="font-semibold text-gray-900 dark:text-white">经验分析</h4>
                                             </div>
-                                            {expandedSections.experience ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                            {expandedSections.experience ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
                                         </button>
                                         {expandedSections.experience && comparisonResult.results && (
                                             <div className="space-y-4">
@@ -598,18 +761,20 @@ export default function Compare() {
                                                 ))}
                                             </div>
                                         )}
-                                    </div>
+                                    </GlassCard>
 
-                                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                                    <GlassCard className="p-6" delay={0.5}>
                                         <button
                                             onClick={() => toggleSection('education')}
                                             className="w-full flex items-center justify-between mb-4"
                                         >
                                             <div className="flex items-center space-x-2">
-                                                <GraduationCap className="w-5 h-5 text-emerald-600" />
+                                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md shadow-emerald-500/20">
+                                                    <GraduationCap className="w-4 h-4 text-white" />
+                                                </div>
                                                 <h4 className="font-semibold text-gray-900 dark:text-white">学历分析</h4>
                                             </div>
-                                            {expandedSections.education ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                            {expandedSections.education ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
                                         </button>
                                         {expandedSections.education && comparisonResult.results && (
                                             <div className="space-y-4">
@@ -638,13 +803,15 @@ export default function Compare() {
                                                 ))}
                                             </div>
                                         )}
-                                    </div>
+                                    </GlassCard>
                                 </div>
 
                                 {comparisonResult.comparison.priorityWeights && (
-                                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
-                                        <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-                                            <Target className="w-5 h-5 text-purple-600" />
+                                    <GlassCard className="p-6 mb-8" delay={0.6}>
+                                        <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-3">
+                                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-400 to-violet-600 flex items-center justify-center shadow-md shadow-purple-500/20">
+                                                <Target className="w-4 h-4 text-white" />
+                                            </div>
                                             <span>权重分配</span>
                                         </h4>
                                         <div className="flex items-center space-x-4">
@@ -661,22 +828,24 @@ export default function Compare() {
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
+                                    </GlassCard>
                                 )}
 
                                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {comparisonResult.resumes.map((resume, index) => (
                                         <div key={resume.id} className="space-y-4">
-                                            <h4 className="font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
+                                            <h4 className="font-semibold text-gray-900 dark:text-white flex items-center space-x-2 text-lg">
                                                 <span>{resume.basicInfo.name}</span>
                                                 {comparisonResult.comparison.ranking && comparisonResult.comparison.ranking[index]?.rank === 1 && (
-                                                    <Trophy className="w-4 h-4 text-amber-500" />
+                                                    <Crown className="w-5 h-5 text-amber-500" />
                                                 )}
                                             </h4>
                                             {comparisonResult.comparison.strengths[resume.id]?.length > 0 && (
-                                                <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
-                                                    <h5 className="text-sm font-semibold text-emerald-800 mb-3 flex items-center space-x-1">
-                                                        <TrendingUp className="w-4 h-4" />
+                                                <div className="backdrop-blur-xl bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/50 dark:border-emerald-800/30 rounded-2xl p-4 hover:shadow-md hover:shadow-emerald-500/5 transition-all duration-300">
+                                                    <h5 className="text-sm font-semibold text-emerald-800 dark:text-emerald-300 mb-3 flex items-center space-x-2">
+                                                        <div className="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                                                            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+                                                        </div>
                                                         <span>优势</span>
                                                     </h5>
                                                     <ul className="space-y-2">
@@ -690,9 +859,11 @@ export default function Compare() {
                                                 </div>
                                             )}
                                             {comparisonResult.comparison.weaknesses[resume.id]?.length > 0 && (
-                                                <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
-                                                    <h5 className="text-sm font-semibold text-red-800 mb-3 flex items-center space-x-1">
-                                                        <TrendingDown className="w-4 h-4" />
+                                                <div className="backdrop-blur-xl bg-red-50/60 dark:bg-red-900/20 border border-red-200/50 dark:border-red-800/30 rounded-2xl p-4 hover:shadow-md hover:shadow-red-500/5 transition-all duration-300">
+                                                    <h5 className="text-sm font-semibold text-red-800 dark:text-red-300 mb-3 flex items-center space-x-2">
+                                                        <div className="w-6 h-6 rounded-lg bg-red-500/20 flex items-center justify-center">
+                                                            <TrendingDown className="w-3.5 h-3.5 text-red-600" />
+                                                        </div>
                                                         <span>劣势</span>
                                                     </h5>
                                                     <ul className="space-y-2">
@@ -706,9 +877,11 @@ export default function Compare() {
                                                 </div>
                                             )}
                                             {comparisonResult.results && comparisonResult.results[index].highlights.length > 0 && (
-                                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                                                    <h5 className="text-sm font-semibold text-blue-800 mb-3 flex items-center space-x-1">
-                                                        <Trophy className="w-4 h-4" />
+                                                <div className="backdrop-blur-xl bg-blue-50/60 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30 rounded-2xl p-4 hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300">
+                                                    <h5 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-3 flex items-center space-x-2">
+                                                        <div className="w-6 h-6 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                                            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                                                        </div>
                                                         <span>亮点</span>
                                                     </h5>
                                                     <ul className="space-y-2">
@@ -725,15 +898,17 @@ export default function Compare() {
                                     ))}
                                 </div>
 
-                                <div className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-8 border border-purple-200">
-                                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-                                        <Trophy className="w-6 h-6 text-purple-600" />
+                                <GlassCard className="p-8 mt-8" delay={0.7}>
+                                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-3">
+                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
+                                            <Sparkles className="w-5 h-5 text-white" />
+                                        </div>
                                         <span>AI 推荐建议</span>
                                     </h4>
                                     <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                                         {comparisonResult.comparison.recommendation}
                                     </p>
-                                </div>
+                                </GlassCard>
                             </motion.div>
                         )}
                     </AnimatePresence>
