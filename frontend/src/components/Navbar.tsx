@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface NavItem {
     path: string;
@@ -178,6 +179,10 @@ export default function Navbar() {
                             <Settings className="w-4 h-4" />
                             <span>设置</span>
                         </Link>
+
+                        <div className="pl-2 border-l border-gray-200 dark:border-gray-700">
+                            <ThemeToggle />
+                        </div>
                     </div>
 
                     <button
