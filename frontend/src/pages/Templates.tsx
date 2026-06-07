@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
     FileText,
+    FileStack,
     Download,
     Eye,
     Star,
     Search,
-    Filter,
     Briefcase,
     Code,
     Palette,
@@ -49,7 +49,7 @@ const templates: Template[] = [
         id: "2",
         name: "技术精英",
         category: "技术",
-        description: "专为程序员和技术人员设计，突出技术栈和项目经验。",
+        description: "专为程序员和技术人员设计，突出技术和项目经验。",
         thumbnail: "bg-gradient-to-br from-emerald-100 to-emerald-200",
         rating: 4.9,
         downloads: 980,
@@ -109,6 +109,87 @@ const templates: Template[] = [
 
 const categories = ["全部", "通用", "技术", "设计", "商务", "校园", "销售"];
 
+// ============ 设计系统组件 ============
+
+const AnimatedBackground = () => (
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full">
+            <motion.div
+                animate={{ x: [0, 100, 0], y: [0, -50, 0], rotate: [0, 180, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-teal-400/20 to-emerald-600/20 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{ x: [0, -80, 0], y: [0, 60, 0], rotate: [360, 180, 0] }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/2 right-1/4 w-80 h-80 bg-gradient-to-br from-emerald-400/20 to-teal-500/20 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{ x: [0, 60, 0], y: [0, -80, 0] }}
+                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-cyan-400/20 to-teal-500/20 rounded-full blur-3xl"
+            />
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-white/50 to-white dark:via-gray-900/50 dark:to-gray-900" />
+    </div>
+);
+
+const ParticleField = () => {
+    const particles = Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 4 + 2,
+        duration: Math.random() * 10 + 10,
+        delay: Math.random() * 5,
+    }));
+    return (
+        <div className="fixed inset-0 -z-10 pointer-events-none">
+            {particles.map((particle) => (
+                <motion.div
+                    key={particle.id}
+                    className="absolute rounded-full bg-teal-500/10 dark:bg-teal-400/10"
+                    style={{
+                        left: `${particle.x}%`,
+                        top: `${particle.y}%`,
+                        width: particle.size,
+                        height: particle.size,
+                    }}
+                    animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
+                    transition={{
+                        duration: particle.duration,
+                        repeat: Infinity,
+                        delay: particle.delay,
+                        ease: "easeInOut",
+                    }}
+                />
+            ))}
+        </div>
+    );
+};
+
+const GlassCard = ({
+    children,
+    className = "",
+    delay = 0,
+}: {
+    children: React.ReactNode;
+    className?: string;
+    delay?: number;
+}) => (
+    <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+        className={`relative backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 shadow-2xl shadow-gray-900/5 dark:shadow-black/20 rounded-3xl overflow-hidden ${className}`}
+    >
+        <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-white/5 dark:to-transparent pointer-events-none" />
+        <div className="relative z-10">{children}</div>
+    </motion.div>
+);
+
+// ============ 页面主体 ============
+
 export default function Templates() {
     const navigate = useNavigate();
     const [searchKeyword, setSearchKeyword] = useState("");
@@ -125,133 +206,186 @@ export default function Templates() {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen relative">
+            <AnimatedBackground />
+            <ParticleField />
             <Navbar />
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative">
                 <BackButton />
+
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
                 >
+                    {/* ============ Hero Header ============ */}
                     <div className="text-center mb-12">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                            简历模板
-                        </h1>
-                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500 max-w-2xl mx-auto">
-                            精选多款专业简历模板，助您打造完美简历
-                        </p>
-                    </div>
-
-                    <div className="flex flex-col md:flex-row gap-4 mb-8">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                            <input
-                                type="text"
-                                placeholder="搜索模板..."
-                                value={searchKeyword}
-                                onChange={(e) => setSearchKeyword(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white"
+                        <motion.div
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{
+                                delay: 0.2,
+                                type: "spring",
+                                stiffness: 100,
+                            }}
+                            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-teal-500 via-emerald-500 to-green-600 rounded-3xl shadow-2xl shadow-teal-500/30 mb-8 relative"
+                        >
+                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent" />
+                            <FileStack className="w-10 h-10 text-white relative z-10" />
+                            <motion.div
+                                className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-teal-500/20 to-emerald-500/20 blur-xl"
+                                animate={{
+                                    scale: [1, 1.2, 1],
+                                    opacity: [0.5, 0.8, 0.5],
+                                }}
+                                transition={{ duration: 3, repeat: Infinity }}
                             />
-                        </div>
-                        <div className="flex gap-2 overflow-x-auto pb-2">
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => setSelectedCategory(category)}
-                                    className={`px-4 py-3 rounded-xl font-medium whitespace-nowrap transition-all duration-200 ${
-                                        selectedCategory === category
-                                            ? "bg-blue-600 text-white"
-                                            : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 dark:text-gray-600 border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
-                                    }`}
-                                >
-                                    {category}
-                                </button>
-                            ))}
-                        </div>
+                        </motion.div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                            className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6"
+                        >
+                            <span className="bg-gradient-to-r from-gray-900 via-teal-800 to-emerald-800 dark:from-white dark:via-teal-200 dark:to-emerald-200 bg-clip-text text-transparent">
+                                简历模板
+                            </span>
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.6 }}
+                            className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed"
+                        >
+                            精选多款专业简历模板，助您打造完美简历
+                            <br className="hidden sm:block" />
+                            <span className="bg-gradient-to-r from-teal-600 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent font-semibold">
+                                选择模板，一键开始编辑
+                            </span>
+                        </motion.p>
                     </div>
 
+                    {/* ============ 搜索和筛选 ============ */}
+                    <GlassCard delay={0.5} className="mb-10 p-6">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex-1 relative">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="搜索模板..."
+                                    value={searchKeyword}
+                                    onChange={(e) => setSearchKeyword(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-200/50 dark:border-gray-600/50 rounded-2xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white"
+                                />
+                            </div>
+                            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+                                {categories.map((category) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => setSelectedCategory(category)}
+                                        className={`px-5 py-3.5 rounded-2xl font-semibold whitespace-nowrap transition-all duration-300 text-sm ${
+                                            selectedCategory === category
+                                                ? "bg-gradient-to-r from-teal-500 to-emerald-600 text-white shadow-lg shadow-teal-500/25"
+                                                : "bg-white/60 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300 border border-gray-200/50 dark:border-gray-600/50 hover:border-teal-300 dark:hover:border-teal-600"
+                                        }`}
+                                    >
+                                        {category}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </GlassCard>
+
+                    {/* ============ 模板卡片网格 ============ */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredTemplates.map((template, index) => {
                             const Icon = template.icon;
                             return (
                                 <motion.div
                                     key={template.id}
-                                    initial={{ opacity: 0, y: 20 }}
+                                    initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
+                                    transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
                                     whileHover={{ y: -8 }}
-                                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
+                                    className="relative backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/30 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-teal-500/10 dark:hover:shadow-teal-500/5 transition-all duration-300"
                                 >
-                                    <div
-                                        className={`h-48 ${template.thumbnail} flex items-center justify-center`}
-                                    >
-                                        <div className="text-center">
-                                            <div
-                                                className={`w-20 h-28 bg-white rounded-lg shadow-lg mx-auto mb-4 flex items-center justify-center`}
-                                            >
-                                                <Icon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
-                                            </div>
-                                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-500">
-                                                {template.name}
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-white/5 dark:to-transparent pointer-events-none" />
 
-                                    <div className="p-6">
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div>
-                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    <div className="relative">
+                                        {/* 缩略图 */}
+                                        <div className={`h-48 ${template.thumbnail} flex items-center justify-center`}>
+                                            <div className="text-center">
+                                                <div className="w-20 h-28 bg-white rounded-lg shadow-lg mx-auto mb-4 flex items-center justify-center">
+                                                    <Icon className="w-10 h-10 text-gray-400" />
+                                                </div>
+                                                <p className="text-sm font-medium text-gray-600">
                                                     {template.name}
-                                                </h3>
-                                                <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                                                    {template.category}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center space-x-1">
-                                                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">
-                                                    {template.rating}
-                                                </span>
+                                                </p>
                                             </div>
                                         </div>
 
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-4 line-clamp-2">
-                                            {template.description}
-                                        </p>
-
-                                        <div className="flex flex-wrap gap-2 mb-4">
-                                            {template.tags.map((tag) => (
-                                                <span
-                                                    key={tag}
-                                                    className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 dark:text-gray-600 text-xs rounded-md"
-                                                >
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                                            <div className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                                                <Download className="w-4 h-4" />
-                                                <span>{template.downloads} 次下载</span>
+                                        <div className="p-6">
+                                            {/* 标题和评分 */}
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                                        {template.name}
+                                                    </h3>
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                        {template.category}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center space-x-1">
+                                                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                        {template.rating}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center space-x-2">
-                                                <button
-                                                    onClick={() => setPreviewTemplate(template)}
-                                                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors"
-                                                    title="预览"
-                                                >
-                                                    <Eye className="w-5 h-5" />
-                                                </button>
-                                                <button
-                                                    onClick={() => navigate(`/home/editor?template=${template.id}`)}
-                                                    className="inline-flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-200"
-                                                >
-                                                    <Edit3 className="w-4 h-4" />
-                                                    <span>使用此模板</span>
-                                                </button>
+
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                                                {template.description}
+                                            </p>
+
+                                            {/* 标签 */}
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {template.tags.map((tag) => (
+                                                    <span
+                                                        key={tag}
+                                                        className="px-2 py-1 bg-gray-100/80 dark:bg-gray-700/80 text-gray-600 dark:text-gray-300 text-xs rounded-md"
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+
+                                            {/* 底部操作 */}
+                                            <div className="flex items-center justify-between pt-4 border-t border-gray-100/80 dark:border-gray-700/80">
+                                                <div className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-400">
+                                                    <Download className="w-4 h-4" />
+                                                    <span>{template.downloads} 次下载</span>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <button
+                                                        onClick={() => setPreviewTemplate(template)}
+                                                        className="p-2 text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors"
+                                                        title="预览"
+                                                    >
+                                                        <Eye className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            navigate(`/home/editor?template=${template.id}`)
+                                                        }
+                                                        className="inline-flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:shadow-teal-500/25 transition-all duration-200"
+                                                    >
+                                                        <Edit3 className="w-4 h-4" />
+                                                        <span>使用此模板</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -260,29 +394,37 @@ export default function Templates() {
                         })}
                     </div>
 
+                    {/* 空状态 */}
                     {filteredTemplates.length === 0 && (
-                        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-center py-16 backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white/20 dark:border-gray-700/30"
+                        >
                             <FileText className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                 未找到匹配的模板
                             </h3>
-                            <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">尝试使用其他关键词或分类筛选</p>
-                        </div>
+                            <p className="text-gray-500 dark:text-gray-400">
+                                尝试使用其他关键词或分类筛选
+                            </p>
+                        </motion.div>
                     )}
                 </motion.div>
             </main>
 
+            {/* ============ 预览弹窗 ============ */}
             {previewTemplate && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
                     onClick={() => setPreviewTemplate(null)}
                 >
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-8">
@@ -292,9 +434,9 @@ export default function Templates() {
                                 </h2>
                                 <button
                                     onClick={() => setPreviewTemplate(null)}
-                                    className="p-2 hover:bg-gray-100 dark:bg-gray-700 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                                 >
-                                    <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500">✕</span>
+                                    <span className="text-gray-500 dark:text-gray-400 text-lg">✕</span>
                                 </button>
                             </div>
 
@@ -303,12 +445,12 @@ export default function Templates() {
                             >
                                 <div className="text-center">
                                     <div className="w-48 h-64 bg-white rounded-lg shadow-2xl mx-auto mb-4 flex items-center justify-center">
-                                        <previewTemplate.icon className="w-16 h-16 text-gray-400 dark:text-gray-500" />
+                                        <previewTemplate.icon className="w-16 h-16 text-gray-400" />
                                     </div>
                                 </div>
                             </div>
 
-                            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500 mb-6">
+                            <p className="text-gray-600 dark:text-gray-400 mb-6">
                                 {previewTemplate.description}
                             </p>
 
@@ -318,7 +460,7 @@ export default function Templates() {
                                         <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
                                         <span className="font-medium">{previewTemplate.rating}</span>
                                     </div>
-                                    <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500">
+                                    <span className="text-gray-500 dark:text-gray-400">
                                         {previewTemplate.downloads} 次下载
                                     </span>
                                 </div>
@@ -327,7 +469,7 @@ export default function Templates() {
                                         setPreviewTemplate(null);
                                         navigate(`/home/editor?template=${previewTemplate.id}`);
                                     }}
-                                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:shadow-teal-500/25 transition-all duration-200"
                                 >
                                     <Edit3 className="w-5 h-5" />
                                     <span>使用此模板编辑</span>

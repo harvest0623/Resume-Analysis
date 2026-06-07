@@ -19,10 +19,79 @@ import {
     GripVertical,
     Edit3,
     X,
+    Brain,
+    ArrowRight,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
 import { api } from "@/utils/api";
+
+const AnimatedBackground = () => (
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full">
+            <motion.div
+                animate={{
+                    x: [0, 100, 0],
+                    y: [0, -50, 0],
+                    rotate: [0, 180, 360]
+                }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-violet-400/20 to-purple-600/20 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{
+                    x: [0, -80, 0],
+                    y: [0, 60, 0],
+                    rotate: [360, 180, 0]
+                }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/2 right-1/4 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-violet-500/20 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{
+                    x: [0, 60, 0],
+                    y: [0, -80, 0]
+                }}
+                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-fuchsia-400/20 to-purple-400/20 rounded-full blur-3xl"
+            />
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-white/50 to-white dark:via-gray-900/50 dark:to-gray-900" />
+    </div>
+);
+
+const ParticleField = () => {
+    const particles = Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 4 + 2,
+        duration: Math.random() * 10 + 10,
+        delay: Math.random() * 5
+    }));
+
+    return (
+        <div className="fixed inset-0 -z-10 pointer-events-none">
+            {particles.map(particle => (
+                <motion.div
+                    key={particle.id}
+                    className="absolute rounded-full bg-violet-500/10 dark:bg-violet-400/10"
+                    style={{ left: `${particle.x}%`, top: `${particle.y}%`, width: particle.size, height: particle.size }}
+                    animate={{
+                        y: [0, -30, 0],
+                        opacity: [0.3, 0.8, 0.3]
+                    }}
+                    transition={{
+                        duration: particle.duration,
+                        repeat: Infinity,
+                        delay: particle.delay,
+                        ease: "easeInOut"
+                    }}
+                />
+            ))}
+        </div>
+    );
+};
 
 interface ResumeSection {
     title: string;
@@ -290,27 +359,55 @@ export default function Generate() {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen relative">
+            <AnimatedBackground />
+            <ParticleField />
             <Navbar />
 
-            <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative">
                 <BackButton />
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
                 >
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center px-4 py-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-full mb-4">
-                            <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 mr-2" />
-                            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">AI 驱动</span>
-                        </div>
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                            AI 生成简历
-                        </h1>
-                        <p className="text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500 max-w-2xl mx-auto">
+                        <motion.div
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+                            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-violet-500 via-purple-600 to-purple-700 rounded-3xl shadow-2xl shadow-purple-500/30 mb-8 relative"
+                        >
+                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent" />
+                            <Sparkles className="w-10 h-10 text-white relative z-10" />
+                            <motion.div
+                                className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-violet-500/30 to-purple-600/30 blur-xl"
+                                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                                transition={{ duration: 3, repeat: Infinity }}
+                            />
+                        </motion.div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                            className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6"
+                        >
+                            <span className="bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 dark:from-white dark:via-purple-200 dark:to-indigo-200 bg-clip-text text-transparent">
+                                AI 生成简历
+                            </span>
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.6 }}
+                            className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed"
+                        >
                             填写基本信息，AI 为您生成专业的简历内容
-                        </p>
+                            <br className="hidden sm:block" />
+                            <span className="text-purple-600 dark:text-purple-400 font-medium">快速打造高质量简历</span>
+                        </motion.p>
                     </div>
 
                     <div className="flex items-center justify-center mb-12">
@@ -322,7 +419,7 @@ export default function Generate() {
                                         onClick={() => setStep(s.id)}
                                         className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 whitespace-nowrap ${
                                             step === s.id
-                                                ? "bg-blue-600 text-white"
+                                                ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-purple-500/30"
                                                 : step > s.id
                                                 ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
                                                 : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 dark:text-gray-500"
@@ -426,7 +523,7 @@ export default function Generate() {
                                 <div className="flex justify-end mt-8">
                                     <button
                                         onClick={() => setStep(2)}
-                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl"
+                                        className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200"
                                     >
                                         下一步
                                     </button>
@@ -497,7 +594,7 @@ export default function Generate() {
                                     </button>
                                     <button
                                         onClick={() => setStep(3)}
-                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl"
+                                        className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200"
                                     >
                                         下一步
                                     </button>
@@ -551,7 +648,7 @@ export default function Generate() {
                                     </button>
                                     <button
                                         onClick={() => setStep(4)}
-                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl"
+                                        className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200"
                                     >
                                         下一步
                                     </button>
@@ -593,7 +690,7 @@ export default function Generate() {
                                     </button>
                                     <button
                                         onClick={() => setStep(5)}
-                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl"
+                                        className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200"
                                     >
                                         下一步
                                     </button>
@@ -662,7 +759,7 @@ export default function Generate() {
                                     </button>
                                     <button
                                         onClick={() => setStep(6)}
-                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl"
+                                        className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200"
                                     >
                                         下一步
                                     </button>
@@ -698,7 +795,7 @@ export default function Generate() {
                                     <button
                                         onClick={addCustomModule}
                                         disabled={!newModuleName.trim()}
-                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                                     >
                                         <Plus className="w-4 h-4" />
                                         <span>添加</span>
@@ -843,7 +940,7 @@ export default function Generate() {
                                     </button>
                                     <button
                                         onClick={() => setStep(7)}
-                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl"
+                                        className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200"
                                     >
                                         下一步
                                     </button>
@@ -860,15 +957,40 @@ export default function Generate() {
                             >
                                 {!generatedResume ? (
                                     <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
-                                        <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                                            <Wand2 className="w-10 h-10 text-white" />
-                                        </div>
-                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                                            准备生成简历
-                                        </h2>
-                                        <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-                                            AI 将根据您填写的信息，生成一份专业的简历内容。点击下方按钮开始生成。
-                                        </p>
+                                        <motion.div
+                                            initial={{ scale: 0, rotate: -180 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+                                            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-violet-500 via-purple-600 to-purple-700 rounded-3xl shadow-2xl shadow-purple-500/30 mb-8 relative"
+                                        >
+                                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent" />
+                                            <Wand2 className="w-10 h-10 text-white relative z-10" />
+                                            <motion.div
+                                                className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-violet-500/30 to-purple-600/30 blur-xl"
+                                                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                                                transition={{ duration: 3, repeat: Infinity }}
+                                            />
+                                        </motion.div>
+                                        <motion.h2
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.3, duration: 0.6 }}
+                                            className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6"
+                                        >
+                                            <span className="bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 dark:from-white dark:via-purple-200 dark:to-indigo-200 bg-clip-text text-transparent">
+                                                准备生成简历
+                                            </span>
+                                        </motion.h2>
+                                        <motion.p
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.4, duration: 0.6 }}
+                                            className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed mb-10"
+                                        >
+                                            AI 将根据您填写的信息，生成一份专业的简历内容
+                                            <br className="hidden sm:block" />
+                                            <span className="text-purple-600 dark:text-purple-400 font-medium">点击下方按钮开始生成</span>
+                                        </motion.p>
                                         {generateError && (
                                             <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-300 max-w-md mx-auto">
                                                 <p className="text-sm">{generateError}</p>
@@ -885,19 +1007,23 @@ export default function Generate() {
                                             <button
                                                 onClick={handleGenerate}
                                                 disabled={isGenerating}
-                                                className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 transition-all duration-200"
+                                                className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-2xl shadow-xl shadow-purple-500/25 hover:shadow-2xl hover:shadow-purple-500/40 transform hover:-translate-y-1 disabled:opacity-50 transition-all duration-300 overflow-hidden"
                                             >
-                                                {isGenerating ? (
-                                                    <>
-                                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                        <span>生成中...</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Sparkles className="w-5 h-5" />
-                                                        <span>AI 生成简历</span>
-                                                    </>
-                                                )}
+                                                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                                <span className="relative z-10 flex items-center">
+                                                    {isGenerating ? (
+                                                        <>
+                                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                                                            <span>生成中...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Sparkles className="w-5 h-5 mr-2" />
+                                                            <span>AI 生成简历</span>
+                                                            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                                                        </>
+                                                    )}
+                                                </span>
                                             </button>
                                         </div>
                                     </div>
@@ -905,10 +1031,30 @@ export default function Generate() {
                                     <div>
                                         <div className="flex items-center justify-between mb-8">
                                             <div className="flex items-center space-x-3">
-                                                <Check className="w-8 h-8 text-emerald-500" />
-                                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                                    简历生成完成
-                                                </h2>
+                                                <motion.div
+                                                    initial={{ scale: 0, rotate: -180 }}
+                                                    animate={{ scale: 1, rotate: 0 }}
+                                                    transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+                                                    className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-violet-500 via-purple-600 to-purple-700 rounded-3xl shadow-2xl shadow-purple-500/30 relative"
+                                                >
+                                                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent" />
+                                                    <Check className="w-10 h-10 text-white relative z-10" />
+                                                    <motion.div
+                                                        className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-violet-500/30 to-purple-600/30 blur-xl"
+                                                        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                                                        transition={{ duration: 3, repeat: Infinity }}
+                                                    />
+                                                </motion.div>
+                                                <motion.h2
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 0.3, duration: 0.6 }}
+                                                    className="text-5xl sm:text-6xl lg:text-7xl font-bold"
+                                                >
+                                                    <span className="bg-gradient-to-r from-gray-900 via-purple-800 to-indigo-800 dark:from-white dark:via-purple-200 dark:to-indigo-200 bg-clip-text text-transparent">
+                                                        简历生成完成
+                                                    </span>
+                                                </motion.h2>
                                             </div>
                                             <div className="flex items-center space-x-3">
                                                 <button
@@ -925,7 +1071,7 @@ export default function Generate() {
                                                     <Copy className="w-4 h-4" />
                                                     <span>复制</span>
                                                 </button>
-                                                <button className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl">
+                                                <button className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200">
                                                     <Download className="w-5 h-5" />
                                                     <span>下载 PDF</span>
                                                 </button>
