@@ -92,17 +92,17 @@ const AnimatedBackground = () => (
             <motion.div
                 animate={{ x: [0, 100, 0], y: [0, -50, 0], rotate: [0, 180, 360] }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"
+                className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-cyan-400/20 to-teal-600/20 rounded-full blur-3xl"
             />
             <motion.div
                 animate={{ x: [0, -80, 0], y: [0, 60, 0], rotate: [360, 180, 0] }}
                 transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                className="absolute top-1/2 right-1/4 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-600/20 rounded-full blur-3xl"
+                className="absolute top-1/2 right-1/4 w-80 h-80 bg-gradient-to-br from-teal-400/20 to-cyan-600/20 rounded-full blur-3xl"
             />
             <motion.div
                 animate={{ x: [0, 60, 0], y: [0, -80, 0] }}
                 transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl"
+                className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-sky-400/20 to-cyan-400/20 rounded-full blur-3xl"
             />
         </div>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-white/50 to-white dark:via-gray-900/50 dark:to-gray-900" />
@@ -123,7 +123,7 @@ const ParticleField = () => {
             {particles.map(p => (
                 <motion.div
                     key={p.id}
-                    className="absolute rounded-full bg-blue-500/10 dark:bg-blue-400/10"
+                    className="absolute rounded-full bg-cyan-500/10 dark:bg-cyan-400/10"
                     style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
                     animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
                     transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "easeInOut" }}
@@ -151,7 +151,7 @@ const GlowButton = ({ children, onClick, variant = "primary", className = "", di
 }) => {
     const baseClass = "relative group overflow-hidden rounded-2xl font-semibold transition-all duration-300";
     const variants = {
-        primary: "bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5",
+        primary: "bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 text-white shadow-lg shadow-cyan-500/25 hover:shadow-xl hover:shadow-cyan-500/30 hover:-translate-y-0.5",
         secondary: "bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-700",
         ghost: "bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
     };
@@ -345,12 +345,12 @@ function PageHeader({ phase }: { phase: Phase }) {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-                className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-3xl shadow-2xl shadow-blue-500/30 mb-8 relative"
+                className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 rounded-3xl shadow-2xl shadow-cyan-500/30 mb-8 relative"
             >
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent" />
                 <Layers className="w-10 h-10 text-white relative z-10" />
                 <motion.div
-                    className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-xl"
+                    className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-cyan-500/20 to-teal-500/20 blur-xl"
                     animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
                     transition={{ duration: 3, repeat: Infinity }}
                 />
@@ -361,7 +361,7 @@ function PageHeader({ phase }: { phase: Phase }) {
                 transition={{ delay: 0.3, duration: 0.6 }}
                 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6"
             >
-                <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-gray-900 via-cyan-800 to-teal-800 dark:from-white dark:via-cyan-200 dark:to-teal-200 bg-clip-text text-transparent">
                     {phase === "upload" && "批量简历分析"}
                     {phase === "processing" && "正在分析中"}
                     {phase === "results" && "分析完成"}
@@ -406,8 +406,9 @@ function UploadPhase({ localFiles, isDragging, useCoze, uploadErrors, onToggleCo
                             transition={{ type: "spring", stiffness: 400, damping: 35 }}
                             style={{
                                 left: 4,
-                                right: 'calc(50% + 4px)',
-                                background: useCoze ? 'linear-gradient(to right, #9333ea, #ec4899)' : 'linear-gradient(to right, #2563eb, #4f46e5)',
+                                right: 4,
+                                width: 'calc(50% - 4px)',
+                                background: useCoze ? 'linear-gradient(to right, #22d3ee, #67e8f9)' : 'linear-gradient(to right, #0e7490, #0891b2)',
                             }}
                         />
                         <div className="relative flex">
@@ -435,22 +436,22 @@ function UploadPhase({ localFiles, isDragging, useCoze, uploadErrors, onToggleCo
             {/* Upload Area */}
             <GlassCard delay={0.6}>
                 <motion.div
-                    onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
-                    className={`relative rounded-2xl border-2 border-dashed transition-all duration-500 cursor-pointer ${
-                        isDragging ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 scale-[1.02]' : 'border-gray-200/60 dark:border-gray-700/40 hover:border-blue-400/60 hover:bg-blue-50/30 dark:hover:bg-blue-900/10'
-                    }`}
-                >
+                        onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
+                        className={`relative rounded-2xl border-2 border-dashed transition-all duration-500 cursor-pointer ${
+                            isDragging ? 'border-cyan-500 bg-cyan-50/50 dark:bg-cyan-900/20 scale-[1.02]' : 'border-gray-200/60 dark:border-gray-700/40 hover:border-cyan-400/60 hover:bg-cyan-50/30 dark:hover:bg-cyan-900/10'
+                        }`}
+                    >
                     <input type="file" accept=".pdf" multiple onChange={onFileSelect} className="hidden" id="batch-file-input" />
                     <label htmlFor="batch-file-input" className="block cursor-pointer">
                         <div className="p-16 text-center">
                             <motion.div
                                 animate={{ y: isDragging ? -15 : 0 }}
                                 transition={{ type: "spring", stiffness: 200 }}
-                                className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 rounded-3xl mb-8 relative"
+                                className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-cyan-100 to-teal-100 dark:from-cyan-900/40 dark:to-teal-900/40 rounded-3xl mb-8 relative"
                             >
-                                <CloudUpload className={`w-12 h-12 ${isDragging ? 'text-blue-600 scale-110' : 'text-blue-500'} transition-all duration-300`} />
+                                <CloudUpload className={`w-12 h-12 ${isDragging ? 'text-cyan-600 scale-110' : 'text-cyan-500'} transition-all duration-300`} />
                                 <motion.div
-                                    className="absolute inset-0 rounded-3xl border-2 border-blue-400/30"
+                                    className="absolute inset-0 rounded-3xl border-2 border-cyan-400/30"
                                     animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0, 0.5] }}
                                     transition={{ duration: 2, repeat: Infinity }}
                                 />
@@ -459,7 +460,7 @@ function UploadPhase({ localFiles, isDragging, useCoze, uploadErrors, onToggleCo
                                 {isDragging ? "释放文件开始上传" : "拖放简历文件到这里"}
                             </h3>
                             <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">
-                                或者 <span className="text-blue-600 dark:text-blue-400 font-semibold hover:underline decoration-2 underline-offset-2">点击浏览文件</span>
+                                或者 <span className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline decoration-2 underline-offset-2">点击浏览文件</span>
                             </p>
                             <div className="flex items-center justify-center space-x-8 text-sm text-gray-400 dark:text-gray-500">
                                 <span className="flex items-center space-x-2 px-4 py-2 bg-white/50 dark:bg-gray-800/50 rounded-xl">
@@ -517,7 +518,7 @@ function UploadPhase({ localFiles, isDragging, useCoze, uploadErrors, onToggleCo
                             <div className="p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center space-x-2">
-                                        <FileText className="w-5 h-5 text-blue-500" />
+                                        <FileText className="w-5 h-5 text-cyan-500" />
                                         <span>已选择 {localFiles.length} 个文件</span>
                                     </h3>
                                     <button onClick={onClearAll} className="text-sm text-rose-500 hover:text-rose-600 font-medium flex items-center space-x-1 transition-colors">
@@ -530,7 +531,7 @@ function UploadPhase({ localFiles, isDragging, useCoze, uploadErrors, onToggleCo
                                             <motion.div key={lf.localId} layout initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
                                                 className="flex items-center justify-between p-3 rounded-xl bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-700/60 transition-colors group border border-white/30 dark:border-gray-700/30">
                                                 <div className="flex items-center space-x-3 min-w-0">
-                                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center flex-shrink-0">
                                                         <FileText className="w-4 h-4 text-white" />
                                                     </div>
                                                     <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{lf.file.name}</span>
@@ -569,21 +570,21 @@ function ProcessingPhase({ progressPercent, totalCount, completedCount, failedCo
                     {/* Central processing icon with pulsing glow */}
                     <div className="relative w-28 h-28 mx-auto mb-8">
                         <motion.div
-                            className="absolute inset-0 rounded-full border-2 border-blue-400/30"
+                            className="absolute inset-0 rounded-full border-2 border-cyan-400/30"
                             animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0, 0.5] }}
                             transition={{ duration: 2, repeat: Infinity }}
                         />
                         <motion.div
-                            className="absolute inset-2 rounded-full border-2 border-purple-400/30"
+                            className="absolute inset-2 rounded-full border-2 border-teal-400/30"
                             animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0, 0.5] }}
                             transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
                         />
                         <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-2 rounded-full border-2 border-dashed border-blue-300/50 dark:border-blue-600/50"
+                            className="absolute inset-2 rounded-full border-2 border-dashed border-cyan-300/50 dark:border-cyan-600/50"
                         />
-                        <div className="absolute inset-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <div className="absolute inset-4 rounded-full bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
                             <Cpu className="w-10 h-10 text-white" />
                         </div>
                     </div>
@@ -594,7 +595,7 @@ function ProcessingPhase({ progressPercent, totalCount, completedCount, failedCo
                     {/* Progress bar */}
                     <div className="relative h-4 bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden mb-6">
                         <motion.div
-                            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500"
+                            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500"
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPercent}%` }}
                             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -619,9 +620,9 @@ function ProcessingPhase({ progressPercent, totalCount, completedCount, failedCo
                                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">正在处理</p>
                                 {currentProcessing.map((name, i) => (
                                     <motion.div key={name + i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-                                        className="flex items-center justify-center space-x-3 py-2 px-4 rounded-xl bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/30">
-                                        <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
-                                        <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">{name}</span>
+                                        className="flex items-center justify-center space-x-3 py-2 px-4 rounded-xl bg-cyan-50/80 dark:bg-cyan-900/20 border border-cyan-100/50 dark:border-cyan-800/30">
+                                        <Loader2 className="w-4 h-4 text-cyan-500 animate-spin" />
+                                        <span className="text-sm text-cyan-700 dark:text-cyan-300 font-medium">{name}</span>
                                     </motion.div>
                                 ))}
                             </motion.div>
@@ -656,7 +657,7 @@ function ResultsPhase({ results, sortedResults, completedCount, failedCount, avg
             {/* Stats Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                 {[
-                    { icon: Layers, label: "总数", value: results.length, unit: "份简历", gradient: "from-blue-500 to-indigo-600", color: "text-gray-900 dark:text-white", glow: "shadow-blue-500/20" },
+                    { icon: Layers, label: "总数", value: results.length, unit: "份简历", gradient: "from-cyan-500 to-teal-600", color: "text-gray-900 dark:text-white", glow: "shadow-cyan-500/20" },
                     { icon: CheckCircle, label: "成功", value: completedCount, unit: "份完成", gradient: "from-emerald-500 to-teal-600", color: "text-emerald-600 dark:text-emerald-400", glow: "shadow-emerald-500/20" },
                     { icon: Target, label: "平均分", value: avgScore, unit: "综合评分", gradient: "from-amber-500 to-orange-600", color: "text-amber-600 dark:text-amber-400", glow: "shadow-amber-500/20" },
                     { icon: XCircle, label: "失败", value: failedCount, unit: "份异常", gradient: "from-rose-500 to-pink-600", color: "text-rose-600 dark:text-rose-400", glow: "shadow-rose-500/20" },
@@ -689,7 +690,7 @@ function ResultsPhase({ results, sortedResults, completedCount, failedCount, avg
                         <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">排序</span>
                         {( ["overall", "skills", "experience", "education"] as SortField[] ).map((field) => (
                             <button key={field} onClick={() => onToggleSort(field)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${sortField === field ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25" : "bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-700 border border-gray-200/50 dark:border-gray-700/50"}`}>
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${sortField === field ? "bg-gradient-to-r from-cyan-600 to-teal-600 text-white shadow-lg shadow-cyan-500/25" : "bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-700 border border-gray-200/50 dark:border-gray-700/50"}`}>
                                 {sortLabels[field]}
                                 {sortField === field && (sortOrder === "desc" ? " ↓" : " ↑")}
                             </button>
@@ -700,13 +701,13 @@ function ResultsPhase({ results, sortedResults, completedCount, failedCount, avg
                             <Filter className="w-4 h-4 text-gray-400" />
                             <span className="text-xs text-gray-500">最低分 {filterMinScore}</span>
                             <input type="range" min={0} max={100} value={filterMinScore} onChange={(e) => onFilterChange(Number(e.target.value))}
-                                className="w-24 accent-blue-500" />
+                                className="w-24 accent-cyan-500" />
                         </div>
                         <div className="flex items-center bg-white/80 dark:bg-gray-800/80 rounded-lg p-0.5 border border-gray-200/50 dark:border-gray-700/50">
-                            <button onClick={() => onViewModeChange("table")} className={`p-1.5 rounded-md transition-colors ${viewMode === "table" ? "bg-white dark:bg-gray-600 shadow-sm text-blue-500" : "text-gray-400"}`}>
+                            <button onClick={() => onViewModeChange("table")} className={`p-1.5 rounded-md transition-colors ${viewMode === "table" ? "bg-white dark:bg-gray-600 shadow-sm text-cyan-500" : "text-gray-400"}`}>
                                 <List className="w-4 h-4" />
                             </button>
-                            <button onClick={() => onViewModeChange("grid")} className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-white dark:bg-gray-600 shadow-sm text-blue-500" : "text-gray-400"}`}>
+                            <button onClick={() => onViewModeChange("grid")} className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-white dark:bg-gray-600 shadow-sm text-cyan-500" : "text-gray-400"}`}>
                                 <LayoutGrid className="w-4 h-4" />
                             </button>
                         </div>
@@ -741,10 +742,10 @@ function ResultsPhase({ results, sortedResults, completedCount, failedCount, avg
                                 <AnimatePresence>
                                     {sortedResults.map((resume, idx) => (
                                         <motion.tr key={resume.id || idx} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                            className="border-b border-gray-100/50 dark:border-gray-800/50 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-colors group">
+                                            className="border-b border-gray-100/50 dark:border-gray-800/50 hover:bg-cyan-50/30 dark:hover:bg-cyan-900/20 transition-colors group">
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center space-x-3">
-                                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
                                                         {resume.basicInfo?.name?.charAt(0) || "?"}
                                                     </div>
                                                     <span className="font-medium text-gray-900 dark:text-white">{resume.basicInfo?.name || "未知"}</span>
@@ -764,7 +765,7 @@ function ResultsPhase({ results, sortedResults, completedCount, failedCount, avg
                                                 </span>
                                             </td>
                                             <td className="px-5 py-4 text-right">
-                                                <button onClick={() => onViewDetail(resume)} className="inline-flex items-center space-x-1 text-blue-500 hover:text-blue-600 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => onViewDetail(resume)} className="inline-flex items-center space-x-1 text-cyan-500 hover:text-cyan-600 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <Eye className="w-3.5 h-3.5" /><span>详情</span>
                                                 </button>
                                             </td>
@@ -795,7 +796,7 @@ function ResultsPhase({ results, sortedResults, completedCount, failedCount, avg
                                 <div className="relative z-10">
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="flex items-center space-x-3">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold shadow-lg">
+                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center text-white text-lg font-bold shadow-lg">
                                                 {resume.basicInfo?.name?.charAt(0) || "?"}
                                             </div>
                                             <div>
@@ -809,9 +810,9 @@ function ResultsPhase({ results, sortedResults, completedCount, failedCount, avg
                                     </div>
                                     <div className="space-y-2 mb-4">
                                         {[
-                                            { label: "技能", score: resume.scores?.skills ?? 0, color: "bg-blue-500" },
+                                            { label: "技能", score: resume.scores?.skills ?? 0, color: "bg-cyan-500" },
                                             { label: "经验", score: resume.scores?.experience ?? 0, color: "bg-emerald-500" },
-                                            { label: "学历", score: resume.scores?.education ?? 0, color: "bg-purple-500" },
+                                            { label: "学历", score: resume.scores?.education ?? 0, color: "bg-teal-500" },
                                         ].map((dim) => (
                                             <div key={dim.label} className="flex items-center justify-between text-xs">
                                                 <span className="text-gray-500">{dim.label}</span>
@@ -824,7 +825,7 @@ function ResultsPhase({ results, sortedResults, completedCount, failedCount, avg
                                     </div>
                                     <div className="flex items-center justify-between pt-3 border-t border-gray-100/50 dark:border-gray-700/50">
                                         <span className="text-xs text-gray-400">{resume.background?.workYears} · {resume.background?.education}</span>
-                                        <span className="text-xs text-blue-500 font-medium flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
+                                        <span className="text-xs text-cyan-500 font-medium flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
                                             <span>查看详情</span><ChevronRight className="w-3 h-3" />
                                         </span>
                                     </div>
@@ -858,9 +859,9 @@ function DetailHeader({ resume, onBack }: { resume: ResumeData; onBack: () => vo
             <GlassCard>
                 <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                            {resume.basicInfo?.name?.charAt(0) || "?"}
-                        </div>
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        {resume.basicInfo?.name?.charAt(0) || "?"}
+                    </div>
                         <div>
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">{resume.basicInfo?.name || "未知"}</h2>
                             <p className="text-sm text-gray-500">{resume.jobInfo?.position || "无求职意向"} · {resume.background?.workYears || "-"} · {resume.background?.education || "-"}</p>
@@ -883,7 +884,7 @@ function DetailContent({ resume }: { resume: ResumeData }) {
                 <GlassCard>
                     <div className="p-6">
                         <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-                            <User className="w-4 h-4 text-blue-500" /><span>基本信息</span>
+                            <User className="w-4 h-4 text-cyan-500" /><span>基本信息</span>
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {[
@@ -904,14 +905,14 @@ function DetailContent({ resume }: { resume: ResumeData }) {
                 <GlassCard>
                     <div className="p-6">
                         <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-                            <GraduationCap className="w-4 h-4 text-blue-500" /><span>技能</span>
+                            <GraduationCap className="w-4 h-4 text-cyan-500" /><span>技能</span>
                         </h3>
                         <div className="flex flex-wrap gap-2">
                             {(resume.skills || []).map((skill, i) => (
                                 <motion.span key={i} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: 0.03 * i }}
                                     whileHover={{ scale: 1.05, y: -2 }}
-                                    className="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200/60 dark:border-blue-700/40 text-blue-700 dark:text-blue-300 text-xs font-medium transition-all cursor-default"
+                                    className="px-3 py-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 border border-cyan-200/60 dark:border-cyan-700/40 text-cyan-700 dark:text-cyan-300 text-xs font-medium transition-all cursor-default"
                                 >
                                     {skill}
                                 </motion.span>
@@ -925,8 +926,8 @@ function DetailContent({ resume }: { resume: ResumeData }) {
                     <GlassCard>
                         <div className="p-6">
                             <h3 className="text-base font-bold text-gray-900 dark:text-white mb-3 flex items-center space-x-2">
-                                <Sparkles className="w-4 h-4 text-blue-500" /><span>AI 评价</span>
-                            </h3>
+                            <Sparkles className="w-4 h-4 text-cyan-500" /><span>AI 评价</span>
+                        </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{resume.analysis}</p>
                         </div>
                     </GlassCard>
@@ -942,9 +943,9 @@ function DetailContent({ resume }: { resume: ResumeData }) {
                         </div>
                         <div className="space-y-3">
                             {([
-                                { key: "skills" as const, label: "技能", gradient: "from-blue-500 to-indigo-500" },
+                                { key: "skills" as const, label: "技能", gradient: "from-cyan-500 to-teal-500" },
                                 { key: "experience" as const, label: "经验", gradient: "from-emerald-500 to-teal-500" },
-                                { key: "education" as const, label: "学历", gradient: "from-purple-500 to-pink-500" },
+                                { key: "education" as const, label: "学历", gradient: "from-sky-500 to-cyan-500" },
                             ]).map((dim) => (
                                 <div key={dim.key}>
                                     <div className="flex justify-between text-xs mb-1">
