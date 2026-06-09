@@ -34,11 +34,96 @@ import {
   ToggleRight,
   Copy,
   ExternalLink,
+  Brain,
+  Heart,
+  Bookmark,
+  Share2,
+  MessageCircle,
+  Flame,
+  Sparkles,
+  Zap,
+  ChevronRight,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
 
+/* ───────── 背景系统（橙红色系，与职位管理主题一致） ───────── */
+const AnimatedBackground = () => (
+  <div className="fixed inset-0 -z-10 overflow-hidden">
+    <div className="absolute -top-1/2 -left-1/2 w-full h-full">
+      <motion.div
+        animate={{
+          x: [0, 100, 0],
+          y: [0, -50, 0],
+          rotate: [0, 180, 360]
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-orange-400/20 to-orange-600/20 rounded-full blur-3xl"
+      />
+      <motion.div
+        animate={{
+          x: [0, -80, 0],
+          y: [0, 60, 0],
+          rotate: [360, 180, 0]
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        className="absolute top-1/2 right-1/4 w-80 h-80 bg-gradient-to-br from-red-400/20 to-orange-500/20 rounded-full blur-3xl"
+      />
+      <motion.div
+        animate={{
+          x: [0, 60, 0],
+          y: [0, -80, 0]
+        }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-pink-400/20 to-orange-400/20 rounded-full blur-3xl"
+      />
+    </div>
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-white/50 to-white dark:via-gray-900/50 dark:to-gray-900" />
+  </div>
+);
+
+const ParticleField = () => {
+  const particles = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 4 + 2,
+    duration: Math.random() * 10 + 10,
+    delay: Math.random() * 5
+  }));
+
+  return (
+    <div className="fixed inset-0 -z-10 pointer-events-none">
+      {particles.map(particle => (
+        <motion.div
+          key={particle.id}
+          className="absolute rounded-full bg-orange-500/10 dark:bg-orange-400/10"
+          style={{ left: `${particle.x}%`, top: `${particle.y}%`, width: particle.size, height: particle.size }}
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0.3, 0.8, 0.3]
+          }}
+          transition={{
+            duration: particle.duration,
+            repeat: Infinity,
+            delay: particle.delay,
+            ease: "easeInOut"
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 /* ─────────────────── 类型定义 ─────────────────── */
+interface Comment {
+  id: string;
+  author: string;
+  avatar: string;
+  content: string;
+  time: string;
+}
+
 interface Job {
   id: string;
   title: string;
@@ -56,6 +141,13 @@ interface Job {
   views: number;
   createdAt: string;
   updatedAt: string;
+  likes: number;
+  isLiked: boolean;
+  isFavorited: boolean;
+  comments: Comment[];
+  tags: string[];
+  hotLevel: "hot" | "new" | "recommend" | null;
+  hiringProgress: number;
 }
 
 type ViewMode = "grid" | "list";
@@ -86,6 +178,16 @@ const mockJobs: Job[] = [
     views: 1580,
     createdAt: "2024-01-15",
     updatedAt: "2024-01-20",
+    likes: 42,
+    isLiked: false,
+    isFavorited: false,
+    comments: [
+      { id: "c1", author: "张三", avatar: "Z", content: "薪资很有竞争力，已投递！", time: "2小时前" },
+      { id: "c2", author: "李四", avatar: "L", content: "请问支持远程办公吗？", time: "5小时前" },
+    ],
+    tags: ["前端", "React", "高薪"],
+    hotLevel: "hot",
+    hiringProgress: 65,
   },
   {
     id: "2",
@@ -104,6 +206,15 @@ const mockJobs: Job[] = [
     views: 980,
     createdAt: "2024-01-20",
     updatedAt: "2024-01-25",
+    likes: 28,
+    isLiked: false,
+    isFavorited: true,
+    comments: [
+      { id: "c3", author: "王五", avatar: "W", content: "微服务技术栈很感兴趣", time: "1天前" },
+    ],
+    tags: ["后端", "Go", "微服务"],
+    hotLevel: "new",
+    hiringProgress: 40,
   },
   {
     id: "3",
@@ -122,6 +233,16 @@ const mockJobs: Job[] = [
     views: 650,
     createdAt: "2024-02-01",
     updatedAt: "2024-02-05",
+    likes: 56,
+    isLiked: true,
+    isFavorited: false,
+    comments: [
+      { id: "c4", author: "赵六", avatar: "Z", content: "B端产品经理的机会不多，珍惜！", time: "3天前" },
+      { id: "c5", author: "孙七", avatar: "S", content: "期权激励很吸引人", time: "4天前" },
+    ],
+    tags: ["产品", "B端", "高薪"],
+    hotLevel: "recommend",
+    hiringProgress: 25,
   },
   {
     id: "4",
@@ -140,6 +261,15 @@ const mockJobs: Job[] = [
     views: 2100,
     createdAt: "2024-01-10",
     updatedAt: "2024-02-15",
+    likes: 35,
+    isLiked: false,
+    isFavorited: false,
+    comments: [
+      { id: "c6", author: "周八", avatar: "Z", content: "可惜已关闭，期待下次开放", time: "1周前" },
+    ],
+    tags: ["设计", "UI", "Figma"],
+    hotLevel: null,
+    hiringProgress: 100,
   },
   {
     id: "5",
@@ -158,6 +288,13 @@ const mockJobs: Job[] = [
     views: 0,
     createdAt: "2024-02-10",
     updatedAt: "2024-02-10",
+    likes: 0,
+    isLiked: false,
+    isFavorited: false,
+    comments: [],
+    tags: ["数据", "分析", "Python"],
+    hotLevel: null,
+    hiringProgress: 0,
   },
   {
     id: "6",
@@ -176,6 +313,16 @@ const mockJobs: Job[] = [
     views: 1890,
     createdAt: "2024-01-25",
     updatedAt: "2024-02-01",
+    likes: 89,
+    isLiked: false,
+    isFavorited: true,
+    comments: [
+      { id: "c7", author: "吴九", avatar: "W", content: "AI方向前景很好，已投递", time: "6小时前" },
+      { id: "c8", author: "郑十", avatar: "Z", content: "GPU资源太香了！", time: "1天前" },
+    ],
+    tags: ["AI", "算法", "NLP"],
+    hotLevel: "hot",
+    hiringProgress: 35,
   },
 ];
 
@@ -410,7 +557,6 @@ function JobDetailPanel({
 }) {
   if (!job) return null;
   const statusConfig = getStatusConfig(job.status);
-  const StatusIcon = statusConfig.icon;
 
   return (
     <AnimatePresence>
@@ -420,7 +566,7 @@ function JobDetailPanel({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 dark:bg-black/50 z-[60]"
+            className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm z-[60]"
             onClick={onClose}
           />
           <motion.div
@@ -428,13 +574,21 @@ function JobDetailPanel({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-white dark:bg-gray-800 shadow-2xl z-[70] overflow-y-auto"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl shadow-2xl shadow-gray-500/10 z-[70] overflow-y-auto"
           >
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-6 py-4 flex items-center justify-between z-10">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">职位详情</h2>
+            {/* 顶部渐变装饰 */}
+            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${job.status === "active" ? "from-emerald-400 to-teal-500" : job.status === "closed" ? "from-gray-400 to-gray-500" : "from-amber-400 to-orange-500"}`} />
+
+            <div className="sticky top-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-100/80 dark:border-gray-700/50 px-6 py-4 flex items-center justify-between z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl flex items-center justify-center">
+                  <Briefcase className="w-4.5 h-4.5 text-orange-600 dark:text-orange-400" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">职位详情</h2>
+              </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 rounded-xl transition-colors"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -443,20 +597,20 @@ function JobDetailPanel({
             <div className="p-6 space-y-6">
               {/* Header */}
               <div>
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{job.title}</h3>
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">{job.title}</h3>
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${statusConfig.bg} ${statusConfig.text_color} ${statusConfig.border}`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${statusConfig.bg} ${statusConfig.text_color} ${statusConfig.border} flex-shrink-0 ml-3`}
                   >
                     <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
                     {statusConfig.text}
                   </span>
                 </div>
-                <p className={`text-2xl font-bold ${getSalaryColor(job.salary)}`}>{job.salary}</p>
+                <p className={`text-2xl sm:text-3xl font-bold tracking-tight ${getSalaryColor(job.salary)}`}>{job.salary}</p>
               </div>
 
               {/* Meta */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Building2, label: "部门", value: job.department },
                   { icon: MapPin, label: "地点", value: job.location },
@@ -465,11 +619,13 @@ function JobDetailPanel({
                   { icon: Briefcase, label: "类型", value: job.type },
                   { icon: Calendar, label: "发布日期", value: job.createdAt },
                 ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                    <item.icon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{item.label}</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{item.value}</p>
+                  <div key={item.label} className="flex items-center gap-3 p-3.5 bg-gray-50/80 dark:bg-gray-700/30 rounded-xl border border-gray-100/50 dark:border-gray-600/30">
+                    <div className="w-9 h-9 bg-white dark:bg-gray-600/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">{item.label}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{item.value}</p>
                     </div>
                   </div>
                 ))}
@@ -477,31 +633,37 @@ function JobDetailPanel({
 
               {/* Stats */}
               <div className="flex gap-4">
-                <div className="flex-1 text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{job.applicants}</p>
-                  <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">申请人数</p>
+                <div className="flex-1 text-center p-5 bg-gradient-to-br from-orange-50/80 to-red-50/80 dark:from-orange-900/20 dark:to-red-900/20 rounded-2xl border border-orange-100/50 dark:border-orange-800/30">
+                  <p className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400">{job.applicants}</p>
+                  <p className="text-xs text-orange-500 dark:text-orange-400 mt-1.5 font-medium">申请人数</p>
                 </div>
-                <div className="flex-1 text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{job.views}</p>
-                  <p className="text-xs text-purple-500 dark:text-purple-400 mt-1">浏览次数</p>
+                <div className="flex-1 text-center p-5 bg-gradient-to-br from-amber-50/80 to-orange-50/80 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl border border-amber-100/50 dark:border-amber-800/30">
+                  <p className="text-2xl sm:text-3xl font-bold text-amber-600 dark:text-amber-400">{job.views}</p>
+                  <p className="text-xs text-amber-500 dark:text-amber-400 mt-1.5 font-medium">浏览次数</p>
                 </div>
               </div>
 
               {/* Description */}
               <div>
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">职位描述</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{job.description}</p>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <div className="w-1 h-4 bg-gradient-to-b from-orange-400 to-red-500 rounded-full" />
+                  职位描述
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50/50 dark:bg-gray-700/20 rounded-xl p-4">{job.description}</p>
               </div>
 
               {/* Requirements */}
               {job.requirements.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">任职要求</h4>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <div className="w-1 h-4 bg-gradient-to-b from-orange-400 to-red-500 rounded-full" />
+                    任职要求
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {job.requirements.map((req, i) => (
                       <span
                         key={i}
-                        className="px-3 py-1.5 text-xs font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg border border-blue-100 dark:border-blue-800"
+                        className="px-3 py-1.5 text-xs font-medium bg-orange-50/80 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 rounded-lg border border-orange-100/50 dark:border-orange-800/30"
                       >
                         {req}
                       </span>
@@ -513,12 +675,15 @@ function JobDetailPanel({
               {/* Benefits */}
               {job.benefits.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">福利待遇</h4>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <div className="w-1 h-4 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full" />
+                    福利待遇
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {job.benefits.map((benefit, i) => (
                       <span
                         key={i}
-                        className="px-3 py-1.5 text-xs font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg border border-emerald-100 dark:border-emerald-800"
+                        className="px-3 py-1.5 text-xs font-medium bg-emerald-50/80 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 rounded-lg border border-emerald-100/50 dark:border-emerald-800/30"
                       >
                         {benefit}
                       </span>
@@ -528,20 +693,24 @@ function JobDetailPanel({
               )}
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                <button
+              <div className="flex gap-3 pt-4 border-t border-gray-100/80 dark:border-gray-700/50">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => onEdit(job)}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-orange-500/20"
                 >
                   <Edit3 className="w-4 h-4" />
                   编辑职位
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => onToggleStatus(job)}
-                  className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-colors border ${
+                  className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-xl transition-all border ${
                     job.status === "active"
-                      ? "bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
-                      : "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
+                      ? "bg-gray-50/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border-gray-200/80 dark:border-gray-600/50 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      : "bg-emerald-50/80 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-700/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
                   }`}
                 >
                   {job.status === "active" ? (
@@ -555,7 +724,7 @@ function JobDetailPanel({
                       开启招聘
                     </>
                   )}
-                </button>
+                </motion.button>
               </div>
             </div>
           </motion.div>
@@ -734,6 +903,13 @@ export default function Jobs() {
         views: 0,
         createdAt: new Date().toISOString().split("T")[0],
         updatedAt: new Date().toISOString().split("T")[0],
+        likes: 0,
+        isLiked: false,
+        isFavorited: false,
+        comments: [],
+        tags: [],
+        hotLevel: "new",
+        hiringProgress: 0,
       };
       setJobs((prev) => [newJob, ...prev]);
       addToast("职位已发布");
@@ -781,10 +957,40 @@ export default function Jobs() {
       views: 0,
       createdAt: new Date().toISOString().split("T")[0],
       updatedAt: new Date().toISOString().split("T")[0],
+      likes: 0,
+      isLiked: false,
+      isFavorited: false,
+      comments: [],
+      hotLevel: null,
+      hiringProgress: 0,
     };
     setJobs((prev) => [newJob, ...prev]);
     addToast("职位已复制为草稿");
     setActiveDropdown(null);
+  };
+
+  const handleLike = (jobId: string) => {
+    setJobs((prev) =>
+      prev.map((j) =>
+        j.id === jobId
+          ? { ...j, isLiked: !j.isLiked, likes: j.isLiked ? j.likes - 1 : j.likes + 1 }
+          : j
+      )
+    );
+  };
+
+  const handleFavorite = (jobId: string) => {
+    setJobs((prev) =>
+      prev.map((j) =>
+        j.id === jobId ? { ...j, isFavorited: !j.isFavorited } : j
+      )
+    );
+    const job = jobs.find((j) => j.id === jobId);
+    addToast(job?.isFavorited ? "已取消收藏" : "已收藏职位");
+  };
+
+  const handleShare = (job: Job) => {
+    addToast(`已复制「${job.title}」分享链接`);
   };
 
   const handleViewDetail = (job: Job) => {
@@ -801,7 +1007,9 @@ export default function Jobs() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
+      <ParticleField />
       <Navbar />
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       <ConfirmDialog
@@ -823,103 +1031,161 @@ export default function Jobs() {
         <BackButton />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           {/* ─── 页面标题 ─── */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                职位管理
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
-                管理和发布招聘职位，追踪应聘情况
-              </p>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleCreate}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-shadow duration-200"
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+              className="relative inline-flex items-center justify-center w-20 h-20 mb-6"
             >
-              <Plus className="w-5 h-5" />
-              <span>发布职位</span>
-            </motion.button>
+              {/* 左上角光晕 - 粉色系，与首页卡片一致 */}
+              <div className="absolute -top-4 -left-4 w-16 h-16 bg-gradient-to-br from-pink-500/40 to-rose-500/30 rounded-full blur-2xl" />
+              <div className="absolute -top-2 -left-2 w-12 h-12 bg-gradient-to-br from-orange-500/30 to-pink-500/20 rounded-full blur-xl" />
+              {/* 主图标背景 - 橙红渐变，与首页职位管理卡片一致 */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-500 to-red-500 shadow-xl shadow-orange-500/30" />
+              <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-orange-500/20 to-red-500/20 blur-xl animate-pulse" />
+              <Briefcase className="w-10 h-10 text-white relative z-10" />
+              <motion.div
+                className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-orange-500/20 to-red-500/20 blur-xl"
+                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6"
+            >
+              <span className="bg-gradient-to-r from-gray-900 via-orange-800 to-red-800 dark:from-white dark:via-orange-200 dark:to-red-200 bg-clip-text text-transparent">
+                职位管理
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed"
+            >
+              管理和发布招聘职位，追踪应聘情况
+              <br className="hidden sm:block" />
+              <span className="text-orange-600 dark:text-orange-400 font-medium">高效管理招聘全流程</span>
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="mt-8"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleCreate}
+                className="relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 via-pink-500 to-red-500 text-white font-semibold rounded-2xl shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                <Plus className="w-5 h-5 relative z-10" />
+                <span className="relative z-10">发布职位</span>
+              </motion.button>
+            </motion.div>
           </div>
 
           {/* ─── 统计卡片 ─── */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8">
             {[
               {
                 label: "总职位数",
                 value: stats.total,
                 icon: Briefcase,
-                color: "from-blue-500 to-blue-600",
-                bgLight: "bg-blue-50 dark:bg-blue-900/20",
-                iconBg: "bg-blue-100 dark:bg-blue-800/40",
-                iconColor: "text-blue-600 dark:text-blue-400",
+                gradient: "from-orange-500 to-red-500",
+                iconBg: "bg-orange-100 dark:bg-orange-500/20",
+                iconColor: "text-orange-600 dark:text-orange-400",
+                shadow: "shadow-orange-500/30",
               },
               {
                 label: "招聘中",
                 value: stats.active,
                 icon: TrendingUp,
-                color: "from-emerald-500 to-emerald-600",
-                bgLight: "bg-emerald-50 dark:bg-emerald-900/20",
-                iconBg: "bg-emerald-100 dark:bg-emerald-800/40",
+                gradient: "from-emerald-500 to-teal-500",
+                iconBg: "bg-emerald-100 dark:bg-emerald-500/20",
                 iconColor: "text-emerald-600 dark:text-emerald-400",
+                shadow: "shadow-emerald-500/30",
               },
               {
                 label: "总申请数",
                 value: stats.totalApplicants,
                 icon: UserCheck,
-                color: "from-purple-500 to-purple-600",
-                bgLight: "bg-purple-50 dark:bg-purple-900/20",
-                iconBg: "bg-purple-100 dark:bg-purple-800/40",
-                iconColor: "text-purple-600 dark:text-purple-400",
+                gradient: "from-violet-500 to-purple-500",
+                iconBg: "bg-violet-100 dark:bg-violet-500/20",
+                iconColor: "text-violet-600 dark:text-violet-400",
+                shadow: "shadow-violet-500/30",
               },
               {
                 label: "总浏览量",
                 value: stats.totalViews,
                 icon: Eye,
-                color: "from-orange-500 to-orange-600",
-                bgLight: "bg-orange-50 dark:bg-orange-900/20",
-                iconBg: "bg-orange-100 dark:bg-orange-800/40",
-                iconColor: "text-orange-600 dark:text-orange-400",
+                gradient: "from-amber-500 to-orange-500",
+                iconBg: "bg-amber-100 dark:bg-amber-500/20",
+                iconColor: "text-amber-600 dark:text-amber-400",
+                shadow: "shadow-amber-500/30",
               },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 + 0.1 }}
-                className={`${stat.bgLight} rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-700/50`}
+                transition={{ delay: i * 0.08 + 0.1 }}
+                whileHover={{ y: -4 }}
+                className="group relative bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 border border-gray-200/70 dark:border-gray-700/60 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300 overflow-hidden"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`w-10 h-10 ${stat.iconBg} rounded-xl flex items-center justify-center`}>
+                {/* 顶部装饰条 */}
+                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                {/* 角落光晕 */}
+                <div className={`absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 rounded-full blur-2xl transition-opacity duration-500`} />
+
+                <div className="flex items-center justify-between mb-4 relative">
+                  <div className={`w-12 h-12 ${stat.iconBg} rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                     <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
                   </div>
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg ${stat.shadow} opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110`}>
+                    <stat.icon className="w-4.5 h-4.5 text-white" />
+                  </div>
                 </div>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
                   {stat.value.toLocaleString()}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{stat.label}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5 font-medium">{stat.label}</p>
               </motion.div>
             ))}
           </div>
 
           {/* ─── 搜索与筛选栏 ─── */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-6 shadow-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl border border-gray-100/80 dark:border-gray-700/50 p-4 sm:p-5 mb-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+          >
             <div className="flex flex-col lg:flex-row gap-4">
               {/* 搜索框 */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
+              <div className="flex-1 relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="w-4.5 h-4.5 text-gray-400 group-focus-within:text-orange-500 transition-colors duration-200" />
+                </div>
                 <input
                   type="text"
                   placeholder="搜索职位名称、部门、地点或技能..."
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  className="w-full pl-11 pr-10 py-3 bg-gray-50/80 dark:bg-gray-700/50 border border-gray-200/80 dark:border-gray-600/50 rounded-xl text-sm focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all duration-200 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 hover:bg-white dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500"
                 />
                 {searchKeyword && (
                   <button
                     onClick={() => setSearchKeyword("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-200/80 dark:hover:bg-gray-600/80 rounded-lg transition-colors"
                   >
                     <X className="w-3.5 h-3.5 text-gray-400" />
                   </button>
@@ -928,7 +1194,7 @@ export default function Jobs() {
 
               <div className="flex flex-wrap items-center gap-2">
                 {/* 状态筛选 */}
-                <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+                <div className="flex bg-gray-100/80 dark:bg-gray-700/50 rounded-xl p-1">
                   {[
                     { value: "all", label: "全部" },
                     { value: "active", label: "招聘中" },
@@ -938,9 +1204,9 @@ export default function Jobs() {
                     <button
                       key={s.value}
                       onClick={() => setFilterStatus(s.value)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+                      className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
                         filterStatus === s.value
-                          ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                          ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-500/30"
                           : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                       }`}
                     >
@@ -953,11 +1219,11 @@ export default function Jobs() {
                 <div className="relative" ref={sortRef}>
                   <button
                     onClick={() => setShowSortMenu(!showSortMenu)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-50/80 dark:bg-gray-700/50 border border-gray-200/80 dark:border-gray-600/50 rounded-xl hover:bg-white dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200"
                   >
                     <ArrowUpDown className="w-3.5 h-3.5" />
                     {sortOptions.find((s) => s.value === sortBy)?.label}
-                    <ChevronDown className="w-3 h-3" />
+                    <ChevronDown className="w-3 h-3 opacity-60" />
                   </button>
                   <AnimatePresence>
                     {showSortMenu && (
@@ -966,7 +1232,7 @@ export default function Jobs() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -8, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-30"
+                        className="absolute right-0 top-full mt-2 w-40 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200/80 dark:border-gray-700/50 rounded-xl shadow-xl shadow-gray-500/10 overflow-hidden z-30"
                       >
                         {sortOptions.map((option) => (
                           <button
@@ -975,12 +1241,15 @@ export default function Jobs() {
                               setSortBy(option.value);
                               setShowSortMenu(false);
                             }}
-                            className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors ${
+                            className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors flex items-center gap-2 ${
                               sortBy === option.value
-                                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                                ? "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
                                 : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                             }`}
                           >
+                            {sortBy === option.value && (
+                              <motion.div layoutId="sortCheck" className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                            )}
                             {option.label}
                           </button>
                         ))}
@@ -990,12 +1259,12 @@ export default function Jobs() {
                 </div>
 
                 {/* 视图切换 */}
-                <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+                <div className="flex bg-gray-100/80 dark:bg-gray-700/50 rounded-xl p-1">
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded-lg transition-colors ${
+                    className={`p-2.5 rounded-lg transition-all duration-200 ${
                       viewMode === "grid"
-                        ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                        ? "bg-white dark:bg-gray-600 text-orange-600 dark:text-orange-400 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-500/30"
                         : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     }`}
                   >
@@ -1003,9 +1272,9 @@ export default function Jobs() {
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`p-2 rounded-lg transition-colors ${
+                    className={`p-2.5 rounded-lg transition-all duration-200 ${
                       viewMode === "list"
-                        ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                        ? "bg-white dark:bg-gray-600 text-orange-600 dark:text-orange-400 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-500/30"
                         : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     }`}
                   >
@@ -1014,19 +1283,20 @@ export default function Jobs() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* ─── 搜索结果提示 ─── */}
           {(searchKeyword || filterStatus !== "all") && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="mb-4 text-sm text-gray-500 dark:text-gray-400"
+              className="mb-4 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2"
             >
-              找到 <span className="font-semibold text-gray-900 dark:text-white">{filteredJobs.length}</span> 个职位
+              <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+              找到 <span className="font-bold text-gray-900 dark:text-white">{filteredJobs.length}</span> 个职位
               {searchKeyword && (
                 <span>
-                  ，关键词: <span className="text-blue-600 dark:text-blue-400">"{searchKeyword}"</span>
+                  ，关键词: <span className="text-orange-600 dark:text-orange-400 font-medium">"{searchKeyword}"</span>
                 </span>
               )}
             </motion.div>
@@ -1034,38 +1304,63 @@ export default function Jobs() {
 
           {/* ─── 职位列表 - 网格视图 ─── */}
           {viewMode === "grid" && (
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
               <AnimatePresence mode="popLayout">
                 {filteredJobs.map((job, index) => {
                   const statusConfig = getStatusConfig(job.status);
-                  const StatusIcon = statusConfig.icon;
+                  const relatedJobs = jobs.filter(j => j.id !== job.id && (j.department === job.department || j.tags.some(t => job.tags.includes(t)))).slice(0, 3);
 
                   return (
                     <motion.div
                       key={job.id}
                       layout
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ delay: index * 0.03, type: "spring", damping: 25, stiffness: 200 }}
-                      className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden"
+                      initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.92, y: 20 }}
+                      transition={{ delay: index * 0.04, type: "spring", damping: 25, stiffness: 200 }}
+                      className="group relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200/70 dark:border-gray-700/60 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                     >
-                      <div className="p-5">
-                        {/* 头部: 标题 + 操作 */}
-                        <div className="flex items-start justify-between mb-3">
+                      {/* 顶部装饰条 */}
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      {/* 角落光晕 */}
+                      <div className="absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-red-400/0 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                      <div className="p-5 sm:p-6">
+                        {/* ── 区域1: 头部 - 标题 + 热门标签 + 操作 ── */}
+                        <div className="flex items-start justify-between mb-4">
                           <div className="flex-1 min-w-0 mr-3">
-                            <h3
-                              className="text-base font-semibold text-gray-900 dark:text-white truncate mb-1 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                              onClick={() => handleViewDetail(job)}
-                            >
-                              {job.title}
-                            </h3>
-                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                              <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
-                              <span className="truncate">{job.department}</span>
-                              <span className="text-gray-300 dark:text-gray-600">·</span>
-                              <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                              <span className="truncate">{job.location}</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3
+                                className="text-base font-bold text-gray-900 dark:text-white truncate cursor-pointer hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-200"
+                                onClick={() => handleViewDetail(job)}
+                              >
+                                {job.title}
+                              </h3>
+                              {/* 热门/最新/推荐标签 */}
+                              {job.hotLevel && (
+                                <span className={`flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                  job.hotLevel === "hot"
+                                    ? "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-800/30"
+                                    : job.hotLevel === "new"
+                                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/30"
+                                    : "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200/50 dark:border-purple-800/30"
+                                }`}>
+                                  {job.hotLevel === "hot" && <Flame className="w-3 h-3" />}
+                                  {job.hotLevel === "new" && <Zap className="w-3 h-3" />}
+                                  {job.hotLevel === "recommend" && <Sparkles className="w-3 h-3" />}
+                                  {job.hotLevel === "hot" ? "热门" : job.hotLevel === "new" ? "最新" : "推荐"}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                              <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100/70 dark:bg-gray-700/40 rounded-md">
+                                <Building2 className="w-3 h-3 flex-shrink-0 text-gray-400" />
+                                <span className="truncate font-medium">{job.department}</span>
+                              </div>
+                              <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100/70 dark:bg-gray-700/40 rounded-md">
+                                <MapPin className="w-3 h-3 flex-shrink-0 text-gray-400" />
+                                <span className="truncate font-medium">{job.location}</span>
+                              </div>
                             </div>
                           </div>
                           <div className="relative" ref={activeDropdown === job.id ? dropdownRef : undefined}>
@@ -1074,7 +1369,7 @@ export default function Jobs() {
                                 e.stopPropagation();
                                 setActiveDropdown(activeDropdown === job.id ? null : job.id);
                               }}
-                              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                             >
                               <MoreHorizontal className="w-4 h-4" />
                             </button>
@@ -1084,55 +1379,26 @@ export default function Jobs() {
                                   initial={{ opacity: 0, scale: 0.95, y: -4 }}
                                   animate={{ opacity: 1, scale: 1, y: 0 }}
                                   exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                                  className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-20"
+                                  className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl shadow-gray-900/10 overflow-hidden z-20"
                                 >
-                                  <button
-                                    onClick={() => handleViewDetail(job)}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                  >
-                                    <Eye className="w-3.5 h-3.5" />
-                                    查看详情
+                                  <button onClick={() => handleViewDetail(job)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                    <Eye className="w-3.5 h-3.5 text-orange-500" />查看详情
                                   </button>
-                                  <button
-                                    onClick={() => handleEdit(job)}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                  >
-                                    <Edit3 className="w-3.5 h-3.5" />
-                                    编辑职位
+                                  <button onClick={() => handleEdit(job)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                    <Edit3 className="w-3.5 h-3.5 text-orange-500" />编辑职位
                                   </button>
-                                  <button
-                                    onClick={() => handleDuplicate(job)}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                  >
-                                    <Copy className="w-3.5 h-3.5" />
-                                    复制职位
+                                  <button onClick={() => handleDuplicate(job)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                    <Copy className="w-3.5 h-3.5 text-orange-500" />复制职位
                                   </button>
-                                  <button
-                                    onClick={() => handleToggleStatus(job)}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                  >
-                                    {job.status === "active" ? (
-                                      <>
-                                        <ToggleLeft className="w-3.5 h-3.5" />
-                                        关闭招聘
-                                      </>
-                                    ) : (
-                                      <>
-                                        <ToggleRight className="w-3.5 h-3.5" />
-                                        开启招聘
-                                      </>
-                                    )}
+                                  <button onClick={() => handleShare(job)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                    <Share2 className="w-3.5 h-3.5 text-orange-500" />分享职位
+                                  </button>
+                                  <button onClick={() => handleToggleStatus(job)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                    {job.status === "active" ? (<><ToggleLeft className="w-3.5 h-3.5 text-orange-500" />关闭招聘</>) : (<><ToggleRight className="w-3.5 h-3.5 text-orange-500" />开启招聘</>)}
                                   </button>
                                   <div className="border-t border-gray-100 dark:border-gray-700" />
-                                  <button
-                                    onClick={() => {
-                                      handleDelete(job.id);
-                                      setActiveDropdown(null);
-                                    }}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                    删除职位
+                                  <button onClick={() => { handleDelete(job.id); setActiveDropdown(null); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                    <Trash2 className="w-3.5 h-3.5" />删除职位
                                   </button>
                                 </motion.div>
                               )}
@@ -1140,24 +1406,44 @@ export default function Jobs() {
                           </div>
                         </div>
 
-                        {/* 薪资 - BOSS直聘风格突出显示 */}
-                        <p className={`text-xl font-bold mb-3 ${getSalaryColor(job.salary)}`}>
-                          {job.salary}
-                        </p>
+                        {/* ── 区域2: 薪资 + 招聘进度 ── */}
+                        <div className="flex items-baseline gap-1 mb-3">
+                          <p className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${getSalaryColor(job.salary)}`}>
+                            {job.salary}
+                          </p>
+                          <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">/月</span>
+                        </div>
+                        {/* 招聘进度条 */}
+                        {job.status === "active" && (
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">招聘进度</span>
+                              <span className="text-[11px] font-bold text-orange-600 dark:text-orange-400">{job.hiringProgress}%</span>
+                            </div>
+                            <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${job.hiringProgress}%` }}
+                                transition={{ duration: 1, delay: index * 0.1, ease: "easeOut" }}
+                                className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full"
+                              />
+                            </div>
+                          </div>
+                        )}
 
-                        {/* 标签 */}
+                        {/* ── 区域3: 标签区 ── */}
                         <div className="flex flex-wrap gap-1.5 mb-3">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${statusConfig.bg} ${statusConfig.text_color} ${statusConfig.border}`}>
-                            <span className={`w-1 h-1 rounded-full ${statusConfig.dot}`} />
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${statusConfig.bg} ${statusConfig.text_color} ${statusConfig.border}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot} animate-pulse`} />
                             {statusConfig.text}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-100/50 dark:border-blue-800/30">
                             {job.experience}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 border border-violet-100/50 dark:border-violet-800/30">
                             {job.education}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 border border-teal-100/50 dark:border-teal-800/30">
                             {job.type}
                           </span>
                         </div>
@@ -1166,70 +1452,146 @@ export default function Jobs() {
                         {job.requirements.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mb-4">
                             {job.requirements.slice(0, 3).map((req, i) => (
-                              <span
-                                key={i}
-                                className="px-2 py-0.5 text-[10px] font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-md"
-                              >
+                              <span key={i} className="px-2.5 py-1 text-[11px] font-medium bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 text-orange-700 dark:text-orange-300 rounded-md border border-orange-100/50 dark:border-orange-800/30">
                                 {req}
                               </span>
                             ))}
                             {job.requirements.length > 3 && (
-                              <span className="px-2 py-0.5 text-[10px] font-medium text-gray-400 dark:text-gray-500">
+                              <span className="px-2.5 py-1 text-[11px] font-semibold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 rounded-md border border-orange-100/50 dark:border-orange-800/30">
                                 +{job.requirements.length - 3}
                               </span>
                             )}
                           </div>
                         )}
 
-                        {/* 底部信息 */}
-                        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-                          <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
-                            <span className="inline-flex items-center gap-1">
-                              <Users className="w-3.5 h-3.5" />
-                              {job.applicants}人
-                            </span>
-                            <span className="inline-flex items-center gap-1">
-                              <Eye className="w-3.5 h-3.5" />
-                              {job.views}
-                            </span>
+                        {/* ── 区域4: 评论预览区 ── */}
+                        {job.comments.length > 0 && (
+                          <div className="mb-4 p-3 bg-gray-50/80 dark:bg-gray-700/30 rounded-xl border border-gray-100/50 dark:border-gray-600/30">
+                            <div className="flex items-center gap-1.5 mb-2">
+                              <MessageCircle className="w-3.5 h-3.5 text-gray-400" />
+                              <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">最新评论</span>
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500">({job.comments.length})</span>
+                            </div>
+                            <div className="space-y-2">
+                              {job.comments.slice(0, 2).map((comment) => (
+                                <div key={comment.id} className="flex items-start gap-2">
+                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-[9px] font-bold text-white">{comment.avatar}</span>
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-[11px] text-gray-700 dark:text-gray-300 leading-relaxed truncate">
+                                      <span className="font-semibold">{comment.author}</span> {comment.content}
+                                    </p>
+                                    <span className="text-[10px] text-gray-400 dark:text-gray-500">{comment.time}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">{job.createdAt}</span>
+                        )}
+
+                        {/* ── 区域5: 元数据 + 互动区 ── */}
+                        <div className="flex items-center justify-between pt-4 border-t border-dashed border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-orange-50/60 dark:bg-orange-900/20 rounded-lg">
+                              <Users className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
+                              <span className="text-xs font-bold text-orange-700 dark:text-orange-300">{job.applicants}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50/60 dark:bg-amber-900/20 rounded-lg">
+                              <Eye className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
+                              <span className="text-xs font-bold text-amber-700 dark:text-amber-300">{job.views}</span>
+                            </div>
+                          </div>
+                          <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">{job.createdAt}</span>
+                        </div>
+
+                        {/* ── 区域6: 互动按钮区 ── */}
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100/80 dark:border-gray-700/50">
+                          <div className="flex items-center gap-1">
+                            <motion.button
+                              whileTap={{ scale: 0.85 }}
+                              onClick={() => handleLike(job.id)}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                job.isLiked
+                                  ? "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
+                                  : "bg-gray-50 dark:bg-gray-700/30 text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500"
+                              }`}
+                            >
+                              <Heart className={`w-3.5 h-3.5 ${job.isLiked ? "fill-current" : ""}`} />
+                              <span>{job.likes}</span>
+                            </motion.button>
+                            <motion.button
+                              whileTap={{ scale: 0.85 }}
+                              onClick={() => handleFavorite(job.id)}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                job.isFavorited
+                                  ? "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400"
+                                  : "bg-gray-50 dark:bg-gray-700/30 text-gray-500 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-500"
+                              }`}
+                            >
+                              <Bookmark className={`w-3.5 h-3.5 ${job.isFavorited ? "fill-current" : ""}`} />
+                              <span className="hidden sm:inline">收藏</span>
+                            </motion.button>
+                            <motion.button
+                              whileTap={{ scale: 0.85 }}
+                              onClick={() => handleShare(job)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-gray-50 dark:bg-gray-700/30 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-500 transition-all"
+                            >
+                              <Share2 className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">分享</span>
+                            </motion.button>
+                          </div>
+                          <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+                            <MessageCircle className="w-3.5 h-3.5 text-gray-400" />
+                            <span className="text-[11px] font-semibold text-gray-600 dark:text-gray-400">{job.comments.length}</span>
+                          </div>
                         </div>
                       </div>
 
-                      {/* 快捷操作栏 */}
-                      <div className="px-5 py-3 bg-gray-50/50 dark:bg-gray-700/20 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                      {/* ── 区域7: 关联推荐区 ── */}
+                      {relatedJobs.length > 0 && (
+                        <div className="px-5 sm:px-6 py-3 bg-gray-50/60 dark:bg-gray-700/20 border-t border-gray-100 dark:border-gray-700/50">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">相关职位</span>
+                            <ChevronRight className="w-3 h-3 text-gray-400" />
+                          </div>
+                          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                            {relatedJobs.map((rJob) => (
+                              <button
+                                key={rJob.id}
+                                onClick={() => handleViewDetail(rJob)}
+                                className="flex-shrink-0 flex items-center gap-2 px-2.5 py-1.5 bg-white dark:bg-gray-600/40 rounded-lg border border-gray-200/60 dark:border-gray-600/40 hover:border-orange-300 dark:hover:border-orange-700 transition-colors group/r"
+                              >
+                                <div className="w-6 h-6 bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/40 dark:to-red-900/40 rounded-md flex items-center justify-center flex-shrink-0">
+                                  <Briefcase className="w-3 h-3 text-orange-600 dark:text-orange-400" />
+                                </div>
+                                <div className="text-left min-w-0 max-w-[100px]">
+                                  <p className="text-[11px] font-semibold text-gray-700 dark:text-gray-300 truncate group-hover/r:text-orange-600 dark:group-hover/r:text-orange-400 transition-colors">{rJob.title}</p>
+                                  <p className={`text-[10px] font-bold ${getSalaryColor(rJob.salary)} truncate`}>{rJob.salary.split("·")[0]}</p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* ── 区域8: 快捷操作栏 ── */}
+                      <div className="px-5 sm:px-6 py-3 bg-gradient-to-r from-gray-50/80 to-orange-50/30 dark:from-gray-700/30 dark:to-orange-900/10 border-t border-gray-100 dark:border-gray-700/50 flex items-center justify-between">
                         <button
                           onClick={() => handleViewDetail(job)}
-                          className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                          className="text-xs font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors flex items-center gap-1 group/btn"
                         >
                           查看详情
+                          <ExternalLink className="w-3 h-3 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                         </button>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleEdit(job)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                          >
+                        <div className="flex items-center gap-0.5">
+                          <button onClick={() => handleEdit(job)} className="p-1.5 text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition-all hover:scale-110">
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
-                          <button
-                            onClick={() => handleToggleStatus(job)}
-                            className={`p-1.5 rounded-lg transition-colors ${
-                              job.status === "active"
-                                ? "text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                                : "text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                            }`}
-                          >
-                            {job.status === "active" ? (
-                              <ToggleLeft className="w-3.5 h-3.5" />
-                            ) : (
-                              <ToggleRight className="w-3.5 h-3.5" />
-                            )}
+                          <button onClick={() => handleToggleStatus(job)} className={`p-1.5 rounded-lg transition-all hover:scale-110 ${job.status === "active" ? "text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30" : "text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"}`}>
+                            {job.status === "active" ? <ToggleLeft className="w-3.5 h-3.5" /> : <ToggleRight className="w-3.5 h-3.5" />}
                           </button>
-                          <button
-                            onClick={() => handleDelete(job.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                          >
+                          <button onClick={() => handleDelete(job.id)} className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all hover:scale-110">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -1243,9 +1605,9 @@ export default function Jobs() {
 
           {/* ─── 职位列表 - 列表视图 ─── */}
           {viewMode === "list" && (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200/70 dark:border-gray-700/60 overflow-hidden shadow-sm">
               {/* 表头 */}
-              <div className="hidden lg:grid grid-cols-[1fr_140px_120px_100px_80px_80px_140px_100px] gap-4 px-5 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <div className="hidden lg:grid grid-cols-[1.4fr_140px_120px_120px_100px_100px_140px_120px] gap-4 px-6 py-4 bg-gradient-to-r from-gray-50/80 to-orange-50/30 dark:from-gray-700/40 dark:to-orange-900/10 border-b border-gray-200/70 dark:border-gray-700/60 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <span>职位信息</span>
                 <span>薪资</span>
                 <span>地点</span>
@@ -1264,75 +1626,84 @@ export default function Jobs() {
                     <motion.div
                       key={job.id}
                       layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
                       transition={{ delay: index * 0.02 }}
-                      className="group grid grid-cols-1 lg:grid-cols-[1fr_140px_120px_100px_80px_80px_140px_100px] gap-2 lg:gap-4 items-center px-5 py-4 border-b border-gray-50 dark:border-gray-700/50 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+                      className="group grid grid-cols-1 lg:grid-cols-[1.4fr_140px_120px_120px_100px_100px_140px_120px] gap-2 lg:gap-4 items-center px-6 py-4 border-b border-gray-100/80 dark:border-gray-700/50 last:border-0 hover:bg-gradient-to-r hover:from-orange-50/30 hover:to-transparent dark:hover:from-orange-900/10 dark:hover:to-transparent transition-all duration-200 cursor-pointer"
+                      onClick={() => handleViewDetail(job)}
                     >
                       {/* 职位信息 */}
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/40 dark:to-red-900/40 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                          <Briefcase className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <p
-                            className="text-sm font-semibold text-gray-900 dark:text-white truncate cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                            onClick={() => handleViewDetail(job)}
+                            className="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors"
                           >
                             {job.title}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                             {job.department} · {job.experience} · {job.education}
                           </p>
                         </div>
                       </div>
 
                       {/* 薪资 */}
-                      <p className={`text-sm font-bold ${getSalaryColor(job.salary)}`}>{job.salary}</p>
+                      <p className={`text-sm font-extrabold ${getSalaryColor(job.salary)}`}>{job.salary}</p>
 
                       {/* 地点 */}
-                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{job.location}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                        {job.location}
+                      </p>
 
                       {/* 状态 */}
                       <span
-                        className={`inline-flex items-center gap-1.5 w-fit px-2.5 py-1 rounded-full text-[11px] font-medium border ${statusConfig.bg} ${statusConfig.text_color} ${statusConfig.border}`}
+                        className={`inline-flex items-center gap-1.5 w-fit px-2.5 py-1 rounded-full text-[11px] font-semibold border ${statusConfig.bg} ${statusConfig.text_color} ${statusConfig.border}`}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
+                        <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot} animate-pulse`} />
                         {statusConfig.text}
                       </span>
 
                       {/* 申请数 */}
-                      <p className="text-sm text-gray-900 dark:text-white font-medium">{job.applicants}</p>
+                      <p className="text-sm text-gray-900 dark:text-white font-bold flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-orange-500" />
+                        {job.applicants}
+                      </p>
 
                       {/* 浏览数 */}
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{job.views}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                        <Eye className="w-3.5 h-3.5 text-amber-500" />
+                        {job.views}
+                      </p>
 
                       {/* 日期 */}
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{job.createdAt}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{job.createdAt}</p>
 
                       {/* 操作 */}
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => handleViewDetail(job)}
-                          className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition-all hover:scale-110"
                           title="查看详情"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleEdit(job)}
-                          className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all hover:scale-110"
                           title="编辑"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleToggleStatus(job)}
-                          className={`p-2 rounded-lg transition-colors ${
+                          className={`p-1.5 rounded-lg transition-all hover:scale-110 ${
                             job.status === "active"
-                              ? "text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                              : "text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                              ? "text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                              : "text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
                           }`}
                           title={job.status === "active" ? "关闭招聘" : "开启招聘"}
                         >
@@ -1344,7 +1715,7 @@ export default function Jobs() {
                         </button>
                         <button
                           onClick={() => handleDelete(job.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all hover:scale-110"
                           title="删除"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1362,38 +1733,50 @@ export default function Jobs() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700"
+              className="text-center py-20 bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl border border-gray-100/80 dark:border-gray-700/50"
             >
-              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Briefcase className="w-10 h-10 text-gray-300 dark:text-gray-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                className="relative w-24 h-24 mx-auto mb-8"
+              >
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-400/20 to-red-400/20 blur-xl" />
+                <div className="relative w-full h-full bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-3xl flex items-center justify-center">
+                  <Briefcase className="w-12 h-12 text-orange-400 dark:text-orange-500" />
+                </div>
+              </motion.div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                 {searchKeyword || filterStatus !== "all" ? "未找到匹配的职位" : "暂无职位"}
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
+              <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
                 {searchKeyword || filterStatus !== "all"
-                  ? "尝试调整搜索条件或筛选状态"
-                  : "点击「发布职位」创建你的第一个招聘职位"}
+                  ? "尝试调整搜索条件或筛选状态，或清除当前筛选查看全部职位"
+                  : "点击「发布职位」创建你的第一个招聘职位，开启高效招聘之旅"}
               </p>
               {searchKeyword || filterStatus !== "all" ? (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     setSearchKeyword("");
                     setFilterStatus("all");
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-xl transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-orange-600 dark:text-orange-400 bg-orange-50/80 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-xl transition-colors border border-orange-100/50 dark:border-orange-800/30"
                 >
                   <X className="w-4 h-4" />
                   清除筛选
-                </button>
+                </motion.button>
               ) : (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleCreate}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-xl transition-all shadow-lg shadow-orange-500/25"
                 >
                   <Plus className="w-4 h-4" />
                   发布职位
-                </button>
+                </motion.button>
               )}
             </motion.div>
           )}
