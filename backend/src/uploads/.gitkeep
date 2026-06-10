@@ -1,0 +1,2 @@
+# 此文件用于保持 uploads 目录在 Git 中存在
+# 上传的 PDF 文件被 .gitignore 排除，不会被提交

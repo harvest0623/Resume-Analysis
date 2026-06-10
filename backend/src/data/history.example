@@ -1,0 +1,50 @@
+{
+  "描述": "用户数据隔离存储示例，仅作为参考文件，不会被应用程序读取",
+  "存储结构": {
+    "说明": "数据按 userId 两层索引存储，每个用户只能访问自己的数据",
+    "格式": {
+      "user_A_xxxxxxxx": {
+        "resume_id_1": {
+          "id": "resume_id_1",
+          "filename": "张三-简历.pdf",
+          "uploadedAt": "2026-01-15T10:30:00.000Z",
+          "basicInfo": {
+            "name": "张三",
+            "phone": "13800000000",
+            "email": "zhangsan@example.com"
+          },
+          "scores": {
+            "overall": 85,
+            "skills": 88,
+            "experience": 82,
+            "education": 85
+          }
+        }
+      },
+      "user_B_xxxxxxxx": {
+        "resume_id_2": {
+          "id": "resume_id_2",
+          "filename": "李四-简历.pdf",
+          "uploadedAt": "2026-01-16T14:20:00.000Z",
+          "basicInfo": {
+            "name": "李四",
+            "phone": "13900000000",
+            "email": "lisi@example.com"
+          },
+          "scores": {
+            "overall": 78,
+            "skills": 75,
+            "experience": 80,
+            "education": 82
+          }
+        }
+      }
+    }
+  },
+  "隔离机制": {
+    "1. 用户标识生成": "前端在 localStorage 中生成唯一 userId（如 user_1718xxxx_xxxxx），首次访问时自动生成",
+    "2. 请求头注入": "所有 API 请求自动携带 X-User-Id 请求头",
+    "3. 后端隔离": "后端根据 X-User-Id 读写对应的数据空间，跨用户数据不可见",
+    "4. Git 排除": "实际 history.json 文件被 .gitignore 排除，不会提交到仓库"
+  }
+}

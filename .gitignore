@@ -18,9 +18,14 @@ build/
 frontend/dist/
 frontend/.vite/
 
-# Uploads and data
-backend/uploads/
-backend/data/
+# Uploads and data (user-specific data - 每人独立，不会共享)
+backend/src/uploads/*
+backend/src/data/*.json
+
+# 保留目录占位文件
+!backend/src/uploads/.gitkeep
+!backend/src/data/.gitkeep
+!backend/src/data/history.example
 
 # IDE
 .vscode/

@@ -20,7 +20,7 @@ CORS(app, resources={
     r"/*": {
         "origins": ["*"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
+        "allow_headers": ["Content-Type", "Authorization", "X-User-Id"]
     }
 })
 
@@ -45,11 +45,16 @@ MAX_BATCH_FILES = 50
 MAX_SINGLE_FILE_SIZE = 10 * 1024 * 1024
 
 
+def _get_user_id():
+    """从请求头中提取用户标识，未提供时返回默认值"""
+    return request.headers.get('X-User-Id', 'default')
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def _analyze_single_resume(resume_id, filename, use_coze):
+def _analyze_single_resume(resume_id, filename, user_id, use_coze):
     pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{resume_id}.pdf")
 
     if not os.path.exists(pdf_path):
@@ -100,11 +105,11 @@ def _analyze_single_resume(resume_id, filename, use_coze):
         **analysis_result
     }
 
-    history_store.add(resume_data)
+    history_store.add(user_id, resume_data)
     return resume_data
 
 
-def _process_batch_task(batch_id, file_tasks, use_coze):
+def _process_batch_task(batch_id, user_id, file_tasks, use_coze):
     with batch_tasks_lock:
         batch_tasks[batch_id]['status'] = 'processing'
         batch_tasks[batch_id]['totalCount'] = len(file_tasks)
@@ -116,7 +121,7 @@ def _process_batch_task(batch_id, file_tasks, use_coze):
             with batch_tasks_lock:
                 batch_tasks[batch_id]['currentProcessing'].append(resume_id)
 
-            result = _analyze_single_resume(resume_id, filename, use_coze)
+            result = _analyze_single_resume(resume_id, filename, user_id, use_coze)
 
             with batch_tasks_lock:
                 batch_tasks[batch_id]['completedCount'] += 1
@@ -183,8 +188,9 @@ def upload_resume():
 @app.route('/api/resume/analyze', methods=['POST'])
 def analyze_resume():
     data = request.get_json()
+    user_id = _get_user_id()
     resume_id = data.get('id')
-    use_coze = data.get('useCoze', False)  # 是否使用 Coze AI 分析
+    use_coze = data.get('useCoze', False)
 
     if not resume_id:
         return jsonify({'error': 'Resume ID is required'}), 400
@@ -202,24 +208,18 @@ def analyze_resume():
         extractor = TextExtractor(text, lines)
         extracted_data = extractor.extract_all()
 
-        # 根据选择使用不同的分析方式
         if use_coze:
             try:
-                # 使用 Coze AI 分析
                 coze_result = coze_analyzer.analyze_resume(
                     resume_text=text,
                     basic_info=extracted_data.get('basicInfo', {})
                 )
-
-                # 合并 Coze 分析结果和提取的数据
                 analysis_result = {
                     'scores': coze_result.get('scores', {}),
                     'analysis': coze_result.get('analysis', ''),
                     'suggestions': coze_result.get('suggestions', []),
                     'aiProvider': 'coze'
                 }
-
-                # 如果 Coze 没有返回部分数据，用规则补充
                 if 'skills' not in analysis_result.get('scores', {}):
                     analyzer = ResumeAnalyzer(extracted_data)
                     rule_result = analyzer.analyze()
@@ -227,16 +227,13 @@ def analyze_resume():
                         **rule_result['scores'],
                         **analysis_result['scores']
                     }
-
             except Exception as e:
-                # Coze 分析失败，回退到规则分析
                 print(f"Coze analysis failed, falling back to rules: {e}")
                 analyzer = ResumeAnalyzer(extracted_data)
                 analysis_result = analyzer.analyze()
                 analysis_result['aiProvider'] = 'rule'
                 analysis_result['cozeError'] = str(e)
         else:
-            # 使用规则分析（默认）
             analyzer = ResumeAnalyzer(extracted_data)
             analysis_result = analyzer.analyze()
             analysis_result['aiProvider'] = 'rule'
@@ -249,7 +246,7 @@ def analyze_resume():
             **analysis_result
         }
 
-        history_store.add(resume_data)
+        history_store.add(user_id, resume_data)
 
         return jsonify(resume_data)
 
@@ -259,7 +256,8 @@ def analyze_resume():
 
 @app.route('/api/resume/<resume_id>', methods=['GET'])
 def get_resume(resume_id):
-    resume = history_store.get(resume_id)
+    user_id = _get_user_id()
+    resume = history_store.get(user_id, resume_id)
     if resume:
         return jsonify(resume)
     else:
@@ -323,6 +321,7 @@ def batch_upload():
 @app.route('/api/resume/batch/analyze', methods=['POST'])
 def batch_analyze():
     data = request.get_json()
+    user_id = _get_user_id()
     file_tasks = data.get('files', [])
     use_coze = data.get('useCoze', False)
 
@@ -348,7 +347,7 @@ def batch_analyze():
 
     thread = threading.Thread(
         target=_process_batch_task,
-        args=(batch_id, file_tasks, use_coze),
+        args=(batch_id, user_id, file_tasks, use_coze),
         daemon=True
     )
     thread.start()
@@ -405,6 +404,7 @@ def get_batch_results(batch_id):
 @app.route('/api/resume/compare', methods=['POST'])
 def compare_resumes():
     data = request.get_json()
+    user_id = _get_user_id()
     resume_ids = data.get('resumeIds', [])
     config_data = data.get('config', {})
     use_coze = data.get('useCoze', False)
@@ -414,7 +414,7 @@ def compare_resumes():
     
     resumes = []
     for rid in resume_ids:
-        resume = history_store.get(rid)
+        resume = history_store.get(user_id, rid)
         if not resume:
             return jsonify({'error': f'简历 {rid} 未找到'}), 404
         resumes.append(resume)
@@ -545,12 +545,13 @@ def validate_comparison_config():
 @app.route('/api/resume/optimize', methods=['POST'])
 def optimize_resume():
     data = request.get_json()
+    user_id = _get_user_id()
     resume_id = data.get('id')
     
     if not resume_id:
         return jsonify({'error': 'Resume ID is required'}), 400
     
-    resume = history_store.get(resume_id)
+    resume = history_store.get(user_id, resume_id)
     if not resume:
         return jsonify({'error': 'Resume not found'}), 404
     
@@ -587,6 +588,7 @@ def optimize_resume():
 @app.route('/api/match', methods=['POST'])
 def match_resumes():
     data = request.get_json()
+    user_id = _get_user_id()
     job_description = data.get('jobDescription', '')
     requirements = data.get('requirements', '')
     filters = data.get('filters', None)
@@ -594,7 +596,7 @@ def match_resumes():
 
     if use_coze:
         try:
-            all_resumes = history_store.get_all()
+            all_resumes = history_store.get_all(user_id)
             resumes_for_coze = []
             for resume in all_resumes:
                 resumes_for_coze.append({
@@ -616,7 +618,7 @@ def match_resumes():
             return jsonify({'error': str(e)}), 500
     else:
         matcher = Matcher(job_description, requirements, filters)
-        all_resumes = history_store.get_all()
+        all_resumes = history_store.get_all(user_id)
 
         matches = []
         for resume in all_resumes:
@@ -632,11 +634,12 @@ def match_resumes():
 
 @app.route('/api/history', methods=['GET'])
 def get_history():
+    user_id = _get_user_id()
     keyword = request.args.get('keyword', '')
     if keyword:
-        resumes = history_store.search(keyword)
+        resumes = history_store.search(user_id, keyword)
     else:
-        resumes = history_store.get_all()
+        resumes = history_store.get_all(user_id)
     
     resumes.sort(key=lambda x: x.get('uploadedAt', ''), reverse=True)
     return jsonify(resumes)
@@ -644,7 +647,8 @@ def get_history():
 
 @app.route('/api/history/<resume_id>', methods=['DELETE'])
 def delete_history(resume_id):
-    success = history_store.delete(resume_id)
+    user_id = _get_user_id()
+    success = history_store.delete(user_id, resume_id)
     if success:
         pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{resume_id}.pdf")
         if os.path.exists(pdf_path):
