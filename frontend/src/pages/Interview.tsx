@@ -52,6 +52,25 @@ import {
     CalendarOff,
     GripVertical,
     Sparkles,
+    Tag,
+    Flame,
+    Activity,
+    GitMerge,
+    Smile,
+    Frown,
+    Meh,
+    Coffee,
+    Moon,
+    Sun,
+    Sunrise,
+    Sunset,
+    Dribbble,
+    Hash,
+    FlagTriangleRight,
+    ListTodo,
+    RefreshCw,
+    Wand2,
+    Palette,
 } from "lucide-react";
 import {
     BarChart,
@@ -73,11 +92,91 @@ import {
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
 
+/* ========== 动画背景组件 ========== */
+
+const AnimatedBackground = () => (
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full">
+            <motion.div
+                animate={{
+                    x: [0, 100, 0],
+                    y: [0, -50, 0],
+                    rotate: [0, 180, 360]
+                }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-pink-400/20 to-rose-600/20 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{
+                    x: [0, -80, 0],
+                    y: [0, 60, 0],
+                    rotate: [360, 180, 0]
+                }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/2 right-1/4 w-80 h-80 bg-gradient-to-br from-rose-400/20 to-pink-500/20 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{
+                    x: [0, 60, 0],
+                    y: [0, -80, 0]
+                }}
+                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-fuchsia-400/20 to-pink-400/20 rounded-full blur-3xl"
+            />
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-white/50 to-white dark:via-gray-900/50 dark:to-gray-900" />
+    </div>
+);
+
+const ParticleField = () => {
+    const particles = Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 4 + 2,
+        duration: Math.random() * 10 + 10,
+        delay: Math.random() * 5
+    }));
+
+    return (
+        <div className="fixed inset-0 -z-10 pointer-events-none">
+            {particles.map(particle => (
+                <motion.div
+                    key={particle.id}
+                    className="absolute rounded-full bg-pink-500/10 dark:bg-pink-400/10"
+                    style={{ left: `${particle.x}%`, top: `${particle.y}%`, width: particle.size, height: particle.size }}
+                    animate={{
+                        y: [0, -30, 0],
+                        opacity: [0.3, 0.8, 0.3]
+                    }}
+                    transition={{
+                        duration: particle.duration,
+                        repeat: Infinity,
+                        delay: particle.delay,
+                        ease: "easeInOut"
+                    }}
+                />
+            ))}
+        </div>
+    );
+};
+
 /* ========== 类型定义 ========== */
 
 type InterviewType = "onsite" | "video" | "phone";
 type InterviewStatus = "scheduled" | "completed" | "cancelled" | "pending" | "in_progress";
 type InterviewResult = "pass" | "fail" | "pending" | null;
+type InterviewPriority = "critical" | "high" | "medium" | "low";
+type InterviewTag = "紧急" | "高管" | "校招" | "社招" | "实习" | "急聘" | "核心岗位" | "储备";
+
+interface ActivityLog {
+    id: string;
+    interviewId: string;
+    action: string;
+    detail: string;
+    timestamp: string;
+    icon: React.ReactNode;
+}
 
 interface EvaluationDimension {
     name: string;
@@ -107,7 +206,10 @@ interface Interview {
     result: InterviewResult;
     round: number;
     totalRounds: number;
+    priority: InterviewPriority;
+    tags: InterviewTag[];
     feedback?: string;
+    feedbackSentiment?: "positive" | "neutral" | "negative";
     rating?: number;
     evaluations?: EvaluationDimension[];
     notes?: string;
@@ -146,7 +248,7 @@ const mockInterviews: Interview[] = [
         department: "技术研发部",
         interviewer: "李经理",
         interviewerAvatar: "李",
-        date: "2024-03-15",
+        date: "2026-06-12",
         time: "10:00",
         endTime: "11:00",
         duration: "60分钟",
@@ -156,8 +258,10 @@ const mockInterviews: Interview[] = [
         result: null,
         round: 1,
         totalRounds: 3,
-        createdAt: "2024-03-10T08:00:00Z",
-        updatedAt: "2024-03-10T08:00:00Z",
+        priority: "high",
+        tags: ["核心岗位", "社招"],
+        createdAt: "2026-06-08T08:00:00Z",
+        updatedAt: "2026-06-08T08:00:00Z",
     },
     {
         id: "2",
@@ -170,7 +274,7 @@ const mockInterviews: Interview[] = [
         department: "技术研发部",
         interviewer: "王总监",
         interviewerAvatar: "王",
-        date: "2024-03-15",
+        date: "2026-06-10",
         time: "14:00",
         endTime: "14:45",
         duration: "45分钟",
@@ -180,8 +284,10 @@ const mockInterviews: Interview[] = [
         result: null,
         round: 2,
         totalRounds: 3,
-        createdAt: "2024-03-09T10:00:00Z",
-        updatedAt: "2024-03-09T10:00:00Z",
+        priority: "critical",
+        tags: ["紧急", "高管"],
+        createdAt: "2026-06-07T10:00:00Z",
+        updatedAt: "2026-06-07T10:00:00Z",
     },
     {
         id: "3",
@@ -194,7 +300,7 @@ const mockInterviews: Interview[] = [
         department: "产品部",
         interviewer: "赵经理",
         interviewerAvatar: "赵",
-        date: "2024-03-14",
+        date: "2026-06-09",
         time: "11:00",
         endTime: "11:30",
         duration: "30分钟",
@@ -204,7 +310,10 @@ const mockInterviews: Interview[] = [
         result: "pass",
         round: 1,
         totalRounds: 2,
+        priority: "medium",
+        tags: ["社招"],
         feedback: "候选人表达清晰，产品思维敏捷，有较强的逻辑能力，对行业趋势有深刻理解。",
+        feedbackSentiment: "positive",
         rating: 4,
         evaluations: [
             { name: "技术能力", score: 4, maxScore: 5, icon: <Brain className="w-4 h-4" /> },
@@ -214,8 +323,8 @@ const mockInterviews: Interview[] = [
             { name: "学习能力", score: 4, maxScore: 5, icon: <Zap className="w-4 h-4" /> },
         ],
         notes: "建议进入下一轮面试，重点考察项目管理能力。",
-        createdAt: "2024-03-08T14:00:00Z",
-        updatedAt: "2024-03-14T12:00:00Z",
+        createdAt: "2026-06-06T14:00:00Z",
+        updatedAt: "2026-06-09T12:00:00Z",
     },
     {
         id: "4",
@@ -228,7 +337,7 @@ const mockInterviews: Interview[] = [
         department: "设计部",
         interviewer: "刘总监",
         interviewerAvatar: "刘",
-        date: "2024-03-13",
+        date: "2026-06-08",
         time: "15:00",
         endTime: "16:00",
         duration: "60分钟",
@@ -238,7 +347,10 @@ const mockInterviews: Interview[] = [
         result: "fail",
         round: 2,
         totalRounds: 2,
+        priority: "medium",
+        tags: ["社招"],
         feedback: "设计能力出色，作品集质量高，但团队协作经验稍显不足，与团队文化契合度有待提升。",
+        feedbackSentiment: "neutral",
         rating: 3,
         evaluations: [
             { name: "设计能力", score: 4, maxScore: 5, icon: <Sparkles className="w-4 h-4" /> },
@@ -248,8 +360,8 @@ const mockInterviews: Interview[] = [
             { name: "学习能力", score: 3, maxScore: 5, icon: <Zap className="w-4 h-4" /> },
         ],
         notes: "设计能力符合要求，但建议寻找更匹配团队文化的候选人。",
-        createdAt: "2024-03-07T09:00:00Z",
-        updatedAt: "2024-03-13T17:00:00Z",
+        createdAt: "2026-06-05T09:00:00Z",
+        updatedAt: "2026-06-08T17:00:00Z",
     },
     {
         id: "5",
@@ -262,7 +374,7 @@ const mockInterviews: Interview[] = [
         department: "数据部",
         interviewer: "陈经理",
         interviewerAvatar: "陈",
-        date: "2024-03-16",
+        date: "2026-06-15",
         time: "09:30",
         endTime: "10:15",
         duration: "45分钟",
@@ -272,8 +384,10 @@ const mockInterviews: Interview[] = [
         result: null,
         round: 1,
         totalRounds: 2,
-        createdAt: "2024-03-12T11:00:00Z",
-        updatedAt: "2024-03-12T11:00:00Z",
+        priority: "low",
+        tags: ["储备"],
+        createdAt: "2026-06-09T11:00:00Z",
+        updatedAt: "2026-06-09T11:00:00Z",
     },
     {
         id: "6",
@@ -286,7 +400,7 @@ const mockInterviews: Interview[] = [
         department: "运营部",
         interviewer: "吴总监",
         interviewerAvatar: "吴",
-        date: "2024-03-15",
+        date: "2026-06-10",
         time: "16:00",
         endTime: "16:45",
         duration: "45分钟",
@@ -296,8 +410,10 @@ const mockInterviews: Interview[] = [
         result: null,
         round: 1,
         totalRounds: 2,
-        createdAt: "2024-03-11T08:30:00Z",
-        updatedAt: "2024-03-11T08:30:00Z",
+        priority: "high",
+        tags: ["急聘", "社招"],
+        createdAt: "2026-06-08T08:30:00Z",
+        updatedAt: "2026-06-08T08:30:00Z",
     },
     {
         id: "7",
@@ -310,7 +426,7 @@ const mockInterviews: Interview[] = [
         department: "技术研发部",
         interviewer: "王总监",
         interviewerAvatar: "王",
-        date: "2024-03-17",
+        date: "2026-06-16",
         time: "10:00",
         endTime: "11:00",
         duration: "60分钟",
@@ -320,8 +436,10 @@ const mockInterviews: Interview[] = [
         result: null,
         round: 1,
         totalRounds: 3,
-        createdAt: "2024-03-12T14:00:00Z",
-        updatedAt: "2024-03-12T14:00:00Z",
+        priority: "medium",
+        tags: ["校招"],
+        createdAt: "2026-06-09T14:00:00Z",
+        updatedAt: "2026-06-09T14:00:00Z",
     },
     {
         id: "8",
@@ -334,7 +452,7 @@ const mockInterviews: Interview[] = [
         department: "质量保障部",
         interviewer: "钱经理",
         interviewerAvatar: "钱",
-        date: "2024-03-14",
+        date: "2026-06-09",
         time: "14:00",
         endTime: "15:00",
         duration: "60分钟",
@@ -344,7 +462,10 @@ const mockInterviews: Interview[] = [
         result: "pass",
         round: 2,
         totalRounds: 2,
+        priority: "high",
+        tags: ["急聘", "核心岗位"],
         feedback: "测试理论基础扎实，自动化测试经验丰富，沟通能力良好。",
+        feedbackSentiment: "positive",
         rating: 5,
         evaluations: [
             { name: "技术能力", score: 5, maxScore: 5, icon: <Brain className="w-4 h-4" /> },
@@ -354,8 +475,8 @@ const mockInterviews: Interview[] = [
             { name: "学习能力", score: 5, maxScore: 5, icon: <Zap className="w-4 h-4" /> },
         ],
         notes: "强烈推荐录用，综合素质优秀。",
-        createdAt: "2024-03-06T10:00:00Z",
-        updatedAt: "2024-03-14T16:00:00Z",
+        createdAt: "2026-06-04T10:00:00Z",
+        updatedAt: "2026-06-09T16:00:00Z",
     },
 ];
 
@@ -413,39 +534,750 @@ const getTypeText = (type: InterviewType): string => {
     return map[type];
 };
 
+const getPriorityConfig = (priority: InterviewPriority) => {
+    const map: Record<InterviewPriority, { label: string; color: string; icon: React.ReactNode; gradient: string }> = {
+        critical: { label: "紧急", color: "text-red-500", icon: <Flame className="w-3 h-3" />, gradient: "from-red-500 to-rose-500" },
+        high: { label: "高", color: "text-orange-500", icon: <FlagTriangleRight className="w-3 h-3" />, gradient: "from-orange-500 to-amber-500" },
+        medium: { label: "中", color: "text-blue-500", icon: <Info className="w-3 h-3" />, gradient: "from-blue-500 to-cyan-500" },
+        low: { label: "低", color: "text-gray-400", icon: <ChevronDown className="w-3 h-3" />, gradient: "from-gray-400 to-gray-500" },
+    };
+    return map[priority];
+};
+
+const getTagConfig = (tag: InterviewTag) => {
+    const map: Record<InterviewTag, { color: string; icon: React.ReactNode }> = {
+        "紧急": { color: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800", icon: <Flame className="w-2.5 h-2.5" /> },
+        "高管": { color: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800", icon: <Star className="w-2.5 h-2.5" /> },
+        "校招": { color: "bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800", icon: <GraduationCap className="w-2.5 h-2.5" /> },
+        "社招": { color: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800", icon: <Briefcase className="w-2.5 h-2.5" /> },
+        "实习": { color: "bg-teal-50 text-teal-600 border-teal-200 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-800", icon: <Coffee className="w-2.5 h-2.5" /> },
+        "急聘": { color: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800", icon: <Zap className="w-2.5 h-2.5" /> },
+        "核心岗位": { color: "bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800", icon: <Target className="w-2.5 h-2.5" /> },
+        "储备": { color: "bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700", icon: <Dribbble className="w-2.5 h-2.5" /> },
+    };
+    return map[tag];
+};
+
 /* ========== 子组件 ========== */
 
-// 统计卡片
-function StatCard({ icon, label, value, sub, color, trend }: {
+// 统计卡片 - 玻璃拟态风格
+function StatCard({ icon, label, value, sub, color, trend, gradient }: {
     icon: React.ReactNode; label: string; value: string | number;
     sub?: string; color: string; trend?: { value: string; up: boolean };
+    gradient?: string;
 }) {
     return (
         <motion.div
-            whileHover={{ y: -2 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200"
+            whileHover={{ y: -4, scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="relative overflow-hidden rounded-2xl p-5 shadow-sm hover:shadow-xl transition-shadow duration-300"
+            style={{ background: gradient || `linear-gradient(135deg, ${color}08, ${color}15)` }}
         >
-            <div className="flex items-start justify-between">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center`} style={{ backgroundColor: `${color}15`, color }}>
-                    {icon}
+            <div className="absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-20" style={{ background: color }} />
+            <div className="relative">
+                <div className="flex items-start justify-between">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)`, color: "white" }}>
+                        {icon}
+                    </div>
+                    {trend && (
+                        <span className={`flex items-center text-xs font-semibold px-2 py-1 rounded-full ${trend.up ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
+                            <ArrowUpRight className={`w-3 h-3 mr-0.5 ${!trend.up && "rotate-180"}`} />
+                            {trend.value}
+                        </span>
+                    )}
                 </div>
-                {trend && (
-                    <span className={`flex items-center text-xs font-medium ${trend.up ? "text-emerald-600" : "text-red-500"}`}>
-                        <ArrowUpRight className={`w-3 h-3 mr-0.5 ${!trend.up && "rotate-180"}`} />
-                        {trend.value}
-                    </span>
-                )}
-            </div>
-            <div className="mt-4">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{label}</p>
-                {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>}
+                <div className="mt-4">
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{value}</p>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{label}</p>
+                    {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>}
+                </div>
             </div>
         </motion.div>
     );
 }
 
-// 面试卡片
+// 面试轮次进度条
+function RoundProgress({ round, total }: { round: number; total: number }) {
+    return (
+        <div className="flex items-center gap-1.5">
+            {Array.from({ length: total }, (_, i) => (
+                <div
+                    key={i}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                        i < round
+                            ? "bg-gradient-to-r from-pink-500 to-rose-500"
+                            : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                    style={{ width: i === round - 1 ? "16px" : "8px" }}
+                />
+            ))}
+            <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">{round}/{total}</span>
+        </div>
+    );
+}
+
+// 今日日程时间线
+function TodayTimeline({ interviews }: { interviews: Interview[] }) {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
+    return (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
+            <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/20">
+                        <CalendarClock className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">今日日程</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{interviews.length} 场面试</p>
+                    </div>
+                </div>
+                <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {now.toLocaleDateString("zh-CN", { month: "long", day: "numeric", weekday: "long" })}
+                </span>
+            </div>
+
+            {interviews.length === 0 ? (
+                <div className="text-center py-8">
+                    <CalendarOff className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                    <p className="text-sm text-gray-400 dark:text-gray-500">今日暂无面试安排</p>
+                </div>
+            ) : (
+                <div className="relative">
+                    {/* 时间轴线 */}
+                    <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-pink-400 to-rose-400 opacity-30" />
+
+                    <div className="space-y-3">
+                        {interviews
+                            .sort((a, b) => a.time.localeCompare(b.time))
+                            .map((iv, idx) => {
+                                const [h, m] = iv.time.split(":").map(Number);
+                                const isPast = h < currentHour || (h === currentHour && m < currentMinute);
+                                const isCurrent = h === currentHour && !isPast;
+
+                                return (
+                                    <motion.div
+                                        key={iv.id}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.1 }}
+                                        className={`flex items-start gap-3 ${isPast ? "opacity-50" : ""}`}
+                                    >
+                                        <div className={`relative z-10 w-[14px] h-[14px] rounded-full border-[3px] mt-1.5 flex-shrink-0 ${
+                                            isCurrent
+                                                ? "border-pink-500 bg-white shadow-lg shadow-pink-500/30 animate-pulse"
+                                                : isPast
+                                                    ? "border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-700"
+                                                    : "border-rose-400 bg-white dark:bg-gray-800"
+                                        }`} />
+                                        <div className={`flex-1 p-3 rounded-xl transition-all ${
+                                            isCurrent
+                                                ? "bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800"
+                                                : isPast
+                                                    ? "bg-gray-50 dark:bg-gray-800/50"
+                                                    : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                                        }`}>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs font-mono font-semibold text-gray-500 dark:text-gray-400">
+                                                        {iv.time}
+                                                    </span>
+                                                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                        {iv.candidateName}
+                                                    </span>
+                                                </div>
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${getStatusBadgeClass(iv.status)}`}>
+                                                    {getStatusText(iv.status)}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                                <span>{iv.position}</span>
+                                                <span>·</span>
+                                                <span>{iv.interviewer}</span>
+                                                <span>·</span>
+                                                <span>{getTypeText(iv.type)}</span>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+// 快速操作面板
+function QuickActions({ onAdd, onExport }: { onAdd: () => void; onExport: () => void }) {
+    const actions = [
+        { icon: <Plus className="w-5 h-5" />, label: "安排面试", color: "from-pink-500 to-rose-500", onClick: onAdd },
+        { icon: <Download className="w-5 h-5" />, label: "导出数据", color: "from-violet-500 to-purple-500", onClick: onExport },
+        { icon: <CalendarCheck className="w-5 h-5" />, label: "今日日程", color: "from-blue-500 to-cyan-500", onClick: () => document.getElementById("today-timeline")?.scrollIntoView({ behavior: "smooth" }) },
+        { icon: <BarChart3 className="w-5 h-5" />, label: "数据统计", color: "from-emerald-500 to-teal-500", onClick: () => document.getElementById("stats-section")?.scrollIntoView({ behavior: "smooth" }) },
+    ];
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-6"
+        >
+            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {actions.map((action, idx) => (
+                    <motion.button
+                        key={idx}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={action.onClick}
+                        className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all"
+                    >
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center text-white shadow-sm`}>
+                            {action.icon}
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{action.label}</span>
+                    </motion.button>
+                ))}
+            </div>
+        </motion.div>
+    );
+}
+
+// 面试官排行榜
+function InterviewerRanking({ interviews }: { interviews: Interview[] }) {
+    const interviewerStats = useMemo(() => {
+        const map: Record<string, { count: number; passCount: number; totalRating: number; ratedCount: number }> = {};
+        interviews.forEach((iv) => {
+            if (!map[iv.interviewer]) {
+                map[iv.interviewer] = { count: 0, passCount: 0, totalRating: 0, ratedCount: 0 };
+            }
+            map[iv.interviewer].count++;
+            if (iv.result === "pass") map[iv.interviewer].passCount++;
+            if (iv.rating) {
+                map[iv.interviewer].totalRating += iv.rating;
+                map[iv.interviewer].ratedCount++;
+            }
+        });
+        return Object.entries(map)
+            .map(([name, stats]) => ({
+                name,
+                avatar: name[0],
+                count: stats.count,
+                passRate: stats.count > 0 ? Math.round((stats.passCount / stats.count) * 100) : 0,
+                avgRating: stats.ratedCount > 0 ? (stats.totalRating / stats.ratedCount).toFixed(1) : "-",
+            }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+    }, [interviews]);
+
+    const maxCount = interviewerStats[0]?.count || 1;
+
+    return (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                        <Star className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">面试官排行</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">按面试数量排名</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                {interviewerStats.map((item, idx) => (
+                    <motion.div
+                        key={item.name}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="flex items-center gap-3"
+                    >
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            idx === 0 ? "bg-amber-400 text-white" :
+                            idx === 1 ? "bg-gray-300 text-gray-700" :
+                            idx === 2 ? "bg-orange-300 text-orange-700" :
+                            "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                        }`}>
+                            {idx + 1}
+                        </div>
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                            {item.avatar}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.name}</span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{item.count} 场</span>
+                            </div>
+                            <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${(item.count / maxCount) * 100}%` }}
+                                    transition={{ duration: 0.8, delay: idx * 0.1 }}
+                                    className="h-full bg-gradient-to-r from-pink-400 to-rose-400 rounded-full"
+                                />
+                            </div>
+                            <div className="flex items-center gap-3 mt-1">
+                                <span className="text-[10px] text-gray-400">通过率 {item.passRate}%</span>
+                                <span className="text-[10px] text-gray-400">评分 {item.avgRating}</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// 数据洞察面板
+function DataInsights({ interviews }: { interviews: Interview[] }) {
+    const insights = useMemo(() => {
+        const completed = interviews.filter((i) => i.status === "completed");
+        const total = interviews.length;
+        const passCount = completed.filter((i) => i.result === "pass").length;
+        const failCount = completed.filter((i) => i.result === "fail").length;
+
+        // 面试方式偏好
+        const typeCount = { onsite: 0, video: 0, phone: 0 };
+        interviews.forEach((i) => { typeCount[i.type]++; });
+        const mostUsedType = Object.entries(typeCount).sort((a, b) => b[1] - a[1])[0];
+
+        // 平均面试轮次
+        const avgRounds = total > 0 ? (interviews.reduce((sum, i) => sum + i.round, 0) / total).toFixed(1) : "0";
+
+        // 本周面试数
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const thisWeekCount = interviews.filter((i) => new Date(i.date) >= weekAgo).length;
+
+        return {
+            passRate: completed.length > 0 ? Math.round((passCount / completed.length) * 100) : 0,
+            failRate: completed.length > 0 ? Math.round((failCount / completed.length) * 100) : 0,
+            mostUsedType: mostUsedType ? getTypeText(mostUsedType[0] as InterviewType) : "-",
+            avgRounds,
+            thisWeekCount,
+            topDepartment: (() => {
+                const deptMap: Record<string, number> = {};
+                interviews.forEach((i) => { deptMap[i.department] = (deptMap[i.department] || 0) + 1; });
+                return Object.entries(deptMap).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+            })(),
+        };
+    }, [interviews]);
+
+    const items = [
+        { label: "通过率", value: `${insights.passRate}%`, icon: <CheckCircle className="w-4 h-4" />, color: "text-emerald-500" },
+        { label: "未通过率", value: `${insights.failRate}%`, icon: <XCircle className="w-4 h-4" />, color: "text-red-500" },
+        { label: "最常用方式", value: insights.mostUsedType, icon: <Video className="w-4 h-4" />, color: "text-blue-500" },
+        { label: "平均轮次", value: `${insights.avgRounds} 轮`, icon: <Layers className="w-4 h-4" />, color: "text-purple-500" },
+        { label: "本周面试", value: `${insights.thisWeekCount} 场`, icon: <TrendingUp className="w-4 h-4" />, color: "text-pink-500" },
+        { label: "热门部门", value: insights.topDepartment, icon: <Building2 className="w-4 h-4" />, color: "text-amber-500" },
+    ];
+
+    return (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <Brain className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">数据洞察</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">智能分析面试数据</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+                {items.map((item, idx) => (
+                    <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className={item.color}>{item.icon}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{item.label}</span>
+                        </div>
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">{item.value}</p>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// 年度面试热力图 - GitHub贡献图风格
+function YearlyHeatmap({ interviews, onDateSelect }: { interviews: Interview[]; onDateSelect: (date: string) => void }) {
+    const today = new Date();
+    const yearStart = new Date(today.getFullYear(), 0, 1);
+    // 展示近12个月
+    const months: { name: string; weeks: { date: string; count: number; isToday: boolean; isFuture: boolean }[][] }[] = [];
+
+    for (let m = 0; m < 12; m++) {
+        const monthDate = new Date(today.getFullYear(), m, 1);
+        const daysInMonth = new Date(today.getFullYear(), m + 1, 0).getDate();
+        const firstDayOfWeek = monthDate.getDay();
+        const weeks: { date: string; count: number; isToday: boolean; isFuture: boolean }[][] = [];
+        let currentWeek: { date: string; count: number; isToday: boolean; isFuture: boolean }[] = [];
+
+        // 填充月初空白日
+        for (let d = 0; d < firstDayOfWeek; d++) {
+            currentWeek.push({ date: "", count: -1, isToday: false, isFuture: false });
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${today.getFullYear()}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+            const count = interviews.filter((i) => i.date === dateStr).length;
+            const dateObj = new Date(today.getFullYear(), m, d);
+            const isToday = dateObj.toDateString() === today.toDateString();
+            const isFuture = dateObj > today;
+
+            currentWeek.push({ date: dateStr, count, isToday, isFuture });
+
+            if (currentWeek.length === 7) {
+                weeks.push(currentWeek);
+                currentWeek = [];
+            }
+        }
+
+        // 填充月末剩余日
+        if (currentWeek.length > 0) {
+            while (currentWeek.length < 7) {
+                currentWeek.push({ date: "", count: -1, isToday: false, isFuture: false });
+            }
+            weeks.push(currentWeek);
+        }
+
+        months.push({ name: `${m + 1}月`, weeks });
+    }
+
+    const maxCount = Math.max(1, ...Object.values(
+        interviews.reduce((acc, iv) => {
+            acc[iv.date] = (acc[iv.date] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>)
+    ));
+    const getHeatColor = (count: number, isFuture: boolean) => {
+        if (count < 0) return "bg-transparent";
+        if (isFuture) return "bg-gray-100 dark:bg-gray-700/30";
+        if (count === 0) return "bg-gray-100 dark:bg-gray-700/50";
+        const intensity = Math.min(count / Math.max(maxCount, 4), 1);
+        if (intensity <= 0.25) return "bg-pink-200 dark:bg-pink-900/40";
+        if (intensity <= 0.5) return "bg-pink-400 dark:bg-pink-700/60";
+        if (intensity <= 0.75) return "bg-pink-500 dark:bg-pink-600/80";
+        return "bg-pink-700 dark:bg-pink-500";
+    };
+
+    return (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/20">
+                        <Activity className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">面试热力图</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{today.getFullYear()}年面试密度分布</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-400">少</span>
+                    <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-700/50" />
+                    <div className="w-3 h-3 rounded-sm bg-pink-200 dark:bg-pink-900/40" />
+                    <div className="w-3 h-3 rounded-sm bg-pink-400 dark:bg-pink-700/60" />
+                    <div className="w-3 h-3 rounded-sm bg-pink-500 dark:bg-pink-600/80" />
+                    <div className="w-3 h-3 rounded-sm bg-pink-700 dark:bg-pink-500" />
+                    <span className="text-[10px] text-gray-400">多</span>
+                </div>
+            </div>
+
+            <div className="overflow-x-auto pb-2">
+                <div className="flex gap-4 min-w-[800px]">
+                    {months.map((month, mIdx) => (
+                        <div key={mIdx} className="flex-1">
+                            <div className="text-[10px] text-gray-400 dark:text-gray-500 mb-2 text-center">{month.name}</div>
+                            <div className="flex gap-[3px]">
+                                {month.weeks.map((week, wIdx) => (
+                                    <div key={wIdx} className="flex flex-col gap-[3px]">
+                                        {week.map((day, dIdx) => (
+                                            <motion.div
+                                                key={dIdx}
+                                                whileHover={{ scale: 1.3 }}
+                                                className={`w-3 h-3 rounded-sm cursor-pointer transition-colors ${getHeatColor(day.count, day.isFuture)} ${
+                                                    day.isToday ? "ring-2 ring-pink-500 ring-offset-1" : ""
+                                                }`}
+                                                onClick={() => day.date && onDateSelect(day.date)}
+                                                title={day.date ? `${day.date} · ${day.count} 场面试` : ""}
+                                            />
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-sm ring-2 ring-pink-500 ring-offset-1 bg-pink-200 dark:bg-pink-900/40" />
+                        <span className="text-[10px] text-gray-400">今天</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-700/30" />
+                        <span className="text-[10px] text-gray-400">未来</span>
+                    </div>
+                </div>
+                <span className="text-[10px] text-gray-400">
+                    总计 {interviews.length} 场面试
+                </span>
+            </div>
+        </div>
+    );
+}
+
+// 智能排期建议面板
+function SmartSuggestion({ interviews }: { interviews: Interview[] }) {
+    const suggestions = useMemo(() => {
+        const completed = interviews.filter((i) => i.status === "completed");
+        const allTimes = completed.map((i) => i.time);
+        const passInterviews = completed.filter((i) => i.result === "pass");
+
+        // 最佳面试时段 - 通过率最高的时段
+        const passByHour: Record<string, { total: number; pass: number }> = {};
+        completed.forEach((iv) => {
+            const hour = iv.time.split(":")[0];
+            if (!passByHour[hour]) passByHour[hour] = { total: 0, pass: 0 };
+            passByHour[hour].total++;
+            if (iv.result === "pass") passByHour[hour].pass++;
+        });
+
+        const bestHour = Object.entries(passByHour)
+            .map(([h, d]) => ({ hour: `${h}:00`, rate: d.total > 0 ? Math.round((d.pass / d.total) * 100) : 0, total: d.total }))
+            .sort((a, b) => b.rate - a.rate || b.total - a.total)
+            .slice(0, 3);
+
+        // 最佳面试方式
+        const passByType: Record<string, { total: number; pass: number }> = {};
+        completed.forEach((iv) => {
+            if (!passByType[iv.type]) passByType[iv.type] = { total: 0, pass: 0 };
+            passByType[iv.type].total++;
+            if (iv.result === "pass") passByType[iv.type].pass++;
+        });
+
+        const bestType = Object.entries(passByType)
+            .map(([t, d]) => ({ type: getTypeText(t as InterviewType), rate: d.total > 0 ? Math.round((d.pass / d.total) * 100) : 0 }))
+            .sort((a, b) => b.rate - a.rate)
+            .slice(0, 1);
+
+        // 最佳面试时长
+        const passByDuration: Record<string, { total: number; pass: number }> = {};
+        completed.forEach((iv) => {
+            const dur = iv.duration;
+            if (!passByDuration[dur]) passByDuration[dur] = { total: 0, pass: 0 };
+            passByDuration[dur].total++;
+            if (iv.result === "pass") passByDuration[dur].pass++;
+        });
+
+        const bestDuration = Object.entries(passByDuration)
+            .map(([d, s]) => ({ duration: d, rate: s.total > 0 ? Math.round((s.pass / s.total) * 100) : 0 }))
+            .sort((a, b) => b.rate - a.rate)
+            .slice(0, 1);
+
+        // 本周最佳面试日
+        const dayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+        const passByDay: Record<number, { total: number; pass: number }> = {};
+        completed.forEach((iv) => {
+            const day = new Date(iv.date).getDay();
+            if (!passByDay[day]) passByDay[day] = { total: 0, pass: 0 };
+            passByDay[day].total++;
+            if (iv.result === "pass") passByDay[day].pass++;
+        });
+
+        const bestDay = Object.entries(passByDay)
+            .map(([d, s]) => ({ day: dayNames[Number(d)], rate: s.total > 0 ? Math.round((s.pass / s.total) * 100) : 0 }))
+            .sort((a, b) => b.rate - a.rate)
+            .slice(0, 1);
+
+        return { bestHour, bestType, bestDuration, bestDay };
+    }, [interviews]);
+
+    return (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                        <Wand2 className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">智能排期建议</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">基于历史通过率数据分析</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                {suggestions.bestDay.length > 0 && (
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border border-purple-100 dark:border-purple-800">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Sun className="w-4 h-4 text-purple-500" />
+                            <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">最佳面试日</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">{suggestions.bestDay[0].day}</span>
+                            <span className="text-sm text-purple-500 dark:text-purple-400">通过率 {suggestions.bestDay[0].rate}%</span>
+                        </div>
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {suggestions.bestType.length > 0 && (
+                        <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <Video className="w-3.5 h-3.5 text-blue-500" />
+                                <span className="text-xs text-gray-500 dark:text-gray-400">最佳面试方式</span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-lg font-bold text-gray-900 dark:text-white">{suggestions.bestType[0].type}</span>
+                                <span className="text-xs text-green-500">{suggestions.bestType[0].rate}%</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {suggestions.bestDuration.length > 0 && (
+                        <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <Timer className="w-3.5 h-3.5 text-emerald-500" />
+                                <span className="text-xs text-gray-500 dark:text-gray-400">最佳面试时长</span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-lg font-bold text-gray-900 dark:text-white">{suggestions.bestDuration[0].duration}</span>
+                                <span className="text-xs text-green-500">{suggestions.bestDuration[0].rate}%</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {suggestions.bestHour.length > 0 && (
+                    <div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 mb-2 block">最佳面试时段</span>
+                        <div className="flex gap-2">
+                            {suggestions.bestHour.map((h, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex-1 text-center py-2 px-3 rounded-lg bg-pink-50 dark:bg-pink-900/20 border border-pink-100 dark:border-pink-800"
+                                >
+                                    <div className="text-sm font-bold text-gray-900 dark:text-white">{h.hour}</div>
+                                    <div className="text-[10px] text-pink-500">{h.rate}% 通过率</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// 最近动态流
+function RecentActivity({ interviews, onViewInterview }: { interviews: Interview[]; onViewInterview: (id: string) => void }) {
+    const activities = useMemo(() => {
+        const acts: ActivityLog[] = [];
+        
+        interviews
+            .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+            .slice(0, 8)
+            .forEach((iv) => {
+                if (iv.status === "completed" && iv.result) {
+                    acts.push({
+                        id: `complete-${iv.id}`,
+                        interviewId: iv.id,
+                        action: getResultText(iv.result),
+                        detail: `${iv.candidateName} 的${iv.position}面试${getResultText(iv.result)}`,
+                        timestamp: iv.updatedAt,
+                        icon: iv.result === "pass" ? <CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> : <XCircle className="w-3.5 h-3.5 text-red-500" />,
+                    });
+                } else if (iv.status === "scheduled") {
+                    const createdDate = new Date(iv.createdAt);
+                    const now = new Date();
+                    const diffHours = Math.floor((now.getTime() - createdDate.getTime()) / 3600000);
+                    if (diffHours < 48) {
+                        acts.push({
+                            id: `new-${iv.id}`,
+                            interviewId: iv.id,
+                            action: "新安排",
+                            detail: `为 ${iv.candidateName} 安排了${iv.position}面试`,
+                            timestamp: iv.createdAt,
+                            icon: <CalendarCheck className="w-3.5 h-3.5 text-blue-500" />,
+                        });
+                    }
+                }
+            });
+
+        return acts.slice(0, 6);
+    }, [interviews]);
+
+    if (activities.length === 0) return null;
+
+    return (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                        <RefreshCw className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">最近动态</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">面试活动实时追踪</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                {activities.map((act, idx) => {
+                    const timestamp = new Date(act.timestamp);
+                    const now = new Date();
+                    const diffMs = now.getTime() - timestamp.getTime();
+                    const diffMin = Math.floor(diffMs / 60000);
+                    const diffHour = Math.floor(diffMs / 3600000);
+                    const timeStr = diffMin < 1 ? "刚刚" : diffMin < 60 ? `${diffMin}分钟前` : diffHour < 24 ? `${diffHour}小时前` : `${Math.floor(diffHour / 24)}天前`;
+
+                    return (
+                        <motion.div
+                            key={act.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.05 }}
+                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                            onClick={() => onViewInterview(act.interviewId)}
+                        >
+                            <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                                {act.icon}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm text-gray-900 dark:text-white truncate">{act.detail}</p>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{timeStr}</p>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex-shrink-0">
+                                {act.action}
+                            </span>
+                        </motion.div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+// 面试卡片 - 增强版
 function InterviewCard({ interview, onView, onEdit, onEvaluate, selected, onSelect }: {
     interview: Interview;
     onView: () => void;
@@ -467,16 +1299,43 @@ function InterviewCard({ interview, onView, onEdit, onEvaluate, selected, onSele
 
     const isPast = new Date(`${interview.date}T${interview.endTime}`) < new Date() && interview.status === "scheduled";
 
+    // 计算面试时间距离现在的时间
+    const getTimeStatus = () => {
+        if (interview.status !== "scheduled") return null;
+        const now = new Date();
+        const start = new Date(`${interview.date}T${interview.time}`);
+        const diffMs = start.getTime() - now.getTime();
+        if (diffMs < 0) return { label: "已开始", color: "text-amber-600 dark:text-amber-400" };
+        const diffMin = Math.floor(diffMs / 60000);
+        if (diffMin <= 30) return { label: `${diffMin}分钟后`, color: "text-pink-600 dark:text-pink-400" };
+        if (diffMin <= 60) return { label: `${diffMin}分钟后`, color: "text-gray-500 dark:text-gray-400" };
+        return null;
+    };
+
+    const timeStatus = getTimeStatus();
+
     return (
         <motion.div
             layout
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            className={`group bg-white dark:bg-gray-800 rounded-2xl p-5 border shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${selected ? "border-indigo-400 dark:border-indigo-500 ring-2 ring-indigo-100 dark:ring-indigo-900" : "border-gray-100 dark:border-gray-700"
-                }`}
+            whileHover={{ y: -2 }}
+            className={`group relative bg-white dark:bg-gray-800 rounded-2xl p-5 border shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer ${
+                selected
+                    ? "border-pink-400 dark:border-pink-500 ring-2 ring-pink-100 dark:ring-pink-900/30"
+                    : "border-gray-100 dark:border-gray-700 hover:border-pink-200 dark:hover:border-pink-800/50"
+            }`}
             onClick={() => onView()}
         >
+            {/* 左侧状态指示条 */}
+            <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-full ${
+                interview.status === "completed" ? "bg-emerald-500" :
+                interview.status === "scheduled" ? "bg-pink-500" :
+                interview.status === "pending" ? "bg-amber-500" :
+                "bg-gray-300 dark:bg-gray-600"
+            }`} />
+
             <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                     <label className="relative flex items-center" onClick={(e) => e.stopPropagation()}>
@@ -484,15 +1343,46 @@ function InterviewCard({ interview, onView, onEdit, onEvaluate, selected, onSele
                             type="checkbox"
                             checked={selected}
                             onChange={() => onSelect(interview.id)}
-                            className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                            className="w-4 h-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500 cursor-pointer"
                         />
                     </label>
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-sm bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md">
-                        {interview.candidateAvatar}
+                    <div className="relative">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-sm bg-gradient-to-br from-pink-500 to-rose-500 shadow-lg shadow-pink-500/20">
+                            {interview.candidateAvatar}
+                        </div>
+                        {timeStatus && (
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-pink-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse" />
+                        )}
                     </div>
                     <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{interview.candidateName}</h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{interview.position} · {interview.department}</p>
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{interview.candidateName}</h3>
+                            {timeStatus && (
+                                <span className={`text-[10px] font-semibold ${timeStatus.color} animate-pulse`}>
+                                    {timeStatus.label}
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{interview.position} · {interview.department}</p>
+                        <RoundProgress round={interview.round} total={interview.totalRounds} />
+                        {/* 标签和优先级 */}
+                        <div className="flex items-center gap-1.5 mt-1.5">
+                            {getPriorityConfig(interview.priority) && (
+                                <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-gray-50 dark:bg-gray-700/50 ${getPriorityConfig(interview.priority).color}`}>
+                                    {getPriorityConfig(interview.priority).icon}
+                                    {getPriorityConfig(interview.priority).label}优先
+                                </span>
+                            )}
+                            {interview.tags.slice(0, 3).map((tag) => {
+                                const config = getTagConfig(tag);
+                                return (
+                                    <span key={tag} className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-medium border ${config.color}`}>
+                                        {config.icon}
+                                        {tag}
+                                    </span>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -512,16 +1402,16 @@ function InterviewCard({ interview, onView, onEdit, onEvaluate, selected, onSele
                             <MoreHorizontal className="w-4 h-4 text-gray-400" />
                         </button>
                         {menuOpen && (
-                            <div className="absolute right-0 top-8 w-36 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-1 z-50">
-                                <button onClick={() => { onView(); setMenuOpen(false); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                                    <Eye className="w-3.5 h-3.5" /> 查看详情
+                            <div className="absolute right-0 top-8 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-1 z-50">
+                                <button onClick={() => { onView(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                                    <Eye className="w-3.5 h-3.5 text-gray-400" /> 查看详情
                                 </button>
-                                <button onClick={() => { onEdit(); setMenuOpen(false); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                                    <Edit className="w-3.5 h-3.5" /> 编辑
+                                <button onClick={() => { onEdit(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                                    <Edit className="w-3.5 h-3.5 text-gray-400" /> 编辑
                                 </button>
                                 {interview.status === "completed" && (
-                                    <button onClick={() => { onEvaluate(); setMenuOpen(false); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                                        <ClipboardList className="w-3.5 h-3.5" /> 评价
+                                    <button onClick={() => { onEvaluate(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                                        <ClipboardList className="w-3.5 h-3.5 text-gray-400" /> 评价
                                     </button>
                                 )}
                             </div>
@@ -532,19 +1422,19 @@ function InterviewCard({ interview, onView, onEdit, onEvaluate, selected, onSele
 
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <Calendar className="w-3.5 h-3.5" />
+                    <Calendar className="w-3.5 h-3.5 text-pink-400" />
                     <span>{interview.date}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <Clock className="w-3.5 h-3.5" />
+                    <Clock className="w-3.5 h-3.5 text-pink-400" />
                     <span>{interview.time} - {interview.endTime}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    {getTypeIcon(interview.type)}
+                    <span className="text-pink-400">{getTypeIcon(interview.type)}</span>
                     <span>{getTypeText(interview.type)}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <User className="w-3.5 h-3.5" />
+                    <User className="w-3.5 h-3.5 text-pink-400" />
                     <span>{interview.interviewer}</span>
                 </div>
             </div>
@@ -722,6 +1612,8 @@ function InterviewFormModal({ interview, onClose, onSave }: {
         round: interview?.round || 1,
         totalRounds: interview?.totalRounds || 3,
         notes: interview?.notes || "",
+        priority: interview?.priority || "medium" as InterviewPriority,
+        tags: interview?.tags || [] as InterviewTag[],
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -892,6 +1784,58 @@ function InterviewFormModal({ interview, onClose, onSave }: {
                                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
                                 placeholder="会议室或视频链接"
                             />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">优先级</label>
+                            <div className="flex gap-2">
+                                {(["critical", "high", "medium", "low"] as InterviewPriority[]).map((p) => {
+                                    const cfg = getPriorityConfig(p);
+                                    return (
+                                        <button
+                                            key={p}
+                                            type="button"
+                                            onClick={() => setForm({ ...form, priority: p })}
+                                            className={`flex-1 py-2 rounded-xl text-xs font-medium border transition-all ${
+                                                form.priority === p
+                                                    ? `bg-gradient-to-r ${cfg.gradient} text-white border-transparent shadow-md`
+                                                    : "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-300"
+                                            }`}
+                                        >
+                                            <span className="flex items-center justify-center gap-1">{cfg.icon}{cfg.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">标签</label>
+                            <div className="flex flex-wrap gap-1.5">
+                                {(["紧急", "急聘", "高管", "核心岗位", "社招", "校招", "实习", "储备"] as InterviewTag[]).map((tag) => {
+                                    const cfg = getTagConfig(tag);
+                                    const isSelected = form.tags.includes(tag);
+                                    return (
+                                        <button
+                                            key={tag}
+                                            type="button"
+                                            onClick={() => {
+                                                const newTags = isSelected
+                                                    ? form.tags.filter((t) => t !== tag)
+                                                    : [...form.tags, tag];
+                                                setForm({ ...form, tags: newTags });
+                                            }}
+                                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium border transition-all ${
+                                                isSelected ? `${cfg.color} shadow-sm` : "border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500"
+                                            }`}
+                                        >
+                                            {cfg.icon}
+                                            {tag}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
 
@@ -1134,6 +2078,25 @@ function DetailModal({ interview, onClose, onEdit, onEvaluate }: {
                             <InfoRow icon={<Briefcase className="w-4 h-4" />} label="部门" value={interview.department} />
                             <InfoRow icon={<Layers className="w-4 h-4" />} label="轮次" value={`第 ${interview.round} 轮 / 共 ${interview.totalRounds} 轮`} />
                         </div>
+                        {interview.tags.length > 0 && (
+                            <div className="mt-3 flex items-center gap-2 flex-wrap">
+                                {getPriorityConfig(interview.priority) && (
+                                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium shadow-sm bg-gradient-to-r ${getPriorityConfig(interview.priority).gradient} text-white`}>
+                                        {getPriorityConfig(interview.priority).icon}
+                                        {getPriorityConfig(interview.priority).label}优先级
+                                    </span>
+                                )}
+                                {interview.tags.map((tag) => {
+                                    const config = getTagConfig(tag);
+                                    return (
+                                        <span key={tag} className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium border ${config.color}`}>
+                                            {config.icon}
+                                            {tag}
+                                        </span>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
 
                     {/* 面试信息 */}
@@ -1178,14 +2141,36 @@ function DetailModal({ interview, onClose, onEdit, onEvaluate }: {
                             <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">面试反馈</h3>
                             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
                                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{interview.feedback}</p>
-                                {interview.rating && (
-                                    <div className="flex items-center gap-1 mt-3">
-                                        <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">综合评分:</span>
-                                        {[1, 2, 3, 4, 5].map((s) => (
-                                            <Star key={s} className={`w-4 h-4 ${s <= interview.rating! ? "text-amber-400 fill-amber-400" : "text-gray-300 dark:text-gray-600"}`} />
-                                        ))}
-                                    </div>
-                                )}
+                                <div className="flex items-center gap-3 mt-3">
+                                    {interview.rating && (
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">综合评分:</span>
+                                            {[1, 2, 3, 4, 5].map((s) => (
+                                                <Star key={s} className={`w-4 h-4 ${s <= interview.rating! ? "text-amber-400 fill-amber-400" : "text-gray-300 dark:text-gray-600"}`} />
+                                            ))}
+                                        </div>
+                                    )}
+                                    {interview.feedbackSentiment && (
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-xs text-gray-400 mr-1">情感:</span>
+                                            {interview.feedbackSentiment === "positive" && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                                    <Smile className="w-3 h-3" />积极
+                                                </span>
+                                            )}
+                                            {interview.feedbackSentiment === "neutral" && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                                                    <Meh className="w-3 h-3" />中性
+                                                </span>
+                                            )}
+                                            {interview.feedbackSentiment === "negative" && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                                                    <Frown className="w-3 h-3" />消极
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -1405,6 +2390,8 @@ export default function Interview() {
                 interviewerAvatar: (data.interviewer || "面")[0],
                 status: "scheduled",
                 result: null,
+                priority: data.priority || "medium",
+                tags: data.tags || [],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 ...data,
@@ -1450,7 +2437,9 @@ export default function Interview() {
     }, [interviews]);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen relative">
+            <AnimatedBackground />
+            <ParticleField />
             <Navbar />
 
             {/* 面试提醒弹窗 */}
@@ -1461,47 +2450,72 @@ export default function Interview() {
                 />
             )}
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
                 <BackButton />
 
-                {/* 页面标题 */}
+                {/* Hero Header - 与简历分析页面布局一致 */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
                 >
-                    <div>
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                            面试管理
-                        </h1>
-                        <p className="text-lg text-gray-500 dark:text-gray-400">
-                            安排和管理候选人面试，跟踪面试进度与结果
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => openModal("add")}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                    <div className="text-center mb-12">
+                        <motion.div
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+                            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 rounded-3xl shadow-2xl shadow-pink-500/30 mb-8 relative"
                         >
-                            <Plus className="w-5 h-5" />
-                            <span>安排面试</span>
-                        </button>
+                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent" />
+                            <Calendar className="w-10 h-10 text-white relative z-10" />
+                            <motion.div
+                                className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-pink-500/20 to-pink-500/20 blur-xl"
+                                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                                transition={{ duration: 3, repeat: Infinity }}
+                            />
+                        </motion.div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                            className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6"
+                        >
+                            <span className="bg-gradient-to-r from-gray-900 via-pink-800 to-rose-800 dark:from-white dark:via-pink-200 dark:to-rose-200 bg-clip-text text-transparent">
+                                面试管理
+                            </span>
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.6 }}
+                            className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed"
+                        >
+                            安排和管理候选人面试，记录面试反馈
+                            <br className="hidden sm:block" />
+                            <span className="text-pink-600 dark:text-pink-400 font-medium">跟踪面试进度与结果</span>
+                        </motion.p>
                     </div>
                 </motion.div>
+
+                {/* 今日日程时间线 */}
+                <TodayTimeline interviews={stats.todayInterviews} />
 
                 {/* 统计卡片 */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+                    className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"
                 >
                     <StatCard
                         icon={<CalendarCheck className="w-5 h-5" />}
                         label="今日面试"
                         value={stats.todayInterviews.length}
                         sub="场"
-                        color="#3b82f6"
+                        color="#ec4899"
+                        gradient="linear-gradient(135deg, #fdf2f8, #fce7f3)"
                         trend={{ value: "8%", up: true }}
                     />
                     <StatCard
@@ -1510,6 +2524,7 @@ export default function Interview() {
                         value={interviews.length}
                         sub="场"
                         color="#8b5cf6"
+                        gradient="linear-gradient(135deg, #f5f3ff, #ede9fe)"
                     />
                     <StatCard
                         icon={<CheckCircle className="w-5 h-5" />}
@@ -1517,6 +2532,7 @@ export default function Interview() {
                         value={`${stats.passRate}%`}
                         sub={`${stats.passCount}/${stats.completed.length} 人通过`}
                         color="#10b981"
+                        gradient="linear-gradient(135deg, #ecfdf5, #d1fae5)"
                     />
                     <StatCard
                         icon={<AlertCircle className="w-5 h-5" />}
@@ -1524,7 +2540,76 @@ export default function Interview() {
                         value={stats.statusCounts.pending}
                         sub="场"
                         color="#f59e0b"
+                        gradient="linear-gradient(135deg, #fffbeb, #fef3c7)"
                     />
+                </motion.div>
+
+                {/* 快速操作面板 */}
+                <QuickActions onAdd={() => openModal("add")} onExport={() => {
+                    const data = filteredInterviews.map(i => ({
+                        姓名: i.candidateName,
+                        职位: i.position,
+                        部门: i.department,
+                        日期: i.date,
+                        时间: `${i.time}-${i.endTime}`,
+                        面试官: i.interviewer,
+                        类型: getTypeText(i.type),
+                        状态: getStatusText(i.status),
+                        结果: getResultText(i.result),
+                        优先级: getPriorityConfig(i.priority).label,
+                    }));
+                    const csv = [Object.keys(data[0] || {}).join(",")].concat(data.map(r => Object.values(r).join(","))).join("\n");
+                    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `面试数据_${new Date().toISOString().split("T")[0]}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }} />
+
+                {/* 智能面板 - 排期建议 + 最近动态 */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
+                >
+                    <SmartSuggestion interviews={interviews} />
+                    <RecentActivity 
+                        interviews={interviews} 
+                        onViewInterview={(id) => {
+                            const iv = interviews.find((i) => i.id === id);
+                            if (iv) openModal("detail", iv);
+                        }}
+                    />
+                </motion.div>
+
+                {/* 年度面试热力图（列表视图可见） */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                >
+                    <YearlyHeatmap 
+                        interviews={interviews} 
+                        onDateSelect={(date) => {
+                            const [y, m, d] = date.split("-").map(Number);
+                            setSelectedDate(new Date(y, m - 1, d));
+                            setViewMode("calendar");
+                        }} 
+                    />
+                </motion.div>
+
+                {/* 排行榜 + 数据洞察 */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
+                >
+                    <InterviewerRanking interviews={interviews} />
+                    <DataInsights interviews={interviews} />
                 </motion.div>
 
                 {/* 视图切换与工具栏 */}
@@ -1532,10 +2617,10 @@ export default function Interview() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm mb-6"
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm mb-6 overflow-hidden"
                 >
                     <div className="flex flex-col md:flex-row md:items-center justify-between p-4 gap-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
                             {([
                                 { key: "list", label: "列表", icon: <ClipboardList className="w-4 h-4" /> },
                                 { key: "calendar", label: "日历", icon: <Calendar className="w-4 h-4" /> },
@@ -1544,9 +2629,9 @@ export default function Interview() {
                                 <button
                                     key={v.key}
                                     onClick={() => { setViewMode(v.key); setSelectedIds(new Set()); }}
-                                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${viewMode === v.key
-                                            ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400"
-                                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${viewMode === v.key
+                                            ? "bg-white dark:bg-gray-800 text-pink-600 dark:text-pink-400 shadow-sm"
+                                            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                                         }`}
                                 >
                                     {v.icon}
@@ -1563,13 +2648,13 @@ export default function Interview() {
                                     placeholder="搜索候选人、职位、面试官..."
                                     value={searchQuery}
                                     onChange={(e) => handleSearchChange(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all"
                                 />
                             </div>
                             <select
                                 value={filterStatus}
                                 onChange={(e) => setFilterStatus(e.target.value)}
-                                className="px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-pink-500 outline-none"
                             >
                                 <option value="all">全部状态</option>
                                 <option value="scheduled">已安排</option>
@@ -1580,26 +2665,59 @@ export default function Interview() {
                             <select
                                 value={filterType}
                                 onChange={(e) => setFilterType(e.target.value)}
-                                className="px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-pink-500 outline-none"
                             >
                                 <option value="all">全部方式</option>
                                 <option value="video">视频面试</option>
                                 <option value="onsite">现场面试</option>
                                 <option value="phone">电话面试</option>
                             </select>
+                            <button
+                                onClick={() => {
+                                    // 导出功能
+                                    const data = filteredInterviews.map(i => ({
+                                        姓名: i.candidateName,
+                                        职位: i.position,
+                                        部门: i.department,
+                                        日期: i.date,
+                                        时间: `${i.time}-${i.endTime}`,
+                                        面试官: i.interviewer,
+                                        类型: getTypeText(i.type),
+                                        状态: getStatusText(i.status),
+                                        结果: getResultText(i.result),
+                                    }));
+                                    const csv = [Object.keys(data[0] || {}).join(",")].concat(data.map(r => Object.values(r).join(","))).join("\n");
+                                    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement("a");
+                                    a.href = url;
+                                    a.download = `面试数据_${new Date().toISOString().split("T")[0]}.csv`;
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                }}
+                                className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors"
+                                title="导出数据"
+                            >
+                                <Download className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
 
                     {/* 批量操作栏 */}
                     {selectedIds.size > 0 && (
-                        <div className="flex items-center justify-between px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 border-t border-indigo-100 dark:border-indigo-800">
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="flex items-center justify-between px-4 py-3 bg-pink-50 dark:bg-pink-900/20 border-t border-pink-100 dark:border-pink-800"
+                        >
                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-indigo-700 dark:text-indigo-400">
+                                <span className="text-sm font-medium text-pink-700 dark:text-pink-400">
                                     已选择 {selectedIds.size} 项
                                 </span>
                                 <button
                                     onClick={handleSelectAll}
-                                    className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                                    className="text-sm text-pink-600 dark:text-pink-400 hover:underline"
                                 >
                                     {selectedIds.size === filteredInterviews.length ? "取消全选" : "全选"}
                                 </button>
@@ -1608,7 +2726,7 @@ export default function Interview() {
                                 <div className="relative">
                                     <button
                                         onClick={() => setBatchMenuOpen(!batchMenuOpen)}
-                                        className="px-4 py-2 rounded-xl text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors flex items-center gap-1.5"
+                                        className="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:shadow-lg transition-all flex items-center gap-1.5"
                                     >
                                         批量操作
                                         <ChevronDown className="w-4 h-4" />
@@ -1632,7 +2750,7 @@ export default function Interview() {
                                     )}
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     )}
                 </motion.div>
 
@@ -1777,6 +2895,98 @@ export default function Interview() {
                                         <p className="text-gray-500 dark:text-gray-400">当日暂无面试安排</p>
                                     </div>
                                 )}
+                            </div>
+                        </div>
+
+                        {/* 面试类型通过率对比 */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">面试方式通过率</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">各面试方式效果对比</p>
+                                    </div>
+                                    <Video className="w-5 h-5 text-blue-500" />
+                                </div>
+                                <div className="space-y-4">
+                                    {(["video", "onsite", "phone"] as InterviewType[]).map((type) => {
+                                        const typeInterviews = interviews.filter((i) => i.type === type && i.status === "completed");
+                                        const typePass = typeInterviews.filter((i) => i.result === "pass").length;
+                                        const typeRate = typeInterviews.length > 0 ? Math.round((typePass / typeInterviews.length) * 100) : 0;
+                                        return (
+                                            <div key={type}>
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-pink-400">{getTypeIcon(type)}</span>
+                                                        <span className="text-sm text-gray-600 dark:text-gray-400">{getTypeText(type)}</span>
+                                                    </div>
+                                                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                        {typeRate}% ({typePass}/{typeInterviews.length})
+                                                    </span>
+                                                </div>
+                                                <div className="h-2.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <motion.div
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: `${typeRate}%` }}
+                                                        transition={{ duration: 0.8, ease: "easeOut" }}
+                                                        className="h-full rounded-full bg-gradient-to-r from-pink-400 to-rose-400"
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">反馈情感分布</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">面试反馈情感分析</p>
+                                    </div>
+                                    <Smile className="w-5 h-5 text-emerald-500" />
+                                </div>
+                                {(() => {
+                                    const withFeedback = interviews.filter((i) => i.feedbackSentiment);
+                                    const positive = withFeedback.filter((i) => i.feedbackSentiment === "positive").length;
+                                    const neutral = withFeedback.filter((i) => i.feedbackSentiment === "neutral").length;
+                                    const negative = withFeedback.filter((i) => i.feedbackSentiment === "negative").length;
+                                    const total = withFeedback.length || 1;
+                                    const sentiments = [
+                                        { emoticon: "😊", label: "积极", count: positive, color: "from-emerald-400 to-green-500", bgColor: "bg-emerald-50 dark:bg-emerald-900/20", textColor: "text-emerald-600 dark:text-emerald-400" },
+                                        { emoticon: "😐", label: "中性", count: neutral, color: "from-amber-400 to-yellow-500", bgColor: "bg-amber-50 dark:bg-amber-900/20", textColor: "text-amber-600 dark:text-amber-400" },
+                                        { emoticon: "😟", label: "消极", count: negative, color: "from-red-400 to-rose-500", bgColor: "bg-red-50 dark:bg-red-900/20", textColor: "text-red-600 dark:text-red-400" },
+                                    ];
+                                    return (
+                                        <div className="space-y-3">
+                                            {sentiments.map((s, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: idx * 0.1 }}
+                                                    className={`${s.bgColor} rounded-xl p-3`}
+                                                >
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xl">{s.emoticon}</span>
+                                                            <span className={`text-sm font-medium ${s.textColor}`}>{s.label}</span>
+                                                        </div>
+                                                        <span className={`text-sm font-bold ${s.textColor}`}>{s.count}</span>
+                                                    </div>
+                                                    <div className="h-2 bg-white/50 dark:bg-gray-800/50 rounded-full overflow-hidden">
+                                                        <motion.div
+                                                            initial={{ width: 0 }}
+                                                            animate={{ width: `${Math.round((s.count / total) * 100)}%` }}
+                                                            transition={{ duration: 0.8, delay: idx * 0.1 }}
+                                                            className={`h-full rounded-full bg-gradient-to-r ${s.color}`}
+                                                        />
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </motion.div>
