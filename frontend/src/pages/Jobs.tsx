@@ -43,6 +43,12 @@ import {
   Sparkles,
   Zap,
   ChevronRight,
+  BarChart3,
+  SlidersHorizontal,
+  CheckSquare,
+  Download,
+  Keyboard,
+  Wand2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
@@ -755,6 +761,20 @@ export default function Jobs() {
   const sortRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // ── 新功能状态 ──
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [batchMode, setBatchMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [advFilters, setAdvFilters] = useState({
+    salaryMin: "",
+    salaryMax: "",
+    experience: "",
+    education: "",
+  });
+
   const [formData, setFormData] = useState({
     title: "",
     department: "",
@@ -795,6 +815,36 @@ export default function Jobs() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // ── 键盘快捷键 ──
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT") return;
+      const ctrl = e.ctrlKey || e.metaKey;
+
+      if (e.key === "Escape") {
+        setShowModal(false);
+        setShowDetail(false);
+        setShowShortcuts(false);
+        setBatchMode(false);
+        setSelectedIds([]);
+        setActiveDropdown(null);
+      } else if (!e.ctrlKey && !e.metaKey && e.key === "?") {
+        e.preventDefault();
+        setShowShortcuts((prev) => !prev);
+      } else if (ctrl && e.key === "d") {
+        e.preventDefault();
+        setShowDashboard((prev) => !prev);
+      } else if (ctrl && e.key === "b") {
+        e.preventDefault();
+        setBatchMode((prev) => !prev);
+        setSelectedIds([]);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // 筛选与排序
   const filteredJobs = useMemo(() => {
     const result = jobs.filter((job) => {
@@ -806,7 +856,16 @@ export default function Jobs() {
         job.location.toLowerCase().includes(kw) ||
         job.requirements.some((r) => r.toLowerCase().includes(kw));
       const matchStatus = filterStatus === "all" || job.status === filterStatus;
-      return matchKeyword && matchStatus;
+      // 高级搜索过滤
+      const getSalaryNum = (s: string, index: 0 | 1) => {
+        const m = s.match(/(\d+)/g);
+        return m ? parseInt(m[index]) : 0;
+      };
+      const matchSalaryMin = !advFilters.salaryMin || getSalaryNum(job.salary, 0) >= parseInt(advFilters.salaryMin);
+      const matchSalaryMax = !advFilters.salaryMax || getSalaryNum(job.salary, 1) <= parseInt(advFilters.salaryMax);
+      const matchExperience = !advFilters.experience || job.experience === advFilters.experience;
+      const matchEducation = !advFilters.education || job.education === advFilters.education;
+      return matchKeyword && matchStatus && matchSalaryMin && matchSalaryMax && matchExperience && matchEducation;
     });
 
     result.sort((a, b) => {
@@ -830,7 +889,7 @@ export default function Jobs() {
     });
 
     return result;
-  }, [jobs, searchKeyword, filterStatus, sortBy]);
+  }, [jobs, searchKeyword, filterStatus, sortBy, advFilters]);
 
   // 统计数据
   const stats = useMemo(
@@ -999,6 +1058,95 @@ export default function Jobs() {
     setActiveDropdown(null);
   };
 
+  // ── 批量操作 ──
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === filteredJobs.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredJobs.map((j) => j.id));
+    }
+  };
+
+  const handleBatchToggle = (status: Job["status"]) => {
+    const statusLabel = status === "active" ? "开启" : status === "closed" ? "关闭" : "转为草稿";
+    setJobs((prev) =>
+      prev.map((j) =>
+        selectedIds.includes(j.id)
+          ? { ...j, status, updatedAt: new Date().toISOString().split("T")[0] }
+          : j
+      )
+    );
+    addToast(`已批量${statusLabel} ${selectedIds.length} 个职位`);
+    setSelectedIds([]);
+    setBatchMode(false);
+  };
+
+  const handleBatchDelete = () => {
+    setJobs((prev) => prev.filter((j) => !selectedIds.includes(j.id)));
+    addToast(`已删除 ${selectedIds.length} 个职位`);
+    setSelectedIds([]);
+    setBatchMode(false);
+  };
+
+  // ── CSV 导出 ──
+  const handleExportCSV = () => {
+    const headers = ["职位名称", "部门", "地点", "薪资", "类型", "经验", "学历", "状态", "申请数", "浏览量", "创建日期"];
+    const rows = filteredJobs.map((j) => [
+      j.title,
+      j.department,
+      j.location,
+      j.salary,
+      j.type,
+      j.experience,
+      j.education,
+      j.status === "active" ? "招聘中" : j.status === "closed" ? "已关闭" : "草稿",
+      String(j.applicants),
+      String(j.views),
+      j.createdAt,
+    ]);
+    const csv = [headers.map((h) => `"${h}"`).join(","), ...rows.map((r) => r.map((c) => `"${c}"`).join(","))].join("\n");
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `职位数据_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    addToast(`已导出 ${filteredJobs.length} 条职位数据`);
+  };
+
+  // ── AI 优化 ──
+  const handleAIOptimize = async () => {
+    if (!formData.description.trim() && formData.requirements.length === 0) {
+      addToast("请先填写职位描述或任职要求", "error");
+      return;
+    }
+    setAiLoading(true);
+    addToast("AI 正在优化职位描述...", "info");
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const optimizedDesc = formData.description
+        ? `【AI优化】${formData.description}\n\n我们正在寻找充满热情的优秀人才加入我们的团队。在这里，你将与行业顶尖伙伴一起工作，参与有挑战性的项目，获得快速的职业成长和行业领先的薪酬福利。`
+        : "";
+      setFormData((prev) => ({
+        ...prev,
+        description: optimizedDesc || prev.description,
+      }));
+      addToast("AI 优化完成，请查看并确认修改");
+    } catch {
+      addToast("AI 优化失败，请重试", "error");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const sortOptions: { value: SortBy; label: string }[] = [
     { value: "newest", label: "最新发布" },
     { value: "oldest", label: "最早发布" },
@@ -1162,6 +1310,79 @@ export default function Jobs() {
             ))}
           </div>
 
+          {/* ─── 数据仪表板（可折叠） ─── */}
+          <AnimatePresence>
+            {showDashboard && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden mb-6"
+              >
+                <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl border border-gray-100/80 dark:border-gray-700/50 p-5 sm:p-6">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      <BarChart3 className="w-4.5 h-4.5 text-orange-500" />
+                      招聘数据分析看板
+                    </h3>
+                    <button
+                      onClick={() => setShowDashboard(false)}
+                      className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-5">
+                    {[
+                      { label: "招聘中", value: stats.active, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-500/10", bar: "bg-emerald-500" },
+                      { label: "已关闭", value: jobs.filter((j) => j.status === "closed").length, color: "text-red-500", bg: "bg-red-50 dark:bg-red-500/10", bar: "bg-red-500" },
+                      { label: "草稿", value: stats.draft, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-500/10", bar: "bg-amber-500" },
+                      { label: "总申请", value: stats.totalApplicants, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-500/10", bar: "bg-blue-500" },
+                      { label: "总浏览", value: stats.totalViews, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-500/10", bar: "bg-purple-500" },
+                    ].map((item) => (
+                      <div key={item.label} className={`${item.bg} rounded-xl p-4`}>
+                        <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">{item.label}</p>
+                        <p className={`text-xl font-bold ${item.color}`}>{item.value.toLocaleString()}</p>
+                        <div className="mt-2 h-1.5 bg-gray-200/50 dark:bg-gray-600/30 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${item.bar} rounded-full transition-all duration-700`}
+                            style={{ width: `${Math.min(100, (item.value / Math.max(stats.total, 1)) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* 部门分布 */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-3">部门职位分布</h4>
+                    <div className="space-y-2">
+                      {(() => {
+                        const deptMap: Record<string, number> = {};
+                        jobs.forEach((j) => { deptMap[j.department] = (deptMap[j.department] || 0) + 1; });
+                        return Object.entries(deptMap)
+                          .sort((a, b) => b[1] - a[1])
+                          .map(([dept, count]) => (
+                            <div key={dept} className="flex items-center gap-3">
+                              <span className="text-xs text-gray-700 dark:text-gray-300 w-20 truncate">{dept}</span>
+                              <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${(count / jobs.length) * 100}%` }}
+                                  transition={{ duration: 0.8, delay: 0.2 }}
+                                  className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full"
+                                />
+                              </div>
+                              <span className="text-[11px] font-mono text-gray-500 dark:text-gray-400 w-6 text-right">{count}</span>
+                            </div>
+                          ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* ─── 搜索与筛选栏 ─── */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1281,9 +1502,194 @@ export default function Jobs() {
                     <List className="w-4 h-4" />
                   </button>
                 </div>
+
+                {/* 新功能按钮组 */}
+                <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-gray-200/60 dark:border-gray-600/40">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowDashboard(!showDashboard)}
+                    className={`p-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                      showDashboard
+                        ? "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 ring-1 ring-orange-200 dark:ring-orange-800/50"
+                        : "bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-500"
+                    }`}
+                    title="分析看板 (Ctrl+D)"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                    className={`p-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                      showAdvancedSearch || advFilters.salaryMin || advFilters.salaryMax || advFilters.experience || advFilters.education
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 ring-1 ring-blue-200 dark:ring-blue-800/50"
+                        : "bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-500"
+                    }`}
+                    title="高级搜索"
+                  >
+                    <SlidersHorizontal className="w-4 h-4" />
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => { setBatchMode(!batchMode); setSelectedIds([]); }}
+                    className={`p-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                      batchMode
+                        ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 ring-1 ring-green-200 dark:ring-green-800/50"
+                        : "bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-500"
+                    }`}
+                    title="批量操作 (Ctrl+B)"
+                  >
+                    <CheckSquare className="w-4 h-4" />
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleExportCSV}
+                    className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-500 transition-all duration-200"
+                    title="导出CSV (Ctrl+S)"
+                  >
+                    <Download className="w-4 h-4" />
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowShortcuts(!showShortcuts)}
+                    className={`p-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                      showShortcuts
+                        ? "bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300"
+                        : "bg-gray-50 dark:bg-gray-700/50 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-600 dark:hover:text-gray-300"
+                    }`}
+                    title="快捷键 (? 键)"
+                  >
+                    <Keyboard className="w-4 h-4" />
+                  </motion.button>
+                </div>
               </div>
+
+              {/* 高级搜索面板 */}
+              <AnimatePresence>
+                {showAdvancedSearch && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/50 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">最低薪资(K)</label>
+                        <input
+                          type="number"
+                          value={advFilters.salaryMin}
+                          onChange={(e) => setAdvFilters({ ...advFilters, salaryMin: e.target.value })}
+                          className="w-full px-3 py-2 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all text-gray-900 dark:text-white"
+                          placeholder="如 15"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">最高薪资(K)</label>
+                        <input
+                          type="number"
+                          value={advFilters.salaryMax}
+                          onChange={(e) => setAdvFilters({ ...advFilters, salaryMax: e.target.value })}
+                          className="w-full px-3 py-2 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all text-gray-900 dark:text-white"
+                          placeholder="如 40"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">经验要求</label>
+                        <select
+                          value={advFilters.experience}
+                          onChange={(e) => setAdvFilters({ ...advFilters, experience: e.target.value })}
+                          className="w-full px-3 py-2 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all text-gray-900 dark:text-white"
+                        >
+                          <option value="">不限</option>
+                          <option value="应届生">应届生</option>
+                          <option value="1年以内">1年以内</option>
+                          <option value="1-3年">1-3年</option>
+                          <option value="3-5年">3-5年</option>
+                          <option value="5年以上">5年以上</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">学历要求</label>
+                        <select
+                          value={advFilters.education}
+                          onChange={(e) => setAdvFilters({ ...advFilters, education: e.target.value })}
+                          className="w-full px-3 py-2 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all text-gray-900 dark:text-white"
+                        >
+                          <option value="">不限</option>
+                          <option value="大专">大专</option>
+                          <option value="本科">本科</option>
+                          <option value="硕士">硕士</option>
+                          <option value="博士">博士</option>
+                        </select>
+                      </div>
+                      {(advFilters.salaryMin || advFilters.salaryMax || advFilters.experience || advFilters.education) && (
+                        <div className="sm:col-span-2 lg:col-span-4 flex justify-end">
+                          <button
+                            onClick={() => setAdvFilters({ salaryMin: "", salaryMax: "", experience: "", education: "" })}
+                            className="text-xs text-gray-500 hover:text-red-500 transition-colors"
+                          >
+                            清除高级筛选
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
+
+          {/* ─── 批量操作栏 ─── */}
+          <AnimatePresence>
+            {batchMode && selectedIds.length !== 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-4 p-3 bg-green-50/90 dark:bg-green-900/20 backdrop-blur-sm rounded-xl border border-green-200/60 dark:border-green-800/30 flex flex-wrap items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm font-semibold text-green-700 dark:text-green-300">
+                    已选择 {selectedIds.length} 项
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={handleSelectAll}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 rounded-lg border border-gray-200/80 dark:border-gray-600 hover:border-gray-300 transition-colors"
+                  >
+                    {selectedIds.length === filteredJobs.length ? "取消全选" : "全选"}
+                  </button>
+                  <button
+                    onClick={() => handleBatchToggle("active")}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors"
+                  >
+                    批量开启
+                  </button>
+                  <button
+                    onClick={() => handleBatchToggle("draft")}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition-colors"
+                  >
+                    批量草稿
+                  </button>
+                  <button
+                    onClick={() => handleBatchToggle("closed")}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+                  >
+                    批量关闭
+                  </button>
+                  <button
+                    onClick={handleBatchDelete}
+                    className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200/60 dark:border-red-800/30 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg transition-colors"
+                  >
+                    批量删除
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ─── 搜索结果提示 ─── */}
           {(searchKeyword || filterStatus !== "all") && (
@@ -1318,12 +1724,42 @@ export default function Jobs() {
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.92, y: 20 }}
                       transition={{ delay: index * 0.04, type: "spring", damping: 25, stiffness: 200 }}
-                      className="group relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200/70 dark:border-gray-700/60 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                      className={`group relative bg-white dark:bg-gray-800 rounded-2xl border hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-2xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden ${
+                        selectedIds.includes(job.id)
+                          ? "border-orange-400 dark:border-orange-600 ring-2 ring-orange-400/30 shadow-lg"
+                          : "border-gray-200/70 dark:border-gray-700/60"
+                      }`}
                     >
                       {/* 顶部装饰条 */}
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       {/* 角落光晕 */}
                       <div className="absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-red-400/0 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                      {/* 批量选择复选框 */}
+                      <AnimatePresence>
+                        {batchMode && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.5 }}
+                            className="absolute top-3 left-3 z-10"
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleSelect(job.id);
+                              }}
+                              className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
+                                selectedIds.includes(job.id)
+                                  ? "bg-orange-500 text-white shadow-md"
+                                  : "bg-white/90 dark:bg-gray-700/90 border-2 border-gray-300 dark:border-gray-500 text-transparent hover:border-orange-400"
+                              }`}
+                            >
+                              {selectedIds.includes(job.id) && <CheckSquare className="w-3.5 h-3.5" />}
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       <div className="p-5 sm:p-6">
                         {/* ── 区域1: 头部 - 标题 + 热门标签 + 操作 ── */}
@@ -1943,6 +2379,30 @@ export default function Jobs() {
                     className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder:text-gray-400 resize-none"
                     placeholder="描述职位的主要工作内容和职责..."
                   />
+                  <div className="flex justify-end mt-2">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleAIOptimize}
+                      disabled={aiLoading}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                    >
+                      {aiLoading ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full"
+                          />
+                          AI 优化中...
+                        </>
+                      ) : (
+                        <>
+                          <Wand2 className="w-3 h-3" />
+                          AI 优化职位描述
+                        </>
+                      )}
+                    </motion.button>
+                  </div>
                 </div>
 
                 {/* 任职要求 */}
@@ -1991,6 +2451,62 @@ export default function Jobs() {
                     {editingJob ? "保存修改" : "发布职位"}
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── 快捷键帮助弹窗 ─── */}
+      <AnimatePresence>
+        {showShortcuts && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-[90] p-4"
+            onClick={() => setShowShortcuts(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
+            >
+              <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Keyboard className="w-4.5 h-4.5 text-orange-500" />
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">键盘快捷键</h3>
+                </div>
+                <button onClick={() => setShowShortcuts(false)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                  <X className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+              <div className="p-6 space-y-3">
+                {[
+                  { keys: "Ctrl + N", desc: "发布新职位" },
+                  { keys: "Ctrl + F", desc: "聚焦搜索框" },
+                  { keys: "Ctrl + G", desc: "网格视图" },
+                  { keys: "Ctrl + L", desc: "列表视图" },
+                  { keys: "Ctrl + D", desc: "切换分析看板" },
+                  { keys: "Ctrl + B", desc: "批量操作模式" },
+                  { keys: "Ctrl + S", desc: "导出 CSV" },
+                  { keys: "?", desc: "显示/隐藏此帮助" },
+                  { keys: "Esc", desc: "关闭弹窗" },
+                ].map((shortcut) => (
+                  <div key={shortcut.keys} className="flex items-center justify-between">
+                    <span className="text-xs text-gray-600 dark:text-gray-400">{shortcut.desc}</span>
+                    <kbd className="px-2.5 py-1 text-[11px] font-mono font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-200 dark:border-gray-600">
+                      {shortcut.keys}
+                    </kbd>
+                  </div>
+                ))}
+              </div>
+              <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700/20 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center">
+                  按 <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-gray-200 dark:bg-gray-600 rounded">?</kbd> 随时查看快捷键
+                </p>
               </div>
             </motion.div>
           </motion.div>
