@@ -2004,7 +2004,7 @@ export default function Match() {
                                                     <span>立即分析简历</span>
                                                 </a>
                                                 <a
-                                                    href="/upload"
+                                                    href="/analyze"
                                                     className="inline-flex items-center space-x-2 px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl hover:bg-white dark:hover:bg-gray-700 transition-all font-semibold"
                                                 >
                                                     <FileText className="w-4 h-4" />

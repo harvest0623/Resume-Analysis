@@ -623,26 +623,28 @@ export default function Analyze() {
                                     </AnimatePresence>
 
                                     {/* Features Grid */}
-                                    <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-5">
-                                        {features.map((feature, index) => (
-                                            <motion.div
-                                                key={feature.title}
-                                                initial={{ opacity: 0, y: 30 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: 0.7 + 0.1 * index, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                                                whileHover={{ y: -5, scale: 1.02 }}
-                                                className="group relative bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/30 dark:border-gray-700/30 shadow-lg shadow-gray-900/5 hover:shadow-xl transition-all duration-300 overflow-hidden"
-                                            >
-                                                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-white/5 dark:to-transparent" />
-                                                <div className="relative z-10">
-                                                    <div className={`w-12 h-12 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300`}>
-                                                        <feature.icon className="w-6 h-6 text-white" />
+                                    <div className="mt-16">
+                                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+                                            {features.map((feature, index) => (
+                                                <motion.div
+                                                    key={feature.title}
+                                                    initial={{ opacity: 0, y: 30 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 0.7 + 0.1 * index, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                                    whileHover={{ y: -5, scale: 1.02 }}
+                                                    className="group relative bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/30 dark:border-gray-700/30 shadow-lg shadow-gray-900/5 hover:shadow-xl transition-all duration-300 overflow-hidden"
+                                                >
+                                                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-white/5 dark:to-transparent" />
+                                                    <div className="relative z-10">
+                                                        <div className={`w-12 h-12 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300`}>
+                                                            <feature.icon className="w-6 h-6 text-white" />
+                                                        </div>
+                                                        <h4 className="font-bold text-gray-900 dark:text-white mb-2">{feature.title}</h4>
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">{feature.desc}</p>
                                                     </div>
-                                                    <h4 className="font-bold text-gray-900 dark:text-white mb-2">{feature.title}</h4>
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">{feature.desc}</p>
-                                                </div>
-                                            </motion.div>
-                                        ))}
+                                                </motion.div>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     {/* Recent Uploads */}

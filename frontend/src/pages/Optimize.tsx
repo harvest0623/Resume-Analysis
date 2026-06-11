@@ -610,7 +610,7 @@ export default function Optimize() {
                                                     className="mt-10 text-center"
                                                 >
                                                     <a
-                                                        href="/home/history"
+                                                        href="/history"
                                                         className="inline-flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-medium text-sm hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-300 dark:hover:border-orange-500/30 hover:shadow-md transition-all duration-200"
                                                     >
                                                         <span>查看全部 {resumes.length} 份简历</span>
@@ -638,7 +638,7 @@ export default function Optimize() {
                                                     请先上传并分析一些简历
                                                 </p>
                                                 <a
-                                                    href="/home/analyze"
+                                                    href="/analyze"
                                                     className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white font-semibold rounded-2xl shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 transition-all duration-300"
                                                 >
                                                     <span>上传简历</span>

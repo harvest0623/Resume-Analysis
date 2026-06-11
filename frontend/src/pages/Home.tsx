@@ -116,21 +116,21 @@ function GradientText({ children, className = "" }: { children: React.ReactNode;
 
 /* ───────── 数据 ───────── */
 const features = [
-  { icon: FileText, title: "智能简历解析", description: "自动解析 PDF，提取关键信息，包括姓名、电话、邮箱、技能等", path: "/home/analyze", gradient: "from-blue-500 to-cyan-500", glow: "glow-cyan", category: "简历工具" },
-  { icon: Upload, title: "批量分析", description: "一次性上传多份简历，系统自动进行批量分析处理", path: "/home/batch", gradient: "from-cyan-500 to-teal-500", glow: "glow-cyan", category: "简历工具" },
-  { icon: Users, title: "简历对比分析", description: "对比两份简历的各项指标，帮助您做出更好的招聘决策", path: "/home/compare", gradient: "from-indigo-500 to-violet-500", glow: "glow-indigo", category: "简历工具" },
-  { icon: Lightbulb, title: "简历优化建议", description: "AI 生成个性化优化建议，帮助候选人提升简历质量", path: "/home/optimize", gradient: "from-amber-500 to-orange-500", glow: "glow-pink", category: "简历工具" },
-  { icon: Sparkle, title: "AI 生成简历", description: "填写基本信息，AI 为您生成专业的简历内容", path: "/home/generate", gradient: "from-violet-500 to-purple-500", glow: "glow-purple", category: "简历工具" },
-  { icon: Edit3, title: "简历编辑器", description: "在线编辑简历，支持实时预览、模块管理和多种导出格式", path: "/home/editor", gradient: "from-blue-500 to-indigo-500", glow: "glow-indigo", category: "简历工具" },
-  { icon: FileStack, title: "简历模板", description: "精选多款专业简历模板，助您打造完美简历", path: "/home/templates", gradient: "from-teal-500 to-emerald-500", glow: "glow-cyan", category: "简历工具" },
-  { icon: Briefcase, title: "职位管理", description: "管理和发布招聘职位，跟踪招聘进度", path: "/home/jobs", gradient: "from-orange-500 to-red-500", glow: "glow-pink", category: "招聘管理" },
-  { icon: UserCheck, title: "人才库", description: "管理和筛选候选人，建立企业人才储备", path: "/home/talent", gradient: "from-fuchsia-500 to-pink-500", glow: "glow-pink", category: "招聘管理" },
-  { icon: Search, title: "岗位智能匹配", description: "输入岗位要求，自动匹配最合适的候选人，提高招聘效率", path: "/home/match", gradient: "from-purple-500 to-indigo-500", glow: "glow-purple", category: "招聘管理" },
-  { icon: Calendar, title: "面试管理", description: "安排和管理候选人面试，记录面试反馈", path: "/home/interview", gradient: "from-pink-500 to-rose-500", glow: "glow-pink", category: "招聘管理" },
-  { icon: Funnel, title: "招聘漏斗", description: "可视化招聘流程，分析各阶段转化率", path: "/home/pipeline", gradient: "from-red-500 to-orange-500", glow: "glow-pink", category: "招聘管理" },
-  { icon: PieChart, title: "数据统计", description: "查看简历分析的整体数据概览，包括评分分布、技能统计等", path: "/home/stats", gradient: "from-rose-500 to-pink-500", glow: "glow-pink", category: "数据分析" },
-  { icon: History, title: "历史记录管理", description: "保存和管理所有分析过的简历，方便随时查看和对比", path: "/home/history", gradient: "from-emerald-500 to-teal-500", glow: "glow-cyan", category: "数据分析" },
-  { icon: Download, title: "报告导出", description: "导出各类招聘数据报告和分析结果", path: "/home/export", gradient: "from-sky-500 to-blue-500", glow: "glow-cyan", category: "数据分析" },
+  { icon: FileText, title: "智能简历解析", description: "自动解析 PDF，提取关键信息，包括姓名、电话、邮箱、技能等", path: "/analyze", gradient: "from-blue-500 to-cyan-500", glow: "glow-cyan", category: "简历工具" },
+  { icon: Upload, title: "批量分析", description: "一次性上传多份简历，系统自动进行批量分析处理", path: "/batch", gradient: "from-cyan-500 to-teal-500", glow: "glow-cyan", category: "简历工具" },
+  { icon: Users, title: "简历对比分析", description: "对比两份简历的各项指标，帮助您做出更好的招聘决策", path: "/compare", gradient: "from-indigo-500 to-violet-500", glow: "glow-indigo", category: "简历工具" },
+  { icon: Lightbulb, title: "简历优化建议", description: "AI 生成个性化优化建议，帮助候选人提升简历质量", path: "/optimize", gradient: "from-amber-500 to-orange-500", glow: "glow-pink", category: "简历工具" },
+  { icon: Sparkle, title: "AI 生成简历", description: "填写基本信息，AI 为您生成专业的简历内容", path: "/generate", gradient: "from-violet-500 to-purple-500", glow: "glow-purple", category: "简历工具" },
+  { icon: Edit3, title: "简历编辑器", description: "在线编辑简历，支持实时预览、模块管理和多种导出格式", path: "/editor", gradient: "from-blue-500 to-indigo-500", glow: "glow-indigo", category: "简历工具" },
+  { icon: FileStack, title: "简历模板", description: "精选多款专业简历模板，助您打造完美简历", path: "/templates", gradient: "from-teal-500 to-emerald-500", glow: "glow-cyan", category: "简历工具" },
+  { icon: Briefcase, title: "职位管理", description: "管理和发布招聘职位，跟踪招聘进度", path: "/jobs", gradient: "from-orange-500 to-red-500", glow: "glow-pink", category: "招聘管理" },
+  { icon: UserCheck, title: "人才库", description: "管理和筛选候选人，建立企业人才储备", path: "/talent", gradient: "from-fuchsia-500 to-pink-500", glow: "glow-pink", category: "招聘管理" },
+  { icon: Search, title: "岗位智能匹配", description: "输入岗位要求，自动匹配最合适的候选人，提高招聘效率", path: "/match", gradient: "from-purple-500 to-indigo-500", glow: "glow-purple", category: "招聘管理" },
+  { icon: Calendar, title: "面试管理", description: "安排和管理候选人面试，记录面试反馈", path: "/interview", gradient: "from-pink-500 to-rose-500", glow: "glow-pink", category: "招聘管理" },
+  { icon: Funnel, title: "招聘漏斗", description: "可视化招聘流程，分析各阶段转化率", path: "/pipeline", gradient: "from-red-500 to-orange-500", glow: "glow-pink", category: "招聘管理" },
+  { icon: PieChart, title: "数据统计", description: "查看简历分析的整体数据概览，包括评分分布、技能统计等", path: "/stats", gradient: "from-rose-500 to-pink-500", glow: "glow-pink", category: "数据分析" },
+  { icon: History, title: "历史记录管理", description: "保存和管理所有分析过的简历，方便随时查看和对比", path: "/history", gradient: "from-emerald-500 to-teal-500", glow: "glow-cyan", category: "数据分析" },
+  { icon: Download, title: "报告导出", description: "导出各类招聘数据报告和分析结果", path: "/export", gradient: "from-sky-500 to-blue-500", glow: "glow-cyan", category: "数据分析" },
 ];
 
 const benefits = [
@@ -212,7 +212,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
                 >
                   <Link
-                    to="/home/analyze"
+                    to="/analyze"
                     className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold rounded-2xl shadow-xl shadow-blue-500/25 hover:shadow-2xl hover:shadow-blue-500/40 transform hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
@@ -222,7 +222,7 @@ export default function Home() {
                     </span>
                   </Link>
                   <Link
-                    to="/home/history"
+                    to="/history"
                     className="inline-flex items-center px-8 py-4 glass-card rounded-2xl text-gray-700 dark:text-gray-300 font-semibold hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                   >
                     查看历史
@@ -442,7 +442,7 @@ export default function Home() {
                   <span className="ripple-ring w-20 h-20" />
 
                   <Link
-                    to="/home/analyze"
+                    to="/analyze"
                     className="group relative inline-flex items-center px-10 py-5 bg-white text-blue-600 font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 text-lg hover:bg-blue-50"
                   >
                     免费开始使用
@@ -473,9 +473,9 @@ export default function Home() {
             <div>
               <h3 className="font-semibold text-lg mb-4 text-gray-900 dark:text-white">快速链接</h3>
               <ul className="space-y-3 text-gray-500 dark:text-gray-400">
-                <li><Link to="/home/analyze" className="hover:text-blue-600 dark:hover:text-white transition-colors">简历分析</Link></li>
-                <li><Link to="/home/jobs" className="hover:text-blue-600 dark:hover:text-white transition-colors">职位管理</Link></li>
-                <li><Link to="/home/talent" className="hover:text-blue-600 dark:hover:text-white transition-colors">人才库</Link></li>
+                <li><Link to="/analyze" className="hover:text-blue-600 dark:hover:text-white transition-colors">简历分析</Link></li>
+                <li><Link to="/jobs" className="hover:text-blue-600 dark:hover:text-white transition-colors">职位管理</Link></li>
+                <li><Link to="/talent" className="hover:text-blue-600 dark:hover:text-white transition-colors">人才库</Link></li>
               </ul>
             </div>
             <div>

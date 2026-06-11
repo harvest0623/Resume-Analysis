@@ -10,6 +10,7 @@ interface ResumeStore {
     setCurrentResume: (resume: ResumeData | null) => void;
     addResume: (resume: ResumeData) => void;
     removeResume: (id: string) => void;
+    removeResumes: (ids: string[]) => void;
     setLoading: (loading: boolean) => void;
     setError: (error: string | null) => void;
     clearError: () => void;
@@ -29,6 +30,10 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     removeResume: (id) => set((state) => ({
         resumes: state.resumes.filter((r) => r.id !== id),
     })),
+    removeResumes: (ids) => set((state) => {
+        const idSet = new Set(ids);
+        return { resumes: state.resumes.filter((r) => !idSet.has(r.id)) };
+    }),
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
     clearError: () => set({ error: null }),

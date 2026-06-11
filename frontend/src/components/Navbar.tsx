@@ -65,30 +65,30 @@ export default function Navbar() {
         {
             title: "简历工具",
             items: [
-                { path: "/home/analyze", label: "简历分析", icon: FileText },
-                { path: "/home/batch", label: "批量分析", icon: Upload },
-                { path: "/home/compare", label: "简历比较", icon: Users },
-                { path: "/home/optimize", label: "优化建议", icon: Lightbulb },
-                { path: "/home/generate", label: "AI 生成", icon: Sparkles },
-                { path: "/home/templates", label: "简历模板", icon: FileStack },
+                { path: "/analyze", label: "简历分析", icon: FileText },
+                { path: "/batch", label: "批量分析", icon: Upload },
+                { path: "/compare", label: "简历比较", icon: Users },
+                { path: "/optimize", label: "优化建议", icon: Lightbulb },
+                { path: "/generate", label: "AI 生成", icon: Sparkles },
+                { path: "/templates", label: "简历模板", icon: FileStack },
             ],
         },
         {
             title: "招聘管理",
             items: [
-                { path: "/home/jobs", label: "职位管理", icon: Briefcase },
-                { path: "/home/talent", label: "人才库", icon: UserCheck },
-                { path: "/home/match", label: "岗位匹配", icon: Search },
-                { path: "/home/interview", label: "面试管理", icon: Calendar },
-                { path: "/home/pipeline", label: "招聘漏斗", icon: Funnel },
+                { path: "/jobs", label: "职位管理", icon: Briefcase },
+                { path: "/talent", label: "人才库", icon: UserCheck },
+                { path: "/match", label: "岗位匹配", icon: Search },
+                { path: "/interview", label: "面试管理", icon: Calendar },
+                { path: "/pipeline", label: "招聘漏斗", icon: Funnel },
             ],
         },
         {
             title: "数据分析",
             items: [
-                { path: "/home/stats", label: "数据统计", icon: PieChart },
-                { path: "/home/history", label: "历史记录", icon: History },
-                { path: "/home/export", label: "报告导出", icon: Download },
+                { path: "/stats", label: "数据统计", icon: PieChart },
+                { path: "/history", label: "历史记录", icon: History },
+                { path: "/export", label: "报告导出", icon: Download },
             ],
         },
     ];
@@ -97,7 +97,7 @@ export default function Navbar() {
         if (path === "/home") {
             return location.pathname === "/home" || location.pathname === "/";
         }
-        return location.pathname.startsWith(path);
+        return location.pathname === path || location.pathname.startsWith(path + "/");
     };
 
     const isGroupActive = (group: NavGroup) => {
@@ -186,9 +186,9 @@ export default function Navbar() {
                         ))}
 
                         <Link
-                            to="/home/settings"
+                            to="/settings"
                             className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                                isActive("/home/settings")
+                                isActive("/settings")
                                     ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium"
                                     : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                             }`}

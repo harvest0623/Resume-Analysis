@@ -27,22 +27,22 @@ export default function App() {
         <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/home/analyze" element={<Analyze />} />
-        <Route path="/home/compare" element={<Compare />} />
-        <Route path="/home/history" element={<History />} />
-        <Route path="/home/match" element={<Match />} />
-        <Route path="/home/stats" element={<Stats />} />
-        <Route path="/home/batch" element={<Batch />} />
-        <Route path="/home/optimize" element={<Optimize />} />
-        <Route path="/home/jobs" element={<Jobs />} />
-        <Route path="/home/talent" element={<Talent />} />
-        <Route path="/home/interview" element={<Interview />} />
-        <Route path="/home/templates" element={<Templates />} />
-        <Route path="/home/generate" element={<Generate />} />
-        <Route path="/home/editor" element={<Editor />} />
-        <Route path="/home/pipeline" element={<Pipeline />} />
-        <Route path="/home/export" element={<Export />} />
-        <Route path="/home/settings" element={<Settings />} />
+        <Route path="/analyze" element={<Analyze />} />
+        <Route path="/compare" element={<Compare />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/match" element={<Match />} />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/batch" element={<Batch />} />
+        <Route path="/optimize" element={<Optimize />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/talent" element={<Talent />} />
+        <Route path="/interview" element={<Interview />} />
+        <Route path="/templates" element={<Templates />} />
+        <Route path="/generate" element={<Generate />} />
+        <Route path="/editor" element={<Editor />} />
+        <Route path="/pipeline" element={<Pipeline />} />
+        <Route path="/export" element={<Export />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </Router>
     </ThemeProvider>

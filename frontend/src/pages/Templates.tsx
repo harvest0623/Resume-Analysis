@@ -378,7 +378,7 @@ export default function Templates() {
                                                     </button>
                                                     <button
                                                         onClick={() =>
-                                                            navigate(`/home/editor?template=${template.id}`)
+                                                            navigate(`/editor?template=${template.id}`)
                                                         }
                                                         className="inline-flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:shadow-teal-500/25 transition-all duration-200"
                                                     >
@@ -467,7 +467,7 @@ export default function Templates() {
                                 <button
                                     onClick={() => {
                                         setPreviewTemplate(null);
-                                        navigate(`/home/editor?template=${previewTemplate.id}`);
+                                        navigate(`/editor?template=${previewTemplate.id}`);
                                     }}
                                     className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:shadow-teal-500/25 transition-all duration-200"
                                 >
