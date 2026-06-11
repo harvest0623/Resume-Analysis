@@ -1,147 +1,219 @@
 import json
 import os
-from typing import Dict, Any, List, Optional
+import re
+import stat
+import shutil
+from typing import Dict, Any, List, Optional, Set
 from datetime import datetime
 
 
 class HistoryStore:
-    """用户隔离的历史记录存储，所有操作均需传入 user_id"""
-    
-    def __init__(self, storage_path: str = "data/history.json"):
-        self.storage_path = storage_path
-        # 数据结构：{ user_id: { resume_id: resume_data } }
+    """
+    按用户档案隔离的本地历史记录存储
+    每个 profile 有独立目录：data/users/<profile_id>/history.json
+    目录权限设为 0o700（仅本人可访问），文件权限 0o600
+    """
+
+    # 允许的 profile_id 字符（防止路径注入）
+    SAFE_ID_PATTERN = re.compile(r"^[A-Za-z0-9_]{1,64}$")
+
+    def __init__(self, base_dir: str = "data/users"):
+        self.base_dir = base_dir
+        # 已加载到内存的档案集合（区分"未加载"和"已加载但是空"）
+        self._loaded: Set[str] = set()
         self._data: Dict[str, Dict[str, Dict[str, Any]]] = {}
-        self._ensure_storage_dir()
-        self._load_from_disk()
+        self._ensure_base_dir()
 
-    def _ensure_storage_dir(self):
-        dir_path = os.path.dirname(self.storage_path)
-        if dir_path and not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-
-    def _load_from_disk(self):
-        """从磁盘加载数据，兼容旧版全域存储格式自动迁移"""
-        if os.path.exists(self.storage_path):
+    def _ensure_base_dir(self):
+        if not os.path.exists(self.base_dir):
+            os.makedirs(self.base_dir)
             try:
-                with open(self.storage_path, 'r', encoding='utf-8') as f:
-                    raw = json.load(f)
-                
-                # 新格式：{ user_id: { resume_id: resume_data } }
-                if 'resumes' in raw and not self._is_new_format(raw):
-                    # 旧格式迁移：将所有 resume 归入默认 "legacy" 用户
-                    old_resumes = raw.get('resumes', {})
-                    self._data = {'__legacy__': old_resumes}
-                    self._save_to_disk()
-                    print(f"HistoryStore: 已迁移 {len(old_resumes)} 条旧记录到 legacy 用户")
-                elif self._is_new_format(raw):
-                    # 已经是新格式
-                    self._data = raw
+                os.chmod(self.base_dir, stat.S_IRWXU)
+            except Exception:
+                pass
+
+    def _safe_profile_id(self, profile_id: str) -> str:
+        """验证 profile_id 防止路径注入"""
+        if not profile_id or not self.SAFE_ID_PATTERN.match(profile_id):
+            raise ValueError("Invalid profile_id")
+        return profile_id
+
+    def _profile_dir(self, profile_id: str) -> str:
+        pid = self._safe_profile_id(profile_id)
+        return os.path.join(self.base_dir, pid)
+
+    def _history_file(self, profile_id: str) -> str:
+        return os.path.join(self._profile_dir(profile_id), "history.json")
+
+    def _uploads_dir(self, profile_id: str) -> str:
+        return os.path.join(self._profile_dir(profile_id), "uploads")
+
+    def _load_profile(self, profile_id: str) -> Dict[str, Dict[str, Any]]:
+        """加载某个档案的历史（首次访问时从磁盘读取）"""
+        if profile_id in self._loaded:
+            return self._data[profile_id]
+
+        path = self._history_file(profile_id)
+        loaded: Dict[str, Dict[str, Any]] = {}
+
+        if os.path.exists(path):
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                # 兼容：旧格式 {resumes: {...}} → 扁平化
+                if 'resumes' in data and isinstance(data.get('resumes'), dict):
+                    first_v = next(iter(data['resumes'].values()), None)
+                    if isinstance(first_v, dict) and 'basicInfo' in first_v:
+                        loaded = data['resumes']
+                    else:
+                        loaded = data
                 else:
-                    self._data = raw
+                    loaded = data or {}
             except Exception as e:
-                print(f"Error loading history: {e}")
-                self._data = {}
+                print(f"Error loading profile {profile_id}: {e}")
+                loaded = {}
 
-    @staticmethod
-    def _is_new_format(raw: dict) -> bool:
-        """判断是否已经是按用户隔离的新格式"""
-        if not raw:
-            return False
-        if 'resumes' in raw:
-            # 旧格式：{ "resumes": { resume_id: data } }
-            # 检查 resumes 的值是否是一个 resume 记录（有 id/basicInfo 等字段）
-            resumes_val = raw['resumes']
-            if resumes_val:
-                first_key = next(iter(resumes_val))
-                first_val = resumes_val[first_key]
-                # 新格式下 resumes 的 value 是另一个 dict of resume 记录
-                # 旧格式下 resumes 的 value 直接是 resume 数据
-                if isinstance(first_val, dict) and ('resumes' in first_val or 'basicInfo' in first_val or 'scores' in first_val):
-                    return False  # 旧格式
-            return False
-        # 新格式：{ user_id: { resume_id: data } }
-        if not raw:
-            return True
-        first_key = next(iter(raw))
-        first_val = raw[first_key]
-        return isinstance(first_val, dict) and not ('basicInfo' in first_val or 'scores' in first_val)
+        self._data[profile_id] = loaded
+        self._loaded.add(profile_id)
+        return loaded
 
-    def _save_to_disk(self):
+    def _save_profile(self, profile_id: str):
+        """保存某个档案到磁盘"""
+        pid = self._safe_profile_id(profile_id)
+        pdir = self._profile_dir(pid)
+        if not os.path.exists(pdir):
+            os.makedirs(pdir)
+            try:
+                os.chmod(pdir, stat.S_IRWXU)
+            except Exception:
+                pass
+
+        path = self._history_file(pid)
+        data = self._data.get(pid, {})
         try:
-            with open(self.storage_path, 'w', encoding='utf-8') as f:
-                json.dump(self._data, f, ensure_ascii=False, indent=2)
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            try:
+                os.chmod(path, stat.S_IRUSR | stat.S_IWUSR)
+            except Exception:
+                pass
         except Exception as e:
-            print(f"Error saving history: {e}")
+            print(f"Error saving profile {pid}: {e}")
 
-    def _ensure_user(self, user_id: str):
-        """确保用户数据空间存在"""
-        if user_id not in self._data:
-            self._data[user_id] = {}
+    def _ensure_uploads_dir(self, profile_id: str) -> str:
+        """确保档案的 uploads 目录存在，返回路径"""
+        pid = self._safe_profile_id(profile_id)
+        udir = self._uploads_dir(pid)
+        if not os.path.exists(udir):
+            os.makedirs(udir)
+            try:
+                os.chmod(udir, stat.S_IRWXU)
+            except Exception:
+                pass
+        return udir
 
     # ─── 公开 API ───
 
-    def add(self, user_id: str, resume: Dict[str, Any]) -> str:
-        """添加简历到指定用户的数据空间"""
-        if not user_id:
-            raise ValueError("user_id is required for data isolation")
-        
+    def get_uploads_dir(self, profile_id: str) -> str:
+        return self._ensure_uploads_dir(profile_id)
+
+    def add(self, profile_id: str, resume: Dict[str, Any]) -> str:
+        """添加简历到指定档案的数据空间"""
+        self._safe_profile_id(profile_id)
+
         resume_id = resume.get('id')
         if not resume_id:
             resume_id = f"resume_{int(datetime.now().timestamp())}"
             resume['id'] = resume_id
-        
-        self._ensure_user(user_id)
-        self._data[user_id][resume_id] = resume
-        self._save_to_disk()
+
+        data = self._load_profile(profile_id)
+        data[resume_id] = resume
+        self._save_profile(profile_id)
         return resume_id
 
-    def get(self, user_id: str, resume_id: str) -> Optional[Dict[str, Any]]:
-        """获取指定用户的指定简历"""
-        if not user_id:
+    def get(self, profile_id: str, resume_id: str) -> Optional[Dict[str, Any]]:
+        if not profile_id or not resume_id:
             return None
-        return self._data.get(user_id, {}).get(resume_id)
+        self._safe_profile_id(profile_id)
+        data = self._load_profile(profile_id)
+        return data.get(resume_id)
 
-    def get_all(self, user_id: str) -> List[Dict[str, Any]]:
-        """获取指定用户的所有简历"""
-        if not user_id:
+    def get_all(self, profile_id: str) -> List[Dict[str, Any]]:
+        if not profile_id:
             return []
-        return list(self._data.get(user_id, {}).values())
+        self._safe_profile_id(profile_id)
+        data = self._load_profile(profile_id)
+        return list(data.values())
 
-    def delete(self, user_id: str, resume_id: str) -> bool:
-        """删除指定用户的指定简历"""
-        if not user_id:
+    def delete(self, profile_id: str, resume_id: str) -> bool:
+        if not profile_id or not resume_id:
             return False
-        user_data = self._data.get(user_id, {})
-        if resume_id in user_data:
-            del user_data[resume_id]
-            self._save_to_disk()
+        self._safe_profile_id(profile_id)
+        data = self._load_profile(profile_id)
+        if resume_id in data:
+            del data[resume_id]
+            self._save_profile(profile_id)
             return True
         return False
 
-    def clear(self, user_id: str = None) -> None:
-        """清空数据：指定用户则清该用户，否则清全部"""
-        if user_id:
-            self._data.pop(user_id, None)
-        else:
-            self._data = {}
-        self._save_to_disk()
-
-    def search(self, user_id: str, keyword: str) -> List[Dict[str, Any]]:
-        """在指定用户的数据中搜索简历"""
-        if not user_id:
+    def search(self, profile_id: str, keyword: str) -> List[Dict[str, Any]]:
+        if not profile_id:
             return []
-        
-        results = []
+        self._safe_profile_id(profile_id)
         keyword_lower = keyword.lower()
-        
-        for resume in self._data.get(user_id, {}).values():
+
+        results = []
+        for resume in self._load_profile(profile_id).values():
             name = resume.get('basicInfo', {}).get('name', '').lower()
             email = resume.get('basicInfo', {}).get('email', '').lower()
             position = resume.get('jobInfo', {}).get('position', '').lower()
-            
-            if (keyword_lower in name or 
-                keyword_lower in email or 
+            if (keyword_lower in name or
+                keyword_lower in email or
                 keyword_lower in position):
                 results.append(resume)
-        
         return results
+
+    def list_profiles(self) -> List[str]:
+        """列出所有档案 ID"""
+        if not os.path.exists(self.base_dir):
+            return []
+        result = []
+        for entry in os.listdir(self.base_dir):
+            if self.SAFE_ID_PATTERN.match(entry) and os.path.isdir(os.path.join(self.base_dir, entry)):
+                result.append(entry)
+        return result
+
+    def profile_exists(self, profile_id: str) -> bool:
+        try:
+            self._safe_profile_id(profile_id)
+        except ValueError:
+            return False
+        return os.path.isdir(self._profile_dir(profile_id))
+
+    def get_profile_pdf_path(self, profile_id: str, resume_id: str) -> str:
+        udir = self._ensure_uploads_dir(profile_id)
+        return os.path.join(udir, f"{resume_id}.pdf")
+
+    def cleanup_orphan_uploads(self, profile_id: str, valid_resume_ids: set):
+        udir = self._uploads_dir(profile_id)
+        if not os.path.exists(udir):
+            return
+        for fname in os.listdir(udir):
+            if fname.endswith('.pdf'):
+                rid = fname[:-4]
+                if rid not in valid_resume_ids:
+                    try:
+                        os.remove(os.path.join(udir, fname))
+                    except Exception:
+                        pass
+
+    # ─── 兼容 ───
+
+    def clear(self, profile_id: str = None) -> None:
+        if profile_id:
+            self._safe_profile_id(profile_id)
+            pdir = self._profile_dir(profile_id)
+            if os.path.exists(pdir):
+                shutil.rmtree(pdir, ignore_errors=True)
+            self._data.pop(profile_id, None)
+            self._loaded.discard(profile_id)

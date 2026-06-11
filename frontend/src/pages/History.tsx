@@ -20,7 +20,7 @@ import {
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
 import ResumeCard from "@/components/ResumeCard";
-import { api } from "@/utils/api";
+import { api, ensureProfileRegistered } from "@/utils/api";
 import { useResumeStore } from "@/store/resumeStore";
 import { ResumeData } from "@/types/resume";
 
@@ -241,6 +241,8 @@ export default function HistoryPage() {
     const loadHistory = useCallback(async () => {
         setIsLoading(true);
         try {
+            // 先确保档案已注册（首次访问会触发后端旧数据迁移）
+            await ensureProfileRegistered();
             const history = await api.getHistory(debouncedKeyword || undefined);
             setResumes(history);
         } catch (err) {
@@ -252,6 +254,13 @@ export default function HistoryPage() {
 
     useEffect(() => {
         loadHistory();
+    }, [loadHistory]);
+
+    // 档案切换时自动重新加载
+    useEffect(() => {
+        const handler = () => loadHistory();
+        window.addEventListener("profileChanged", handler);
+        return () => window.removeEventListener("profileChanged", handler);
     }, [loadHistory]);
 
     /* ---------- 点击外部关闭下拉 ---------- */

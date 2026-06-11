@@ -19,10 +19,13 @@ import {
     ChevronDown,
     FileStack,
     UserCheck,
+    UserCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
+import ProfileManager from "@/components/ProfileManager";
+import { getCurrentProfile, type Profile } from "@/utils/userProfile";
 
 interface NavItem {
     path: string;
@@ -39,6 +42,20 @@ export default function Navbar() {
     const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
+    const [profileManagerOpen, setProfileManagerOpen] = useState(false);
+
+    // 监听档案变化（多页面间同步）
+    useEffect(() => {
+        const updateProfile = () => setCurrentProfile(getCurrentProfile());
+        updateProfile();
+        window.addEventListener("storage", updateProfile);
+        window.addEventListener("profileChanged", updateProfile);
+        return () => {
+            window.removeEventListener("storage", updateProfile);
+            window.removeEventListener("profileChanged", updateProfile);
+        };
+    }, []);
 
     const mainNavItems: NavItem[] = [
         { path: "/home", label: "首页", icon: BarChart3 },
@@ -180,6 +197,17 @@ export default function Navbar() {
                             <span>设置</span>
                         </Link>
 
+                        <button
+                            onClick={() => setProfileManagerOpen(true)}
+                            className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                            title="切换用户档案"
+                        >
+                            <UserCircle className="w-4 h-4" />
+                            <span className="text-sm max-w-[120px] truncate">
+                                {currentProfile?.name || "未登录"}
+                            </span>
+                        </button>
+
                         <div className="pl-2 border-l border-gray-200 dark:border-gray-700">
                             <ThemeToggle />
                         </div>
@@ -253,23 +281,30 @@ export default function Navbar() {
                             ))}
 
                             <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
-                                <Link
-                                    to="/home/settings"
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                        isActive("/home/settings")
-                                            ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium"
-                                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                                    }`}
+                                <button
+                                    onClick={() => {
+                                        setIsMenuOpen(false);
+                                        setProfileManagerOpen(true);
+                                    }}
+                                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                 >
-                                    <Settings className="w-5 h-5" />
-                                    <span>设置</span>
-                                </Link>
+                                    <span>{currentProfile?.name || "未登录"}（切换档案）</span>
+                                </button>
                             </div>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <ProfileManager
+                open={profileManagerOpen}
+                onClose={() => setProfileManagerOpen(false)}
+                onProfileChanged={() => {
+                    // 触发全局事件，通知其他组件刷新
+                    window.dispatchEvent(new Event("profileChanged"));
+                    setCurrentProfile(getCurrentProfile());
+                }}
+            />
         </nav>
     );
 }

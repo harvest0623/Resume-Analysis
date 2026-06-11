@@ -19,13 +19,19 @@ frontend/dist/
 frontend/.vite/
 
 # Uploads and data (user-specific data - 每人独立，不会共享)
-backend/src/uploads/*
-backend/src/data/*.json
+# 旧版全局存储（兼容期保留，新代码不再使用）
+backend/src/uploads/*.pdf
+backend/src/data/history.json
+
+# 新版：按用户档案分目录存储
+backend/src/data/users/
+backend/src/data/uploads/
 
 # 保留目录占位文件
 !backend/src/uploads/.gitkeep
 !backend/src/data/.gitkeep
 !backend/src/data/history.example
+!backend/src/data/users/.gitkeep
 
 # IDE
 .vscode/
